@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Complaints</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h2>My Submitted Complaints</h2>
+
+    <a href="/" class="btn btn-secondary mb-3">Back</a>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>ID</th>
+            <th>Issue Type</th>
+            <th>Description</th>
+            <th>Location</th>
+            <th>Image</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+
+        {% for issue in issues %}
+        <tr>
+            <td>{{ issue.id }}</td>
+            <td>{{ issue.issue_type }}</td>
+            <td>{{ issue.description }}</td>
+            <td>{{ issue.latitude }}, {{ issue.longitude }}</td>
+            <td>
+                {% if issue.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + issue.image) }}" width="100">
+                {% endif %}
+            </td>
+            <td>{{ issue.status }}</td>
+            <td>
+        <a href="/delete_my_issue/{{ issue.id }}" class="btn btn-danger btn-sm"
+           onclick="return confirm('Delete this complaint?')">Delete</a>
+    </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</div>
+
+</body>
+</html>

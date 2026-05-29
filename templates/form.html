@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Report Civic Issue</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        .header {
+            background-color: #0d6efd;
+            color: white;
+            padding: 15px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .top-buttons {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+        }
+        .card {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    Civic Issue Reporting Portal
+
+    <div class="top-buttons">
+        <a href="/my_issues" class="btn btn-light btn-sm">My Complaints</a>
+        <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+    </div>
+</div>
+
+<!-- Form Container -->
+<div class="container mt-5">
+    <div class="card shadow p-4">
+        <h3 class="mb-3">Report an Issue</h3>
+
+        <form method="POST" action="/submit" enctype="multipart/form-data">
+
+            <!-- Issue Type -->
+            <div class="mb-3">
+                <label>Issue Type</label>
+                <select name="issue_type" class="form-control" required>
+                    <option value="">Select Issue</option>
+                    <option>Garbage</option>
+                    <option>Pothole</option>
+                    <option>Water Leakage</option>
+                    <option>Street Light</option>
+                    <option>Drainage</option>
+                </select>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+                <label>Description</label>
+                <textarea name="description" class="form-control" required></textarea>
+            </div>
+
+            <!-- Location -->
+            <div class="mb-3">
+                <label>Location</label><br>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="getLocation()">Get Location</button>
+                <p id="locationText" class="mt-2 text-success"></p>
+
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+            </div>
+
+            <!-- Image Upload -->
+            <div class="mb-3">
+                <label>Upload Image</label>
+                <input type="file" name="image" class="form-control">
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn btn-primary">Submit Issue</button>
+
+        </form>
+    </div>
+</div>
+
+<!-- Location Script -->
+<script>
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            document.getElementById("latitude").value = position.coords.latitude;
+            document.getElementById("longitude").value = position.coords.longitude;
+            document.getElementById("locationText").innerHTML = "Location captured successfully!";
+        });
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+}
+</script>
+
+</body>
+</html>

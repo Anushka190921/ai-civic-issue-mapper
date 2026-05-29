@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+        <span class="navbar-brand">Admin Dashboard</span>
+        <a href="/logout" class="btn btn-danger">Logout</a>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h4 class="mb-3">All Complaints</h4>
+
+    <table class="table table-bordered table-striped text-center align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Email</th>
+                <th>Issue</th>
+                <th>Description</th>
+                <th>Location</th>
+                <th>Map</th>
+                <th>Image</th>
+                <th>Status</th>
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for complaint in complaints %}
+        <tr>
+            <td>{{ complaint.id }}</td>
+            <td>{{ complaint.first_name }}</td>
+            <td>{{ complaint.email }}</td>
+            <td>{{ complaint.issue_type }}</td>
+            <td>{{ complaint.description }}</td>
+            <td>{{ complaint.latitude }}, {{ complaint.longitude }}</td>
+
+            <!-- MAP BUTTON -->
+            <td>
+                <a href="https://www.google.com/maps?q={{ complaint.latitude }},{{ complaint.longitude }}" 
+                   target="_blank" 
+                   class="btn btn-secondary btn-sm">
+                   View Map
+                </a>
+            </td>
+
+            <!-- IMAGE -->
+            <td>
+                {% if complaint.image %}
+                <img src="{{ url_for('static', filename='uploads/' + complaint.image) }}" width="80">
+                {% endif %}
+            </td>
+
+            <!-- STATUS WITH COLORS -->
+            <td>
+                {% if complaint.status == 'Pending' %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                {% elif complaint.status == 'In Progress' %}
+                    <span class="badge bg-info text-dark">In Progress</span>
+                {% elif complaint.status == 'Resolved' %}
+                    <span class="badge bg-success">Resolved</span>
+                {% endif %}
+            </td>
+
+            <!-- UPDATE STATUS -->
+            <td>
+                <form action="/update_status/{{ complaint.id }}" method="POST">
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="Pending" {% if complaint.status=='Pending' %}selected{% endif %}>Pending</option>
+                        <option value="In Progress" {% if complaint.status=='In Progress' %}selected{% endif %}>In Progress</option>
+                        <option value="Resolved" {% if complaint.status=='Resolved' %}selected{% endif %}>Resolved</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary btn-sm mt-1">Update</button>
+                </form>
+            </td>
+
+            <!-- DELETE -->
+            <td>
+                <a href="/delete_issue/{{ complaint.id }}" 
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('Delete this complaint?')">
+                   Delete
+                </a>
+            </td>
+
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

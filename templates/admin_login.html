@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .error {
+            color: red;
+        }
+
+        a {
+            display: block;
+            margin-top: 10px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>Admin Login</h2>
+
+        <!-- ✅ FORM (IMPORTANT) -->
+    <form method="POST" action="/admin">
+
+        <input type="text" name="username" placeholder="Enter Username" required>
+
+        <input type="password" name="password" placeholder="Enter Password" required>
+
+
+
+        <!-- ✅ SUBMIT BUTTON -->
+        <button type="submit">Login</button>
+
+    </form>
+
+    <!-- BACK TO USER LOGIN -->
+    <a href="/login">Back to User Login</a>
+</div>
+
+</body>
+</html>

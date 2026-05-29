@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Login Portal</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="logstyle.css">
+
+    <style>
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 10px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #444;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            transition: 0.3s;
+        }
+
+        .google-btn img {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .google-btn:hover {
+            background: #f7f7f7;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Government Header -->
+    <div class="gov-header"> Civic Issue Reporting Portal </div>
+
+    <div class="container d-flex justify-content-center mt-5">
+        <div class="card shadow p-4" style="width: 400px;">
+            <h4 class="mb-3 text-center">Citizen Login</h4>
+
+            <!-- Login Form -->
+            <form method="POST" action="/login">
+                <div class="mb-3">
+                    <label>Email</label>
+                    <input type="email" class="form-control" placeholder="akd@gmail.com" name="email" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Password</label>
+                    <input type="password" class="form-control" name="password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100"> Login </button>
+            </form>
+
+            <!-- Register -->
+            <p class="text-center mt-3 mb-2">NOT registered? <a href="/register">Register</a></p>
+
+            <!-- Google Login Button -->
+            <a href="/google_login" class="google-btn">
+                <img src="https://developers.google.com/identity/images/g-logo.png">
+                Sign in with Google
+            </a>
+
+            <!-- Admin Login -->
+            <div class="text-center mt-3">
+                <a href="/admin" class="btn btn-outline-dark btn-sm">🔐 Admin Login</a>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
