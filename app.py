@@ -3,10 +3,59 @@ import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from dotenv import load_dotenv
+from flask_dance.contrib.google import make_google_blueprint, google
 
 load_dotenv()
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
+
+google_bp = make_google_blueprint(
+    client_id=os.getenv("GOOGLE_CLIENT_ID"),
+    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+    redirect_to="google_login",
+    scope=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"]
+)
+app.register_blueprint(google_bp, url_prefix="/login")
+
+#-----------------GOOGLE LOGIN---------------------
+
+@app.route("/google_login")
+def google_login():
+    if not google.authorized:
+        return redirect("/login/google")
+    
+    resp = google.get("/oauth2/v2/userinfo")
+    info = resp.json()
+    
+    email = info["email"]
+    first_name = info.get("given_name", "")
+    last_name = info.get("family_name", "")
+    
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    
+    cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+    user = cursor.fetchone()
+    
+    if not user:
+        cursor.execute(
+            "INSERT INTO users (first_name, last_name, email, password) VALUES (%s, %s, %s, %s)",
+            (first_name, last_name, email, "google_login")
+        )
+        db.commit()
+        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+        user = cursor.fetchone()
+    
+    session["user_id"] = user["id"]
+    
+    cursor.close()
+    db.close()
+    
+    return redirect("/")
+
+
 
 
 # Upload folder
@@ -250,7 +299,7 @@ def update_status(id):
 
     return redirect("/dashboard")
 
-#-----------------GOOGLE LOGIN---------------------
+
 
 
 
