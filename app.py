@@ -41,9 +41,11 @@ def google_login():
     
     if not user:
         cursor.execute(
-            "INSERT INTO users (first_name, last_name, email, password) VALUES (%s, %s, %s, %s)",
-            (first_name, last_name, email, "google_login")
-        )
+               "INSERT INTO users (first_name, last_name, email, password, login_type) VALUES (%s, %s, %s, %s, %s)",
+               (first_name, last_name, email, "google_login", "google")
+)
+            
+        
         db.commit()
         cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
         user = cursor.fetchone()
