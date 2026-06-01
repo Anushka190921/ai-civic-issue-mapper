@@ -129,22 +129,41 @@ def submit():
         return f"Error: {e}"
 
 # ---------------- REGISTER ----------------
+# ---------------- REGISTER ----------------
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
+
+        first_name = request.form["first_name"]
+        last_name = request.form["last_name"]
+        email = request.form["email"]
+        password = request.form["password"]
+
+        # Validate email format
+        if "@" not in email or "." not in email:
+            return render_template("register.html", error="Invalid email format!")
+
+        # Validate password strength
+        if len(password) < 8:
+            return render_template("register.html", error="Password must be at least 8 characters!")
+
+        if not any(char.isdigit() for char in password):
+            return render_template("register.html", error="Password must contain at least one number!")
+
+        if not any(char in "!@#$%^&*" for char in password):
+            return render_template("register.html", error="Password must contain at least one special character (!@#$%^&*)!")
+
+        # Connect to database
         db = get_db()
         cursor = db.cursor()
 
-        hashed_password = generate_password_hash(request.form["password"])
+        # Hash password before saving
+        hashed_password = generate_password_hash(password)
 
+        # Save new user to database
         cursor.execute(
             "INSERT INTO users (first_name, last_name, email, password) VALUES (%s, %s, %s, %s)",
-            (
-                request.form["first_name"],
-                request.form["last_name"],
-                request.form["email"],
-                hashed_password
-            )
+            (first_name, last_name, email, hashed_password)
         )
 
         db.commit()
