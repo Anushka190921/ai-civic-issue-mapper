@@ -1,115 +1,90 @@
+# ============================================================
+# AI Civic Issue Mapper - Main Application File
+# Backend: Python Flask | Database: MySQL
+# ============================================================
+
 from flask import Flask, request, render_template, redirect, session, flash
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import time
 from dotenv import load_dotenv
 from flask_dance.contrib.google import make_google_blueprint, google
 
+# Load environment variables from .env file
 load_dotenv()
+
+# Allow OAuth over HTTP for local development (remove in production)
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
+# Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
+# Configure Google OAuth blueprint
 google_bp = make_google_blueprint(
     client_id=os.getenv("GOOGLE_CLIENT_ID"),
     client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
     redirect_to="google_login",
-    scope=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"]
+    scope=[
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email",
+        "openid"
+    ]
 )
+# Register Google login blueprint with /login prefix
 app.register_blueprint(google_bp, url_prefix="/login")
 
-#-----------------GOOGLE LOGIN---------------------
-
-@app.route("/google_login")
-def google_login():
-    if not google.authorized:
-        return redirect("/login/google")
-    
-    resp = google.get("/oauth2/v2/userinfo")
-    info = resp.json()
-    
-    email = info["email"]
-    first_name = info.get("given_name", "")
-    last_name = info.get("family_name", "")
-    
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    
-    cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
-    user = cursor.fetchone()
-    
-    if not user:
-        cursor.execute(
-               "INSERT INTO users (first_name, last_name, email, password, login_type) VALUES (%s, %s, %s, %s, %s)",
-               (first_name, last_name, email, "google_login", "google")
-)
-            
-        
-        db.commit()
-        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
-        user = cursor.fetchone()
-    
-    session["user_id"] = user["id"]
-    
-    cursor.close()
-    db.close()
-    
-    return redirect("/")
-
-
-
-
-# Upload folder
+# Folder to store uploaded complaint images
 UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# ---------------- DATABASE CONNECTION ----------------
 def get_db():
+    # Connect to MySQL database using credentials from .env
     return mysql.connector.connect(
         host=os.getenv("DB_HOST"),
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
         database=os.getenv("DB_NAME")
     )
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Anu@1909",
-        database="civic_issues"
-    )
 
 # ---------------- HOME ----------------
 @app.route("/")
 def home():
+    # Redirect to login if user is not logged in
     if "user_id" not in session:
         return redirect("/login")
     return render_template("form.html")
 
-# ---------------- SUBMIT ----------------
+# ---------------- SUBMIT COMPLAINT ----------------
 @app.route("/submit", methods=["POST"])
 def submit():
+    # Only logged in users can submit complaints
     if "user_id" not in session:
         return redirect("/login")
 
     try:
-        print("SUBMIT HIT")
-
+        # Get form data submitted by citizen
         user_id = session["user_id"]
         issue_type = request.form.get("issue_type")
         description = request.form.get("description")
         latitude = request.form.get("latitude")
         longitude = request.form.get("longitude")
 
+        # Handle image upload
         image = request.files.get("image")
         image_name = None
 
         if image and image.filename != "":
-            import time
+            # Create unique filename using timestamp
             filename = str(int(time.time())) + "_" + image.filename
             filepath = os.path.join(UPLOAD_FOLDER, filename)
+            # Save image to uploads folder
             image.save(filepath)
             image_name = filename
 
+        # Connect to database and save complaint
         db = get_db()
         cursor = db.cursor()
 
@@ -129,11 +104,11 @@ def submit():
         return f"Error: {e}"
 
 # ---------------- REGISTER ----------------
-# ---------------- REGISTER ----------------
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
 
+        # Get registration form data
         first_name = request.form["first_name"]
         last_name = request.form["last_name"]
         email = request.form["email"]
@@ -143,13 +118,15 @@ def register():
         if "@" not in email or "." not in email:
             return render_template("register.html", error="Invalid email format!")
 
-        # Validate password strength
+        # Validate password length
         if len(password) < 8:
             return render_template("register.html", error="Password must be at least 8 characters!")
 
+        # Validate password contains a number
         if not any(char.isdigit() for char in password):
             return render_template("register.html", error="Password must contain at least one number!")
 
+        # Validate password contains a special character
         if not any(char in "!@#$%^&*" for char in password):
             return render_template("register.html", error="Password must contain at least one special character (!@#$%^&*)!")
 
@@ -157,7 +134,7 @@ def register():
         db = get_db()
         cursor = db.cursor()
 
-        # Hash password before saving
+        # Hash password before saving for security
         hashed_password = generate_password_hash(password)
 
         # Save new user to database
@@ -178,6 +155,7 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
+        # Connect to database and find user by email
         db = get_db()
         cursor = db.cursor(dictionary=True)
 
@@ -187,26 +165,24 @@ def login():
         cursor.close()
         db.close()
 
+        # Verify password and create session
         if user and check_password_hash(user["password"], request.form["password"]):
             session["user_id"] = user["id"]
             return redirect("/")
 
-        return "Login Failed"
+        # Show error if login fails
+        return render_template("login.html", error="Invalid email or password!")
 
     return render_template("login.html")
 
-
 # ---------------- ADMIN LOGIN ----------------
-
-
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
     if request.method == "POST":
-        print("ADMIN LOGIN HIT")  # debug
-
         username = request.form.get("username")
         password = request.form.get("password")
 
+        # Connect to database and find admin by username
         db = get_db()
         cursor = db.cursor(dictionary=True)
 
@@ -216,28 +192,23 @@ def admin():
         cursor.close()
         db.close()
 
-        if admin:
-            # if using plain password
-            if admin["password"] == password:
-                session["admin"] = admin["id"]
-                return redirect("/dashboard")
-
-            # if using hashed password (better)
-            # if check_password_hash(admin["password"], password):
-            #     session["admin"] = admin["id"]
-            #     return redirect("/dashboard")
+        # Verify admin credentials
+        if admin and admin["password"] == password:
+            session["admin"] = admin["id"]
+            return redirect("/dashboard")
 
         return render_template("admin_login.html", error="Invalid Credentials")
 
     return render_template("admin_login.html")
 
-#------------------my_issues-------------------
-
+# ---------------- MY ISSUES ----------------
 @app.route("/my_issues")
 def my_issues():
+    # Only logged in users can view their issues
     if "user_id" not in session:
         return redirect("/login")
 
+    # Fetch all complaints submitted by logged in user
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
@@ -249,13 +220,14 @@ def my_issues():
 
     return render_template("my_issues.html", issues=issues)
 
-
 # ---------------- ADMIN DASHBOARD ----------------
 @app.route("/dashboard")
 def dashboard():
+    # Only admin can access dashboard
     if "admin" not in session:
         return redirect("/admin")
 
+    # Fetch all complaints with user details
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
@@ -268,23 +240,22 @@ def dashboard():
 
     complaints = cursor.fetchall()
 
-    print(complaints)  # 🔥 DEBUG
-
     cursor.close()
     db.close()
 
     return render_template("admin.html", complaints=complaints)
-#--------------user can delete their own complaint--------
 
+# ---------------- DELETE COMPLAINT ----------------
 @app.route("/delete_my_issue/<int:id>")
 def delete_my_issue(id):
+    # Only logged in users can delete their own complaints
     if "user_id" not in session:
         return redirect("/login")
 
     db = get_db()
     cursor = db.cursor()
 
-    # Check complaint belongs to logged-in user
+    # Check complaint belongs to logged in user before deleting
     cursor.execute("SELECT * FROM civic_issues WHERE id=%s AND user_id=%s", (id, session["user_id"]))
     issue = cursor.fetchone()
 
@@ -297,18 +268,20 @@ def delete_my_issue(id):
 
     return redirect("/my_issues")
 
-#---------update button in the admin dashboard------------
-
+# ---------------- UPDATE COMPLAINT STATUS ----------------
 @app.route("/update_status/<int:id>", methods=["POST"])
 def update_status(id):
+    # Only admin can update complaint status
     if "admin" not in session:
         return redirect("/admin")
 
+    # Get new status from form
     new_status = request.form["status"]
 
     db = get_db()
     cursor = db.cursor()
 
+    # Update complaint status in database
     cursor.execute(
         "UPDATE civic_issues SET status=%s WHERE id=%s",
         (new_status, id)
@@ -320,15 +293,51 @@ def update_status(id):
 
     return redirect("/dashboard")
 
+# ---------------- GOOGLE LOGIN ----------------
+@app.route("/google_login")
+def google_login():
+    # Redirect to Google if not authorized
+    if not google.authorized:
+        return redirect("/login/google")
 
+    # Get user info from Google
+    resp = google.get("/oauth2/v2/userinfo")
+    info = resp.json()
 
+    email = info["email"]
+    first_name = info.get("given_name", "")
+    last_name = info.get("family_name", "")
 
+    # Connect to database
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
 
- 
+    # Check if user already exists
+    cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+    user = cursor.fetchone()
 
-#------------------ submit ----------------
+    if not user:
+        # Register new Google user automatically
+        cursor.execute(
+            "INSERT INTO users (first_name, last_name, email, password, login_type) VALUES (%s, %s, %s, %s, %s)",
+            (first_name, last_name, email, "google_login", "google")
+        )
+        db.commit()
+        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+        user = cursor.fetchone()
+
+    # Create session for logged in user
+    session["user_id"] = user["id"]
+
+    cursor.close()
+    db.close()
+
+    return redirect("/")
+
+# ---------------- SUCCESS PAGE ----------------
 @app.route("/success")
 def success():
+    # Only logged in users can see success page
     if "user_id" not in session:
         return redirect("/login")
     return render_template("success.html")
@@ -336,11 +345,10 @@ def success():
 # ---------------- LOGOUT ----------------
 @app.route("/logout")
 def logout():
+    # Clear session and redirect to login
     session.clear()
     return redirect("/login")
 
-# ---------------- RUN ----------------
+# ---------------- RUN APPLICATION ----------------
 if __name__ == "__main__":
     app.run(debug=True)
-
-
