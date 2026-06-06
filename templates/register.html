@@ -9,10 +9,14 @@
 <body class="bg-light">
 
 <div class="container d-flex justify-content-center align-items-center vh-100">
-
     <div class="card shadow p-4" style="width: 450px;">
 
         <h4 class="text-center mb-3">Citizen Registration</h4>
+
+        <!-- Show error message if registration fails -->
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
 
         <form method="POST" action="/register">
 
@@ -36,15 +40,12 @@
                 <input type="password" class="form-control" name="password" required>
             </div>
 
-            <!-- ✅ Added this (important for backend) -->
             <div class="mb-3">
                 <label>Confirm Password</label>
-                <input type="password" class="form-control" name="confirm_password" required
+                <input type="password" class="form-control" name="confirm_password" required>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">
-                Register
-            </button>
+            <button type="submit" class="btn btn-primary w-100">Register</button>
 
         </form>
 
@@ -53,7 +54,6 @@
         </p>
 
     </div>
-
 </div>
 
 </body>

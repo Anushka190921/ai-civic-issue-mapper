@@ -57,6 +57,10 @@
 
 <div class="box">
     <h2>Admin Login</h2>
+      <!-- Show error message if login fails -->
+      {% if error %}
+     <div class="alert alert-danger">{{ error }}</div>
+     {% endif %}
 
         <!-- ✅ FORM (IMPORTANT) -->
     <form method="POST" action="/admin">

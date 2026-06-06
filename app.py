@@ -201,6 +201,26 @@ def admin():
 
     return render_template("admin_login.html")
 
+
+# ---------------- ADMIN DELETE COMPLAINT ----------------
+@app.route("/delete_admin_issue/<int:id>")
+def delete_admin_issue(id):
+    # Only admin can delete any complaint
+    if "admin" not in session:
+        return redirect("/admin")
+
+    db = get_db()
+    cursor = db.cursor()
+
+    # Delete complaint by id
+    cursor.execute("DELETE FROM civic_issues WHERE id=%s", (id,))
+    db.commit()
+
+    cursor.close()
+    db.close()
+
+    return redirect("/dashboard")
+
 # ---------------- MY ISSUES ----------------
 @app.route("/my_issues")
 def my_issues():
