@@ -1,48 +1,212 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Complaints</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Complaints</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6f8;
+    padding: 30px;
+    color: #333;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  h1 {
+    font-size: 26px;
+    color: #1a1a1a;
+  }
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #444;
+    padding: 9px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .back-btn:hover {
+    background: #f0f0f0;
+    border-color: #bbb;
+  }
+  .table-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  thead th {
+    background: #2b3a4a;
+    color: #fff;
+    text-align: left;
+    padding: 14px 16px;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef0f2;
+    vertical-align: middle;
+  }
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+  tbody tr:hover {
+    background: #f8fafc;
+  }
+  .complaint-id {
+    font-weight: 700;
+    color: #2b7cd3;
+    font-family: 'Consolas', monospace;
+  }
+  .desc-cell {
+    max-width: 240px;
+    color: #555;
+  }
+  .date-cell {
+    color: #666;
+    white-space: nowrap;
+  }
+  .img-thumb {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #eee;
+  }
+  .no-img {
+    color: #aaa;
+    font-size: 13px;
+  }
+  /* Status badges */
+  .badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: capitalize;
+    letter-spacing: 0.3px;
+  }
+  .badge-pending {
+    background: #fff4d6;
+    color: #b8860b;
+  }
+  .badge-in-progress, .badge-in_progress {
+    background: #d6ecff;
+    color: #1565c0;
+  }
+  .badge-resolved {
+    background: #d8f3e0;
+    color: #1d8a4e;
+  }
+  .badge-rejected {
+    background: #fde0e0;
+    color: #c0392b;
+  }
+  .badge-default {
+    background: #eee;
+    color: #777;
+  }
+  .delete-btn {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s ease;
+  }
+  .delete-btn:hover {
+    background: #c0392b;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: #999;
+  }
+</style>
 </head>
 <body>
+  <div class="container">
+    <div class="header-row">
+      <h1>My Submitted Complaints</h1>
+      <a href="/" class="back-btn">&larr; Back</a>
+    </div>
 
-<div class="container mt-4">
-    <h2>My Submitted Complaints</h2>
-
-    <a href="/" class="btn btn-secondary mb-3">Back</a>
-
-    <table class="table table-bordered">
-        <tr>
-            <th>ID</th>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Complaint ID</th>
             <th>Issue Type</th>
             <th>Description</th>
             <th>Location</th>
+            <th>Submitted On</th>
             <th>Image</th>
             <th>Status</th>
             <th>Action</th>
-        </tr>
-
-        {% for issue in issues %}
-        <tr>
-            <td>{{ issue.id }}</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for issue in issues %}
+          <tr>
+            <td><span class="complaint-id">#{{ issue.id }}</span></td>
             <td>{{ issue.issue_type }}</td>
-            <td>{{ issue.description }}</td>
+            <td class="desc-cell">{{ issue.description }}</td>
             <td>{{ issue.latitude }}, {{ issue.longitude }}</td>
+            <td class="date-cell">{{ issue.created_at }}</td>
             <td>
-                {% if issue.image %}
-                    <img src="{{ url_for('static', filename='uploads/' + issue.image) }}" width="100">
-                {% endif %}
+              {% if issue.image %}
+                <img src="{{ url_for('static', filename='uploads/' + issue.image) }}" alt="Issue image" class="img-thumb">
+              {% else %}
+                <span class="no-img">No image</span>
+              {% endif %}
             </td>
-            <td>{{ issue.status }}</td>
             <td>
-        <a href="/delete_my_issue/{{ issue.id }}" class="btn btn-danger btn-sm"
-           onclick="return confirm('Delete this complaint?')">Delete</a>
-    </td>
-        </tr>
-        {% endfor %}
-
-    </table>
-</div>
-
+              <span class="badge badge-{{ issue.status|lower|replace(' ', '_') }}">{{ issue.status }}</span>
+            </td>
+            <td>
+              <a href="/delete_my_issue/{{ issue.id }}" 
+              class="delete-btn"
+              onclick="return confirm('Delete this complaint?')">Delete</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if not issues %}
+      <div class="empty-state">No complaints submitted yet.</div>
+      {% endif %}
+    </div>
+  </div>
 </body>
 </html>
