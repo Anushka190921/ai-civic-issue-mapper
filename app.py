@@ -98,7 +98,7 @@ def submit():
         cursor.close()
         db.close()
 
-        return redirect("/success")
+        return redirect(f"/success/{cursor.lastrowid}")
 
     except Exception as e:
         return f"Error: {e}"
@@ -355,12 +355,12 @@ def google_login():
     return redirect("/")
 
 # ---------------- SUCCESS PAGE ----------------
-@app.route("/success")
-def success():
+@app.route("/success/<int:id>")
+def success(id):
     # Only logged in users can see success page
     if "user_id" not in session:
         return redirect("/login")
-    return render_template("success.html")
+    return render_template("success.html", issue={"id": id})
 
 # ---------------- LOGOUT ----------------
 @app.route("/logout")
