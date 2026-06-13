@@ -1,48 +1,128 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Success</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #eaffea;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .box {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        }
-
-        h2 {
-            color: green;
-        }
-
-        a {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: #4facfe;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Success</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #e8f8ef 0%, #d4f1e0 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 40px 36px;
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+  .icon-circle {
+    width: 70px;
+    height: 70px;
+    background: #e6f7ed;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .icon-circle svg {
+    width: 36px;
+    height: 36px;
+  }
+  h1 {
+    color: #1d8a4e;
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  p.message {
+    color: #555;
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+  .complaint-id-box {
+    background: #f4f9f6;
+    border: 1px dashed #b7e0c8;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 28px;
+  }
+  .complaint-id-box .label {
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .complaint-id-box .value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1d8a4e;
+    letter-spacing: 1px;
+  }
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .btn {
+    display: inline-block;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+  }
+  .btn-primary {
+    background: #1d8a4e;
+    color: #fff;
+  }
+  .btn-primary:hover {
+    background: #166e3e;
+  }
+  .btn-secondary {
+    background: #fff;
+    color: #2b7cd3;
+    border: 1px solid #2b7cd3;
+  }
+  .btn-secondary:hover {
+    background: #f0f6fd;
+  }
+  .btn:active {
+    transform: scale(0.98);
+  }
+</style>
 </head>
 <body>
+  <div class="card">
+    <div class="icon-circle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1d8a4e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+    </div>
+    <h1>Issue Submitted Successfully!</h1>
+    <p class="message">Your complaint has been recorded.</p>
 
-<div class="box">
-    <h2> Issue Submitted Successfully!</h2>
-    <p>Your complaint has been recorded.</p>
+    <div class="complaint-id-box">
+      <div class="label">Complaint ID</div>
+      <div class="value">#{{ issue.id }}</div>
+    </div>
 
-    <a href="/">Submit Another Issue</a>
-</div>
-
+    <div class="btn-group">
+      <a href="/my_issues" class="btn btn-primary">Track My Complaint</a>
+      <a href="/" class="btn btn-secondary">Submit Another Issue</a>
+    </div>
+  </div>
 </body>
 </html>
