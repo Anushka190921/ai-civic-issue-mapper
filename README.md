@@ -21,6 +21,9 @@ A government-style portal where citizens can report civic problems like garbage 
 4. Open browser: http://127.0.0.1:5000
 
 ## Team
-- Frontend Developer
-- Backend Developer
-- API / Testing / Integration
+
+| Role | Name | GitHub |
+|------|------|--------|
+| 👑 Project Lead & Backend Developer | Anushka | [Anushka190921](https://github.com/Anushka190921) |
+| 🎨 Frontend Developer | Kanishka | [Kanishka240306](https://github.com/Kanishka240306) |
+| 🔗 API / Testing / Integration | Coming Soon | - |
