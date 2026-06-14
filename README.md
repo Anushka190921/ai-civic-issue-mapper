@@ -123,6 +123,22 @@ http://127.0.0.1:5000
 
 ---
 
+## 📸 Screenshots
+
+| Login | Register |
+|-------|----------|
+| ![Login](assets/login.png) | ![Register](assets/register.png) |
+
+| Report Issue | Success Page |
+|-------------|--------------|
+| ![Form](assets/form.png) | ![Success](assets/success.png) |
+
+| My Complaints |
+|--------------|
+| ![My Issues](assets/my_issues.png) |
+
+
+
 ## 👥 Team
 
 | Role | Name | GitHub |
