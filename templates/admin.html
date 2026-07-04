@@ -14,7 +14,45 @@
     </div>
 </nav>
 
+
 <div class="container mt-4">
+
+    <!-- DASHBOARD STATS CARDS -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body text-center">
+                    <h6>Total</h6>
+                    <h3>{{ stats.total }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-dark bg-warning">
+                <div class="card-body text-center">
+                    <h6>Pending</h6>
+                    <h3>{{ stats.pending }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-dark bg-info">
+                <div class="card-body text-center">
+                    <h6>In Progress</h6>
+                    <h3>{{ stats.in_progress }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body text-center">
+                    <h6>Resolved</h6>
+                    <h3>{{ stats.resolved }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <h4 class="mb-3">All Complaints</h4>
 
     <table class="table table-bordered table-striped text-center align-middle">
@@ -29,6 +67,7 @@
                 <th>Map</th>
                 <th>Image</th>
                 <th>Status</th>
+                <th>Department</th>
                 <th>Update</th>
                 <th>Delete</th>
             </tr>
@@ -69,6 +108,19 @@
                 {% elif complaint.status == 'Resolved' %}
                     <span class="badge bg-success">Resolved</span>
                 {% endif %}
+            </td>
+
+            <!-- DEPARTMENT -->
+            <td>
+                <form action="/assign_department/{{ complaint.id }}" method="POST">
+                    <select name="department" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="" {% if not complaint.department %}selected{% endif %}>Assign Dept</option>
+                        <option value="Water" {% if complaint.department == 'Water' %}selected{% endif %}>Water</option>
+                        <option value="Roads" {% if complaint.department == 'Roads' %}selected{% endif %}>Roads</option>
+                        <option value="Electricity" {% if complaint.department == 'Electricity' %}selected{% endif %}>Electricity</option>
+                        <option value="Sanitation" {% if complaint.department == 'Sanitation' %}selected{% endif %}>Sanitation</option>
+                    </select>
+                </form>
             </td>
 
             <!-- UPDATE STATUS -->

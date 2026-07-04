@@ -240,6 +240,7 @@ def my_issues():
 
     return render_template("my_issues.html", issues=issues)
 
+
 # ---------------- ADMIN DASHBOARD ----------------
 @app.route("/dashboard")
 def dashboard():
@@ -250,20 +251,41 @@ def dashboard():
     # Fetch all complaints with user details
     db = get_db()
     cursor = db.cursor(dictionary=True)
-
     cursor.execute("""
         SELECT civic_issues.*, users.first_name, users.email
         FROM civic_issues
         JOIN users ON civic_issues.user_id = users.id
         ORDER BY civic_issues.id DESC
     """)
-
     complaints = cursor.fetchall()
+
+    # Count total complaints
+    cursor.execute("SELECT COUNT(*) AS count FROM civic_issues")
+    total = cursor.fetchone()["count"]
+
+    # Count pending complaints
+    cursor.execute("SELECT COUNT(*) AS count FROM civic_issues WHERE status='Pending'")
+    pending = cursor.fetchone()["count"]
+
+    # Count in-progress complaints
+    cursor.execute("SELECT COUNT(*) AS count FROM civic_issues WHERE status='In Progress'")
+    in_progress = cursor.fetchone()["count"]
+
+    # Count resolved complaints
+    cursor.execute("SELECT COUNT(*) AS count FROM civic_issues WHERE status='Resolved'")
+    resolved = cursor.fetchone()["count"]
 
     cursor.close()
     db.close()
 
-    return render_template("admin.html", complaints=complaints)
+    stats = {
+        "total": total,
+        "pending": pending,
+        "in_progress": in_progress,
+        "resolved": resolved
+    }
+
+    return render_template("admin.html", complaints=complaints, stats=stats)
 
 # ---------------- DELETE COMPLAINT ----------------
 @app.route("/delete_my_issue/<int:id>")
@@ -305,6 +327,32 @@ def update_status(id):
     cursor.execute(
         "UPDATE civic_issues SET status=%s WHERE id=%s",
         (new_status, id)
+    )
+
+    db.commit()
+    cursor.close()
+    db.close()
+
+    return redirect("/dashboard")
+
+
+# ---------------- ASSIGN DEPARTMENT ----------------
+@app.route("/assign_department/<int:id>", methods=["POST"])
+def assign_department(id):
+    # Only admin can assign department
+    if "admin" not in session:
+        return redirect("/admin")
+
+    # Get selected department from form
+    department = request.form["department"]
+
+    db = get_db()
+    cursor = db.cursor()
+
+    # Update department in database
+    cursor.execute(
+        "UPDATE civic_issues SET department=%s WHERE id=%s",
+        (department, id)
     )
 
     db.commit()
