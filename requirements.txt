@@ -2,3 +2,4 @@ flask
 mysql-connector-python
 werkzeug
 python-dotenv
+flask-limiter

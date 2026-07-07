@@ -10,6 +10,9 @@ import os
 import time
 from dotenv import load_dotenv
 from flask_dance.contrib.google import make_google_blueprint, google
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -19,6 +22,14 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 # Initialize Flask app
 app = Flask(__name__)
+
+# ---------------- RATE LIMITER ----------------
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"]
+)
+
 app.secret_key = os.getenv("SECRET_KEY")
 
 # Configure Google OAuth blueprint
@@ -59,6 +70,7 @@ def home():
 
 # ---------------- SUBMIT COMPLAINT ----------------
 @app.route("/submit", methods=["POST"])
+@limiter.limit("10 per hour")
 def submit():
     # Only logged in users can submit complaints
     if "user_id" not in session:
@@ -105,6 +117,7 @@ def submit():
 
 # ---------------- REGISTER ----------------
 @app.route("/register", methods=["GET", "POST"])
+@limiter.limit("10 per hour")
 def register():
     if request.method == "POST":
 
@@ -153,6 +166,7 @@ def register():
 
 # ---------------- LOGIN ----------------
 @app.route("/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute")
 def login():
     if request.method == "POST":
         # Connect to database and find user by email
@@ -177,6 +191,7 @@ def login():
 
 # ---------------- ADMIN LOGIN ----------------
 @app.route("/admin", methods=["GET", "POST"])
+@limiter.limit("5 per minute")
 def admin():
     if request.method == "POST":
         username = request.form.get("username")
