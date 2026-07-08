@@ -1,212 +1,607 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Complaints</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: #f4f6f8;
-    padding: 30px;
-    color: #333;
-  }
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  .header-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  h1 {
-    font-size: 26px;
-    color: #1a1a1a;
-  }
-  .back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #fff;
-    border: 1px solid #ddd;
-    color: #444;
-    padding: 9px 18px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
-    transition: background 0.2s ease, border-color 0.2s ease;
-  }
-  .back-btn:hover {
-    background: #f0f0f0;
-    border-color: #bbb;
-  }
-  .table-card {
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-  thead th {
-    background: #2b3a4a;
-    color: #fff;
-    text-align: left;
-    padding: 14px 16px;
-    font-weight: 600;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-  }
-  tbody td {
-    padding: 14px 16px;
-    border-bottom: 1px solid #eef0f2;
-    vertical-align: middle;
-  }
-  tbody tr:last-child td {
-    border-bottom: none;
-  }
-  tbody tr:hover {
-    background: #f8fafc;
-  }
-  .complaint-id {
-    font-weight: 700;
-    color: #2b7cd3;
-    font-family: 'Consolas', monospace;
-  }
-  .desc-cell {
-    max-width: 240px;
-    color: #555;
-  }
-  .date-cell {
-    color: #666;
-    white-space: nowrap;
-  }
-  .img-thumb {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 6px;
-    border: 1px solid #eee;
-  }
-  .no-img {
-    color: #aaa;
-    font-size: 13px;
-  }
-  /* Status badges */
-  .badge {
-    display: inline-block;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: capitalize;
-    letter-spacing: 0.3px;
-  }
-  .badge-pending {
-    background: #fff4d6;
-    color: #b8860b;
-  }
-  .badge-in-progress, .badge-in_progress {
-    background: #d6ecff;
-    color: #1565c0;
-  }
-  .badge-resolved {
-    background: #d8f3e0;
-    color: #1d8a4e;
-  }
-  .badge-rejected {
-    background: #fde0e0;
-    color: #c0392b;
-  }
-  .badge-default {
-    background: #eee;
-    color: #777;
-  }
-  .delete-btn {
-    background: #e74c3c;
-    color: #fff;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    transition: background 0.2s ease;
-  }
-  .delete-btn:hover {
-    background: #c0392b;
-  }
-  .empty-state {
-    text-align: center;
-    padding: 50px 20px;
-    color: #999;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Complaints</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        .header-section {
+            background-color: #0d6efd;
+            color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .header-section h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .container {
+            padding: 15px;
+        }
+
+        .table-responsive {
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table-responsive table {
+            min-width: 700px;
+        }
+
+        .feedback-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+
+        .feedback-content {
+            background-color: white;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
+
+        .star-rating {
+            font-size: 24px;
+            margin: 15px 0;
+        }
+
+        .star {
+            cursor: pointer;
+            color: #ddd;
+            margin-right: 5px;
+            transition: color 0.2s;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #ffc107;
+        }
+
+        .feedback-form textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .feedback-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .feedback-btn:hover {
+            background-color: #218838;
+        }
+
+        .issue-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .issue-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .issue-id {
+            background: #0d6efd;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .status-in-progress {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .status-resolved {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .issue-image {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .issue-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            max-height: 250px;
+        }
+
+        .issue-details {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .issue-details strong {
+            color: #333;
+        }
+
+        .feedback-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            border-left: 4px solid #28a745;
+        }
+
+        .feedback-btn-small {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .feedback-btn-small:hover {
+            background-color: #218838;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header-section {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+
+            .header-section h2 {
+                font-size: 20px;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .table th, .table td {
+                padding: 8px;
+            }
+
+            .btn {
+                font-size: 12px !important;
+                padding: 6px 12px !important;
+            }
+
+            .table-responsive {
+                margin-bottom: 20px;
+            }
+
+            /* Hide table on small screens and show card view instead */
+            .table-view {
+                display: none;
+            }
+
+            .card-view {
+                display: block;
+            }
+
+            .issue-card {
+                margin-bottom: 12px;
+                padding: 12px;
+            }
+
+            .issue-card-header {
+                gap: 8px;
+            }
+
+            .feedback-content {
+                padding: 20px;
+                max-width: 95%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 8px;
+            }
+
+            .header-section {
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+
+            .header-section h2 {
+                font-size: 18px;
+            }
+
+            .table {
+                font-size: 11px;
+            }
+
+            .table th, .table td {
+                padding: 6px;
+            }
+
+            .btn {
+                font-size: 11px !important;
+                padding: 5px 10px !important;
+            }
+
+            .issue-card {
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+
+            .issue-id {
+                font-size: 11px;
+                padding: 4px 8px;
+            }
+
+            .status-badge {
+                font-size: 11px;
+                padding: 4px 8px;
+            }
+
+            .issue-details {
+                font-size: 13px;
+                margin-bottom: 8px;
+            }
+
+            .feedback-content {
+                padding: 15px;
+                max-width: 95%;
+            }
+
+            .feedback-btn-small,
+            .delete-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+                margin-top: 8px;
+            }
+
+            .feedback-section {
+                padding: 10px;
+                margin-top: 10px;
+            }
+
+            .star-rating {
+                font-size: 20px;
+                margin: 10px 0;
+            }
+
+            .star {
+                margin-right: 3px;
+            }
+
+            textarea {
+                font-size: 14px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .card-view {
+                display: none;
+            }
+
+            .table-view {
+                display: block;
+            }
+        }
+    </style>
 </head>
+
 <body>
-  <div class="container">
-    <div class="header-row">
-      <h1>My Submitted Complaints</h1>
-      <a href="/" class="back-btn">&larr; Back</a>
+
+<!-- Header Section -->
+<div class="header-section">
+    <h2>My Submitted Complaints</h2>
+    <a href="/" class="btn btn-light btn-sm mt-2">← Back to Dashboard</a>
+</div>
+
+<div class="container">
+    <!-- Table View (Desktop) -->
+    <div class="table-view">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Issue Type</th>
+                        <th>Description</th>
+                        <th>Location</th>
+                        <th>Image</th>
+                        <th>Status</th>
+                        <th>Feedback</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for issue in issues %}
+                    <tr>
+                        <td><strong>#{{ issue.id }}</strong></td>
+                        <td>{{ issue.issue_type }}</td>
+                        <td>{{ issue.description[:50] }}...</td>
+                        <td>
+                            <small>{{ "%.4f" | format(issue.latitude) }}, {{ "%.4f" | format(issue.longitude) }}</small>
+                        </td>
+                        <td>
+                            {% if issue.image %}
+                                <img src="{{ url_for('static', filename='uploads/' + issue.image) }}" width="60" style="border-radius: 4px; cursor: pointer;" onclick="viewImage(this)">
+                            {% else %}
+                                <span class="text-muted">No image</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge {% if issue.status == 'Pending' %}status-pending{% elif issue.status == 'In Progress' %}status-in-progress{% else %}status-resolved{% endif %}">
+                                {{ issue.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if issue.status == 'Resolved' %}
+                                <button class="btn btn-sm btn-success" onclick="openFeedbackModal({{ issue.id }})">
+                                    ⭐ Leave Feedback
+                                </button>
+                            {% else %}
+                                <span class="text-muted" style="font-size: 12px;">Available when resolved</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/delete_issue/{{ issue.id }}" 
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Are you sure you want to delete this complaint?')">
+                               Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="table-card">
-      <table>
-        <thead>
-          <tr>
-            <th>Complaint ID</th>
-            <th>Issue Type</th>
-            <th>Description</th>
-            <th>Location</th>
-            <th>Submitted On</th>
-            <th>Image</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for issue in issues %}
-          <tr>
-            <td><span class="complaint-id">#{{ issue.id }}</span></td>
-            <td>{{ issue.issue_type }}</td>
-            <td class="desc-cell">{{ issue.description }}</td>
-            <td>{{ issue.latitude }}, {{ issue.longitude }}</td>
-            <td class="date-cell">{{ issue.created_at }}</td>
-            <td>
-              {% if issue.image %}
-                <img src="{{ url_for('static', filename='uploads/' + issue.image) }}" alt="Issue image" class="img-thumb">
-              {% else %}
-                <span class="no-img">No image</span>
-              {% endif %}
-            </td>
-            <td>
-              <span class="badge badge-{{ issue.status|lower|replace(' ', '_') }}">{{ issue.status }}</span>
-            </td>
-            <td>
-              <a href="/delete_my_issue/{{ issue.id }}" 
-              class="delete-btn"
-              onclick="return confirm('Delete this complaint?')">Delete</a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% if not issues %}
-      <div class="empty-state">No complaints submitted yet.</div>
-      {% endif %}
+    <!-- Card View (Mobile) -->
+    <div class="card-view">
+        {% for issue in issues %}
+        <div class="issue-card">
+            <div class="issue-card-header">
+                <span class="issue-id">Issue #{{ issue.id }}</span>
+                <span class="status-badge {% if issue.status == 'Pending' %}status-pending{% elif issue.status == 'In Progress' %}status-in-progress{% else %}status-resolved{% endif %}">
+                    {{ issue.status }}
+                </span>
+            </div>
+
+            <div class="issue-details">
+                <p><strong>Type:</strong> {{ issue.issue_type }}</p>
+                <p><strong>Description:</strong> {{ issue.description }}</p>
+                <p><strong>Location:</strong> {{ "%.4f" | format(issue.latitude) }}, {{ "%.4f" | format(issue.longitude) }}</p>
+            </div>
+
+            {% if issue.image %}
+            <div class="issue-image">
+                <img src="{{ url_for('static', filename='uploads/' + issue.image) }}" style="cursor: pointer;" onclick="viewImage(this)">
+            </div>
+            {% endif %}
+
+            {% if issue.status == 'Resolved' %}
+            <div class="feedback-section">
+                <p><strong>💬 Your Feedback</strong></p>
+                <p style="font-size: 13px; margin-bottom: 10px;">Please share your experience with the resolution</p>
+                <button class="feedback-btn-small" onclick="openFeedbackModal({{ issue.id }})">
+                    ⭐ Rate & Comment
+                </button>
+            </div>
+            {% endif %}
+
+            <div style="margin-top: 12px;">
+                <a href="/delete_issue/{{ issue.id }}" 
+                   class="delete-btn"
+                   onclick="return confirm('Are you sure you want to delete this complaint?')">
+                   🗑️ Delete
+                </a>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-  </div>
+
+    {% if not issues %}
+    <div class="alert alert-info text-center mt-4">
+        <h5>No complaints submitted yet</h5>
+        <p>Click "Back to Dashboard" to report a new issue</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="feedback-modal">
+    <div class="feedback-content">
+        <span class="close-btn" onclick="closeFeedbackModal()">&times;</span>
+        <h5>Share Your Feedback</h5>
+        <p style="font-size: 14px; color: #666;">How satisfied are you with the resolution?</p>
+
+        <div class="star-rating">
+            <span class="star" onclick="setRating(1)" data-value="1">★</span>
+            <span class="star" onclick="setRating(2)" data-value="2">★</span>
+            <span class="star" onclick="setRating(3)" data-value="3">★</span>
+            <span class="star" onclick="setRating(4)" data-value="4">★</span>
+            <span class="star" onclick="setRating(5)" data-value="5">★</span>
+        </div>
+
+        <p style="font-size: 13px; color: #666; margin-top: 10px;">Your rating: <strong id="ratingDisplay">0</strong>/5</p>
+
+        <div class="feedback-form">
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Additional Comments (Optional)</label>
+            <textarea id="feedbackText" placeholder="Share your thoughts about how the issue was resolved..."></textarea>
+        </div>
+
+        <button class="feedback-btn" onclick="submitFeedback()">Submit Feedback</button>
+        <button class="feedback-btn" style="background-color: #6c757d;" onclick="closeFeedbackModal()">Cancel</button>
+    </div>
+</div>
+
+<!-- Image Viewer Modal -->
+<div id="imageModal" class="feedback-modal" onclick="closeImageModal()">
+    <div style="position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;">
+        <img id="modalImage" style="max-width: 90%; max-height: 90%; border-radius: 8px;" onclick="event.stopPropagation()">
+    </div>
+</div>
+
+<script>
+let currentIssueId = null;
+let currentRating = 0;
+
+function openFeedbackModal(issueId) {
+    currentIssueId = issueId;
+    currentRating = 0;
+    document.getElementById("feedbackText").value = "";
+    document.getElementById("ratingDisplay").textContent = "0";
+    document.querySelectorAll(".star").forEach(star => star.classList.remove("active"));
+    document.getElementById("feedbackModal").style.display = "block";
+}
+
+function closeFeedbackModal() {
+    document.getElementById("feedbackModal").style.display = "none";
+    currentIssueId = null;
+    currentRating = 0;
+}
+
+function setRating(rating) {
+    currentRating = rating;
+    document.getElementById("ratingDisplay").textContent = rating;
+    document.querySelectorAll(".star").forEach((star, index) => {
+        if (index < rating) {
+            star.classList.add("active");
+        } else {
+            star.classList.remove("active");
+        }
+    });
+}
+
+function submitFeedback() {
+    if (currentRating === 0) {
+        alert("Please select a rating before submitting");
+        return;
+    }
+
+    const feedback = {
+        issue_id: currentIssueId,
+        rating: currentRating,
+        comment: document.getElementById("feedbackText").value
+    };
+
+    // Store feedback in localStorage (can be extended to backend)
+    let feedbacks = JSON.parse(localStorage.getItem("feedbacks") || "[]");
+    feedbacks.push(feedback);
+    localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+
+    alert("Thank you for your feedback! Your rating (" + currentRating + "/5) has been recorded.");
+    closeFeedbackModal();
+}
+
+function viewImage(img) {
+    document.getElementById("modalImage").src = img.src;
+    document.getElementById("imageModal").style.display = "block";
+}
+
+function closeImageModal() {
+    document.getElementById("imageModal").style.display = "none";
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById("feedbackModal");
+    if (event.target == modal) {
+        closeFeedbackModal();
+    }
+}
+</script>
+
 </body>
 </html>

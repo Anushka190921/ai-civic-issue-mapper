@@ -1,84 +1,169 @@
-<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial;
-            background: #f2f2f2;
+            background-color: whitesmoke;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        .gov-header {
+            background-color: rgb(59, 59, 139);
+            color: white;
+            padding: 12px 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .gov-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .container {
+            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            padding: 20px;
         }
 
-        .box {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            width: 300px;
-            text-align: center;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        }
-
-        input {
-            width: 90%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        button {
+        .card {
             width: 100%;
-            padding: 10px;
-            background: black;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 16px;
+            max-width: 400px;
+            border-radius: 10px;
         }
 
-        .error {
-            color: red;
+        .form-control, .btn {
+            border-radius: 6px;
         }
 
-        a {
-            display: block;
-            margin-top: 10px;
-            text-decoration: none;
+        .alert {
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 576px) {
+            .gov-header h3 {
+                font-size: 16px;
+            }
+
+            .card {
+                max-width: 95vw;
+                padding: 20px !important;
+            }
+
+            h4 {
+                font-size: 18px;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .form-control, .form-select {
+                font-size: 16px;
+                padding: 10px;
+            }
+
+            label {
+                font-size: 14px;
+                margin-bottom: 6px;
+            }
+
+            .text-center a {
+                display: inline-block;
+                margin-top: 10px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .gov-header {
+                padding: 10px 8px;
+            }
+
+            .gov-header h3 {
+                font-size: 14px;
+            }
+
+            .card {
+                padding: 15px !important;
+            }
+
+            h4 {
+                font-size: 16px;
+                margin-bottom: 15px !important;
+            }
+
+            label {
+                font-size: 13px;
+            }
+
+            .btn {
+                font-size: 13px;
+            }
         }
     </style>
 </head>
+<body class="bg-light">
+    <!-- Government Header -->
+    <div class="gov-header">
+        <marquee behavior="alternate" direction="left">
+            <h3>Civic Issue Reporting Portal</h3>
+        </marquee>
+    </div>
 
-<body>
+    <div class="container">
+        <div class="card shadow p-4">
+            <h4 class="text-center mb-3">Admin Login</h4>
 
-<div class="box">
-    <h2>Admin Login</h2>
-      <!-- Show error message if login fails -->
-      {% if error %}
-     <div class="alert alert-danger">{{ error }}</div>
-     {% endif %}
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+            {% endif %}
 
-        <!-- ✅ FORM (IMPORTANT) -->
-    <form method="POST" action="/admin">
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Admin Username</label>
+                    <input type="text" class="form-control" name="admin_username" required>
+                </div>
 
-        <input type="text" name="username" placeholder="Enter Username" required>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" name="admin_password" required>
+                </div>
 
-        <input type="password" name="password" placeholder="Enter Password" required>
+                <button type="submit" class="btn btn-danger w-100">
+                    Login as Admin
+                </button>
+            </form>
 
+            <hr>
 
-
-        <!-- ✅ SUBMIT BUTTON -->
-        <button type="submit">Login</button>
-
-    </form>
-
-    <!-- BACK TO USER LOGIN -->
-    <a href="/login">Back to User Login</a>
-</div>
+            <div class="text-center">
+                <p class="mb-2" style="font-size: 14px;">Not an admin?</p>
+                <a href="/login" class="btn btn-outline-primary btn-sm">
+                    Back to Citizen Login
+                </a>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
