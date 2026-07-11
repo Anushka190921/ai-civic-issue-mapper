@@ -377,6 +377,29 @@ def assign_department(id):
 
     return redirect("/dashboard")
 
+
+# ---------------- SUBMIT FEEDBACK ----------------
+@app.route("/submit_feedback/<int:id>", methods=["POST"])
+def submit_feedback(id):
+    # Only logged in users can submit feedback
+    if "user_id" not in session:
+        return redirect("/login")
+
+    rating = request.form.get("rating")
+    comment = request.form.get("comment")
+
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        "INSERT INTO feedback (issue_id, rating, comment) VALUES (%s, %s, %s)",
+        (id, rating, comment)
+    )
+    db.commit()
+    cursor.close()
+    db.close()
+
+    return redirect("/my_issues")
+
 # ---------------- GOOGLE LOGIN ----------------
 @app.route("/google_login")
 def google_login():
