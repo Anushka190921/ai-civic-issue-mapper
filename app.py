@@ -337,7 +337,7 @@ def update_status(id):
     new_status = request.form["status"]
 
     db = get_db()
-    cursor = db.cursor()
+    cursor = db.cursor(dictionary=True)
 
     # Update complaint status in database
     cursor.execute(
@@ -345,11 +345,50 @@ def update_status(id):
         (new_status, id)
     )
 
+    # Get the complaint's owner so we know who to notify
+    cursor.execute("SELECT user_id FROM civic_issues WHERE id=%s", (id,))
+    issue = cursor.fetchone()
+
+    if issue:
+        message = f"Your complaint #{id} status has been updated to '{new_status}'."
+        cursor.execute(
+            "INSERT INTO notifications (user_id, issue_id, message) VALUES (%s, %s, %s)",
+            (issue["user_id"], id, message)
+        )
+
     db.commit()
     cursor.close()
     db.close()
 
     return redirect("/dashboard")
+
+
+# ---------------- VIEW NOTIFICATIONS ----------------
+@app.route("/notifications")
+def notifications():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute(
+        "SELECT * FROM notifications WHERE user_id=%s ORDER BY created_at DESC",
+        (session["user_id"],)
+    )
+    user_notifications = cursor.fetchall()
+
+    # Mark all as read once viewed
+    cursor.execute(
+        "UPDATE notifications SET is_read=TRUE WHERE user_id=%s",
+        (session["user_id"],)
+    )
+    db.commit()
+
+    cursor.close()
+    db.close()
+
+    return render_template("notifications.html", notifications=user_notifications)
 
 
 # ---------------- ASSIGN DEPARTMENT ----------------
