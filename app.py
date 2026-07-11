@@ -68,6 +68,7 @@ def home():
         return redirect("/login")
     return render_template("form.html")
 
+
 # ---------------- SUBMIT COMPLAINT ----------------
 @app.route("/submit", methods=["POST"])
 @limiter.limit("10 per hour")
@@ -194,8 +195,8 @@ def login():
 @limiter.limit("5 per minute")
 def admin():
     if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
+        username = request.form.get("admin_username")
+        password = request.form.get("admin_password")
 
         # Connect to database and find admin by username
         db = get_db()
@@ -440,6 +441,10 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template("500.html"), 500
+
+@app.errorhandler(429)
+def rate_limit_exceeded(e):
+    return render_template("429.html"), 429
 
 # ---------------- RUN APPLICATION ----------------
 if __name__ == "__main__":
