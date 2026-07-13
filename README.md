@@ -40,6 +40,7 @@ Aligned with **UN Sustainable Development Goal 11: Sustainable Cities and Commun
 | Mobile Responsive Design | ✅ Done |
 | Citizen Feedback System (Star Rating + Comments) | ✅ Done |
 | Notification System | ✅ Done |
+| Forgot / Reset Password (Email Verification) | ✅ Done |
 | Search & Filter on Admin Dashboard | 🚧 In Progress |
 | Map Visualization (Leaflet.js) | 🚧 In Progress |
 | AI Image Classification | ⏳ Coming Soon |
