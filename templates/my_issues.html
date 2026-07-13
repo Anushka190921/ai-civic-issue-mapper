@@ -435,7 +435,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="/delete_issue/{{ issue.id }}" 
+                            <a href="/delete_my_issue/{{ issue.id }}" 
                                class="btn btn-sm btn-danger"
                                onclick="return confirm('Are you sure you want to delete this complaint?')">
                                Delete
@@ -482,7 +482,7 @@
             {% endif %}
 
             <div style="margin-top: 12px;">
-                <a href="/delete_issue/{{ issue.id }}" 
+                <a href="/delete_my_issue/{{ issue.id }}" 
                    class="delete-btn"
                    onclick="return confirm('Are you sure you want to delete this complaint?')">
                    🗑️ Delete
@@ -571,19 +571,25 @@ function submitFeedback() {
         return;
     }
 
-    const feedback = {
-        issue_id: currentIssueId,
-        rating: currentRating,
-        comment: document.getElementById("feedbackText").value
-    };
+    // Create a hidden form and submit it to the backend
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/submit_feedback/" + currentIssueId;
 
-    // Store feedback in localStorage (can be extended to backend)
-    let feedbacks = JSON.parse(localStorage.getItem("feedbacks") || "[]");
-    feedbacks.push(feedback);
-    localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+    const ratingInput = document.createElement("input");
+    ratingInput.type = "hidden";
+    ratingInput.name = "rating";
+    ratingInput.value = currentRating;
+    form.appendChild(ratingInput);
 
-    alert("Thank you for your feedback! Your rating (" + currentRating + "/5) has been recorded.");
-    closeFeedbackModal();
+    const commentInput = document.createElement("input");
+    commentInput.type = "hidden";
+    commentInput.name = "comment";
+    commentInput.value = document.getElementById("feedbackText").value;
+    form.appendChild(commentInput);
+
+    document.body.appendChild(form);
+    form.submit();
 }
 
 function viewImage(img) {

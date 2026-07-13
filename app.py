@@ -68,6 +68,7 @@ def home():
         return redirect("/login")
     return render_template("form.html")
 
+
 # ---------------- SUBMIT COMPLAINT ----------------
 @app.route("/submit", methods=["POST"])
 @limiter.limit("10 per hour")
@@ -194,8 +195,8 @@ def login():
 @limiter.limit("5 per minute")
 def admin():
     if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
+        username = request.form.get("admin_username")
+        password = request.form.get("admin_password")
 
         # Connect to database and find admin by username
         db = get_db()
@@ -336,7 +337,7 @@ def update_status(id):
     new_status = request.form["status"]
 
     db = get_db()
-    cursor = db.cursor()
+    cursor = db.cursor(dictionary=True)
 
     # Update complaint status in database
     cursor.execute(
@@ -344,11 +345,50 @@ def update_status(id):
         (new_status, id)
     )
 
+    # Get the complaint's owner so we know who to notify
+    cursor.execute("SELECT user_id FROM civic_issues WHERE id=%s", (id,))
+    issue = cursor.fetchone()
+
+    if issue:
+        message = f"Your complaint #{id} status has been updated to '{new_status}'."
+        cursor.execute(
+            "INSERT INTO notifications (user_id, issue_id, message) VALUES (%s, %s, %s)",
+            (issue["user_id"], id, message)
+        )
+
     db.commit()
     cursor.close()
     db.close()
 
     return redirect("/dashboard")
+
+
+# ---------------- VIEW NOTIFICATIONS ----------------
+@app.route("/notifications")
+def notifications():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute(
+        "SELECT * FROM notifications WHERE user_id=%s ORDER BY created_at DESC",
+        (session["user_id"],)
+    )
+    user_notifications = cursor.fetchall()
+
+    # Mark all as read once viewed
+    cursor.execute(
+        "UPDATE notifications SET is_read=TRUE WHERE user_id=%s",
+        (session["user_id"],)
+    )
+    db.commit()
+
+    cursor.close()
+    db.close()
+
+    return render_template("notifications.html", notifications=user_notifications)
 
 
 # ---------------- ASSIGN DEPARTMENT ----------------
@@ -375,6 +415,29 @@ def assign_department(id):
     db.close()
 
     return redirect("/dashboard")
+
+
+# ---------------- SUBMIT FEEDBACK ----------------
+@app.route("/submit_feedback/<int:id>", methods=["POST"])
+def submit_feedback(id):
+    # Only logged in users can submit feedback
+    if "user_id" not in session:
+        return redirect("/login")
+
+    rating = request.form.get("rating")
+    comment = request.form.get("comment")
+
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        "INSERT INTO feedback (issue_id, rating, comment) VALUES (%s, %s, %s)",
+        (id, rating, comment)
+    )
+    db.commit()
+    cursor.close()
+    db.close()
+
+    return redirect("/my_issues")
 
 # ---------------- GOOGLE LOGIN ----------------
 @app.route("/google_login")
@@ -440,6 +503,10 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template("500.html"), 500
+
+@app.errorhandler(429)
+def rate_limit_exceeded(e):
+    return render_template("429.html"), 429
 
 # ---------------- RUN APPLICATION ----------------
 if __name__ == "__main__":
