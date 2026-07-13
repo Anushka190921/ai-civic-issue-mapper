@@ -8,11 +8,14 @@ import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import time
+import socket
+socket.getfqdn = lambda name="": "localhost"
 from dotenv import load_dotenv
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer
 
 # Load environment variables from .env file
 load_dotenv()
@@ -31,6 +34,18 @@ limiter = Limiter(
 )
 
 app.secret_key = os.getenv("SECRET_KEY")
+
+
+# ---------------- EMAIL CONFIGURATION ----------------
+app.config["MAIL_SERVER"] = "smtp.gmail.com"
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_USERNAME")
+
+mail = Mail(app)
+serializer = URLSafeTimedSerializer(app.secret_key)
 
 # Configure Google OAuth blueprint
 google_bp = make_google_blueprint(
@@ -494,6 +509,75 @@ def logout():
     # Clear session and redirect to login
     session.clear()
     return redirect("/login")
+
+
+# ---------------- FORGOT PASSWORD ----------------
+@app.route("/forgot_password", methods=["GET", "POST"])
+@limiter.limit("5 per hour")
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email")
+
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+        user = cursor.fetchone()
+        cursor.close()
+        db.close()
+
+        if user:
+            token = serializer.dumps(email, salt="password-reset")
+            reset_link = f"http://127.0.0.1:5000/reset_password/{token}"
+
+            msg = Message(
+                "Password Reset Request - Civic Issue Portal",
+                sender=os.getenv("MAIL_USERNAME"),
+                recipients=[email]
+            )
+            msg.body = f"Click the link below to reset your password:\n\n{reset_link}\n\nThis link expires in 30 minutes."
+            mail.send(msg)
+
+        return render_template("forgot_password.html", message="If that email is registered, a reset link has been sent.")
+
+    return render_template("forgot_password.html")
+
+
+# ---------------- RESET PASSWORD ----------------
+@app.route("/reset_password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    try:
+        email = serializer.loads(token, salt="password-reset", max_age=1800)
+        expired = False
+    except Exception:
+        expired = True
+        email = None
+
+    if request.method == "POST" and not expired:
+        new_password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+
+        if new_password != confirm_password:
+            return render_template("reset_password.html", error="Passwords do not match!", expired=False)
+
+        if len(new_password) < 8:
+            return render_template("reset_password.html", error="Password must be at least 8 characters!", expired=False)
+        if not any(char.isdigit() for char in new_password):
+            return render_template("reset_password.html", error="Password must contain at least one number!", expired=False)
+        if not any(char in "!@#$%^&*" for char in new_password):
+            return render_template("reset_password.html", error="Password must contain at least one special character!", expired=False)
+
+        hashed_password = generate_password_hash(new_password)
+
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("UPDATE users SET password=%s WHERE email=%s", (hashed_password, email))
+        db.commit()
+        cursor.close()
+        db.close()
+
+        return redirect("/login")
+
+    return render_template("reset_password.html", expired=expired)
 
 # ---------------- ERROR HANDLERS ----------------
 @app.errorhandler(404)
