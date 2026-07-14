@@ -16,6 +16,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
+import requests
 
 # Load environment variables from .env file
 load_dotenv()
@@ -512,6 +513,24 @@ def logout():
     return redirect("/login")
 
 
+# ---------------- SEND EMAIL VIA BREVO API ----------------
+def send_reset_email(to_email, reset_link):
+    url = "https://api.brevo.com/v3/smtp/email"
+    headers = {
+        "accept": "application/json",
+        "api-key": os.getenv("BREVO_API_KEY"),
+        "content-type": "application/json"
+    }
+    payload = {
+        "sender": {"name": "Civic Issue Portal", "email": os.getenv("MAIL_USERNAME")},
+        "to": [{"email": to_email}],
+        "subject": "Password Reset Request - Civic Issue Portal",
+        "htmlContent": f"<p>Click the link below to reset your password:</p><p><a href='{reset_link}'>{reset_link}</a></p><p>This link expires in 30 minutes.</p>"
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    return response.status_code == 201
+
+
 # ---------------- FORGOT PASSWORD ----------------
 @app.route("/forgot_password", methods=["GET", "POST"])
 @limiter.limit("5 per hour")
@@ -528,15 +547,9 @@ def forgot_password():
 
         if user:
             token = serializer.dumps(email, salt="password-reset")
-            reset_link = f"http://127.0.0.1:5000/reset_password/{token}"
+            reset_link = f"https://your-actual-render-url.onrender.com/reset_password/{token}"
 
-            msg = Message(
-                "Password Reset Request - Civic Issue Portal",
-                sender=os.getenv("MAIL_USERNAME"),
-                recipients=[email]
-            )
-            msg.body = f"Click the link below to reset your password:\n\n{reset_link}\n\nThis link expires in 30 minutes."
-            mail.send(msg)
+            send_reset_email(email, reset_link)
 
         return render_template("forgot_password.html", message="If that email is registered, a reset link has been sent.")
 
