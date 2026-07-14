@@ -168,7 +168,7 @@ http://127.0.0.1:5000
 |------|------|--------|
 | 👑 Project Lead & Backend Developer | Anushka | [Anushka190921](https://github.com/Anushka190921) |
 | 🎨 Frontend Developer | Kanishka | [Kanishka240306](https://github.com/Kanishka240306) |
-| 🔗 API / Testing / Integration | Coming Soon | - |
+| 🔗 API / Testing / Integration | [Anushka504-S](https://github.com/Anushka504-S)
 
 ---
 
