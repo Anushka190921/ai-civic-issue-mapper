@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Civic Issue Mapper - Test Report</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>AI Civic Issue Mapper</h1>
+<h2>Software Testing Report</h2>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Test ID</th>
+<th>Module</th>
+<th>Expected Result</th>
+<th>Actual Result</th>
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+<td>TC-01</td>
+<td>User Registration</td>
+<td>User should register successfully</td>
+<td>Registration completed successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-02</td>
+<td>User Login</td>
+<td>Registered user should log in</td>
+<td>Login successful</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-03</td>
+<td>Google OAuth Login</td>
+<td>Login using Google account</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-04</td>
+<td>Forgot Password</td>
+<td>Reset link sent to registered email</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-05</td>
+<td>Reset Password</td>
+<td>User should set a new password</td>
+<td>Password reset successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-06</td>
+<td>Complaint Submission</td>
+<td>Complaint stored in database</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-07</td>
+<td>Image Upload</td>
+<td>Complaint image uploaded</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-08</td>
+<td>GPS Location Capture</td>
+<td>Capture user location</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-09</td>
+<td>My Issues Page</td>
+<td>Display submitted complaints</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-10</td>
+<td>Delete Complaint</td>
+<td>Delete selected complaint</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-11</td>
+<td>Admin Login</td>
+<td>Admin authentication</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-12</td>
+<td>Admin Dashboard</td>
+<td>Display all complaints</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-13</td>
+<td>Dashboard Statistics</td>
+<td>Display complaint statistics</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-14</td>
+<td>Status Update</td>
+<td>Update complaint status</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-15</td>
+<td>Department Assignment</td>
+<td>Assign complaint to department</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-16</td>
+<td>Citizen Feedback</td>
+<td>Store rating and comment</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-17</td>
+<td>Notification System</td>
+<td>Generate notification after status update</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-18</td>
+<td>Responsive Design</td>
+<td>Support mobile, tablet and desktop</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-19</td>
+<td>Security Features</td>
+<td>Password hashing & session security</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-20</td>
+<td>Rate Limiting</td>
+<td>Prevent brute-force attacks</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-21</td>
+<td>Error Pages</td>
+<td>404, 429 & 500 pages displayed</td>
+<td>Working successfully</td>
+<td class="pass">PASS ✔</td>
+</tr>
+
+<tr>
+<td>TC-22</td>
+<td>AI Image Classification</td>
+<td>Automatically classify uploaded images</td>
+<td>Not Implemented</td>
+<td class="not">NOT IMPLEMENTED</td>
+</tr>
+
+<tr>
+<td>TC-23</td>
+<td>Map Visualization (Leaflet.js)</td>
+<td>Display complaint locations on map</td>
+<td>Prototype Available</td>
+<td class="progress">IN PROGRESS</td>
+</tr>
+
+<tr>
+<td>TC-24</td>
+<td>Search & Filter Dashboard</td>
+<td>Search by Complaint ID or Issue Type</td>
+<td>Prototype Available</td>
+<td class="progress">IN PROGRESS</td>
+</tr>
+
+</tbody>
+
+</table>
+
+<div class="summary">
+
+<h2>Test Summary</h2>
+
+<p><strong>Total Test Cases:</strong> 24</p>
+
+<p><strong>Passed:</strong> 21 ✔</p>
+
+<p><strong>In Progress:</strong> 2</p>
+
+<p><strong>Not Implemented:</strong> 1</p>
+
+<p><strong>Failed:</strong> 0 ✘</p>
+
+<h2>Conclusion</h2>
+
+<p>
+The AI Civic Issue Mapper successfully passed all implemented functional
+modules including authentication, complaint management, dashboard,
+notifications, feedback system and security features.
+Map Visualization, Search Dashboard and AI Image Classification are planned
+for future integration.
+</p>
+
+</div>
+
+</div>
+
+</body>
+</html>
