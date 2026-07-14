@@ -547,7 +547,7 @@ def forgot_password():
 
         if user:
             token = serializer.dumps(email, salt="password-reset")
-            reset_link = f"https://your-actual-render-url.onrender.com/reset_password/{token}"
+            reset_link = f"https://ai-civic-issue-mapper.onrender.com/reset_password/{token}"
 
             send_reset_email(email, reset_link)
 
