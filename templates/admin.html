@@ -334,6 +334,29 @@
     </div>
 
     <h4 class="mb-3">All Complaints</h4>
+    <!-- SEARCH BAR -->
+    <form action="/admin" method="GET" class="row mb-3">
+       <div class="col-md-5">
+           <input
+              type="text"
+              name="search"
+              class="form-control"
+              placeholder="Search by Complaint ID or Issue Type..."
+              value="{{ request.args.get('search','') }}">
+        </div>
+
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">
+                Search
+            </button>
+        </div>
+
+        <div class="col-md-2">
+            <a href="/admin" class="btn btn-secondary w-100">
+                Reset
+            </a>
+        </div>
+    </form>
 
     <!-- TABLE RESPONSIVE WRAPPER -->
     <div class="table-responsive">
@@ -368,13 +391,7 @@
                 </td>
 
                 <!-- MAP BUTTON -->
-                <td>
-                    <a href="https://www.google.com/maps?q={{ complaint.latitude }},{{ complaint.longitude }}"
-                       target="_blank"
-                       class="btn btn-secondary btn-sm">
-                       View Map
-                    </a>
-                </td>
+                
 
                 <!-- IMAGE -->
                 <td>

@@ -34,7 +34,7 @@ limiter = Limiter(
     default_limits=["200 per day", "50 per hour"]
 )
 
-app.secret_key = os.getenv("SECRET_KEY")
+app.secret_key = "anushka123456"
 
 
 # ---------------- EMAIL CONFIGURATION ----------------
@@ -274,22 +274,59 @@ def my_issues():
     return render_template("my_issues.html", issues=issues)
 
 
-# ---------------- ADMIN DASHBOARD ----------------
+# ---------------- ADMIN DASHBOARD ---------------
+@app.route("/view_map/<int:id>")
+def view_map(id):
+
+   # if "admin" not in session:
+       # return redirect("/admin")
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute(
+        "SELECT latitude, longitude FROM civic_issues WHERE id=%s",
+        (id,)
+    )
+
+    complaint = cursor.fetchone()
+
+    cursor.close()
+    db.close()
+
+    return render_template(
+        "view_map.html",
+        lat=complaint["latitude"],
+        lng=complaint["longitude"]
+    )
 @app.route("/dashboard")
 def dashboard():
     # Only admin can access dashboard
     if "admin" not in session:
         return redirect("/admin")
+    
+    search = request.args.get("search", "").strip()
 
     # Fetch all complaints with user details
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT civic_issues.*, users.first_name, users.email
-        FROM civic_issues
-        JOIN users ON civic_issues.user_id = users.id
+    if search:
+       cursor.execute(""" 
+         SELECT civic_issues.*, users.first_name, users.email
+         FROM civic_issues
+         JOIN users ON civic_issues.user_id = users.id
+         WHERE civic_issues.issue_type LIKE %s
+            OR civic_issues.id LIKE %s
         ORDER BY civic_issues.id DESC
-    """)
+        """, (f"%{search}%", f"%{search}%"))
+    else:
+        cursor.execute("""
+           SELECT civic_issues.*, users.first_name, users.email
+           FROM civic_issues
+           JOIN users ON civic_issues.user_id = users.id
+            ORDER BY civic_issues.id DESC
+        """)
+    
     complaints = cursor.fetchall()
 
     # Count total complaints
@@ -318,8 +355,11 @@ def dashboard():
         "resolved": resolved
     }
 
-    return render_template("admin.html", complaints=complaints, stats=stats)
-
+    return render_template(
+    "admin.html",
+    complaints=complaints,
+    stats=stats
+)
 # ---------------- DELETE COMPLAINT ----------------
 @app.route("/delete_my_issue/<int:id>")
 def delete_my_issue(id):
