@@ -10,16 +10,29 @@
 
 ![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+![Deployed](https://img.shields.io/badge/Deployed-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)
 
 </div>
+
+---
+
+## 🌐 Live Demo
+
+The application is deployed and live at: **[https://ai-civic-issue-mapper.onrender.com](https://ai-civic-issue-mapper.onrender.com)**
+
+**Tech used for deployment:**
+- **Hosting:** Render (Free tier)
+- **Database:** Aiven for MySQL (Free tier)
+- **Email delivery:** Brevo API (bypasses Render's free-tier SMTP restrictions)
+
+> Note: Free tier services may take 30-60 seconds to wake up after periods of inactivity.
+
 
 ---
 
 ## 📌 About
 
 A government-style civic issue reporting portal where citizens can report problems like garbage dumping, broken roads, water leakage, and street light failures. Authorities can track, manage, and resolve issues efficiently while keeping citizens informed.
-
-Aligned with **UN Sustainable Development Goal 11: Sustainable Cities and Communities**.
 
 ---
 
@@ -31,19 +44,19 @@ Aligned with **UN Sustainable Development Goal 11: Sustainable Cities and Commun
 | Google OAuth Login | ✅ Done |
 | Report Issue with Image & Location | ✅ Done |
 | Admin Dashboard | ✅ Done |
-| Dashboard Statistics (Total/Pending/In Progress/Resolved) | ✅ Done |
+| Dashboard Statistics | ✅ Done |
+| Department Assignment | ✅ Done |
 | Complaint Status Tracking | ✅ Done |
-| Department Assignment (Water/Roads/Electricity/Sanitation) | ✅ Done |
 | Email Validation & Password Rules | ✅ Done |
-| Rate Limiting (Brute-force & Spam Protection) | ✅ Done |
+| Rate Limiting | ✅ Done |
 | Custom 404 / 500 / 429 Error Pages | ✅ Done |
 | Mobile Responsive Design | ✅ Done |
-| Citizen Feedback System (Star Rating + Comments) | ✅ Done |
+| Citizen Feedback System | ✅ Done |
 | Notification System | ✅ Done |
 | Forgot / Reset Password (Email Verification) | ✅ Done |
-| Search & Filter on Admin Dashboard | 🚧 In Progress |
-| Map Visualization (Leaflet.js) | 🚧 In Progress |
 | AI Image Classification | ⏳ Coming Soon |
+| Map Visualization | ⏳ Coming Soon |
+| Search & Filter Dashboard | ⏳ Coming Soon |
 
 ---
 
@@ -55,7 +68,7 @@ Aligned with **UN Sustainable Development Goal 11: Sustainable Cities and Commun
 | Database | MySQL |
 | Frontend | HTML, CSS, Bootstrap |
 | Authentication | Flask-Dance, Google OAuth |
-| Security | Werkzeug, python-dotenv, Flask-Limiter |
+| Security | Werkzeug, python-dotenv |
 
 ---
 
@@ -81,14 +94,6 @@ ai-civic-issue-mapper/
 │   ├── admin.html
 
 │   ├── admin_login.html
-
-│   ├── notifications.html
-
-│   ├── 404.html
-
-│   ├── 500.html
-
-│   ├── 429.html
 
 │   └── success.html
 
@@ -170,8 +175,7 @@ http://127.0.0.1:5000
 ## 🔮 Coming Soon
 
 - 🤖 AI Image Classification
-- 🗺️ Map Visualization (Leaflet.js) — integration in progress
-- 🔍 Search & Filter on Admin Dashboard — integration in progress
+- 🗺️ Map Visualization (Leaflet.js)
 - 📊 Analytics Dashboard
 
 ---
