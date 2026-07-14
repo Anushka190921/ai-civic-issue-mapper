@@ -4,3 +4,4 @@ werkzeug
 python-dotenv
 flask-limiter
 flask-mail
+gunicorn
