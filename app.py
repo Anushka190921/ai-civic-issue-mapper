@@ -353,14 +353,30 @@ def update_status(id):
     # Get new status from form
     new_status = request.form["status"]
 
+    # Handle resolution proof image (only relevant when marking Resolved)
+    resolution_image_name = None
+    resolution_image = request.files.get("resolution_image")
+
+    if resolution_image and resolution_image.filename != "":
+        filename = "resolved_" + str(int(time.time())) + "_" + resolution_image.filename
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        resolution_image.save(filepath)
+        resolution_image_name = filename
+
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    # Update complaint status in database
-    cursor.execute(
-        "UPDATE civic_issues SET status=%s WHERE id=%s",
-        (new_status, id)
-    )
+    # Update status, and resolution image only if one was uploaded
+    if resolution_image_name:
+        cursor.execute(
+            "UPDATE civic_issues SET status=%s, resolution_image=%s WHERE id=%s",
+            (new_status, resolution_image_name, id)
+        )
+    else:
+        cursor.execute(
+            "UPDATE civic_issues SET status=%s WHERE id=%s",
+            (new_status, id)
+        )
 
     # Get the complaint's owner so we know who to notify
     cursor.execute("SELECT user_id FROM civic_issues WHERE id=%s", (id,))
@@ -378,7 +394,6 @@ def update_status(id):
     db.close()
 
     return redirect("/dashboard")
-
 
 # ---------------- VIEW NOTIFICATIONS ----------------
 @app.route("/notifications")
@@ -406,6 +421,32 @@ def notifications():
     db.close()
 
     return render_template("notifications.html", notifications=user_notifications)
+
+
+# ---------------- PUBLIC STATUS TRACKER ----------------
+@app.route("/track_status", methods=["GET", "POST"])
+@limiter.limit("20 per hour")
+def track_status():
+    complaint = None
+    error = None
+
+    if request.method == "POST":
+        complaint_id = request.form.get("complaint_id")
+
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT id, issue_type, status, department, created_at, resolution_image FROM civic_issues WHERE id=%s",
+            (complaint_id,)
+        )
+        complaint = cursor.fetchone()
+        cursor.close()
+        db.close()
+
+        if not complaint:
+            error = "No complaint found with that ID. Please check and try again."
+
+    return render_template("track_status.html", complaint=complaint, error=error)
 
 
 # ---------------- ASSIGN DEPARTMENT ----------------
