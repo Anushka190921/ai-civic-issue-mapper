@@ -426,13 +426,14 @@
 
                 <!-- UPDATE STATUS -->
                 <td>
-                    <form action="/update_status/{{ complaint.id }}" method="POST" style="display: inline;">
-                        <select name="status" class="form-select form-select-sm">
+                    <form action="/update_status/{{ complaint.id }}" method="POST" enctype="multipart/form-data" style="display: inline;">
+                        <select name="status" class="form-select form-select-sm mb-1">
                             <option value="Pending" {% if complaint.status=='Pending' %}selected{% endif %}>Pending</option>
                             <option value="In Progress" {% if complaint.status=='In Progress' %}selected{% endif %}>In Progress</option>
                             <option value="Resolved" {% if complaint.status=='Resolved' %}selected{% endif %}>Resolved</option>
                         </select>
-                        <button type="submit" class="btn btn-primary btn-sm mt-1">Update</button>
+                        <input type="file" name="resolution_image" accept="image/*" class="form-control form-control-sm mb-1" title="Attach resolution proof photo (used when marking Resolved)">
+                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
                     </form>
                 </td>
 

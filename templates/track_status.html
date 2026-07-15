@@ -1,0 +1,211 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Complaint Status</title>
+    <!-- Bootstrap for responsiveness -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: whitesmoke;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        .gov-header {
+            background-color: rgb(59, 59, 139);
+            color: white;
+            padding: 12px 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .gov-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 480px;
+            border-radius: 10px;
+        }
+
+        .form-control, .btn {
+            border-radius: 6px;
+        }
+
+        .badge {
+            font-size: 13px;
+            padding: 6px 10px;
+        }
+
+        .result-box {
+            background-color: #f9f9fb;
+            border: 1px solid #e0e0e6;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .result-box dt {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .result-box dd {
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .resolution-photo img {
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #e0e0e6;
+        }
+
+        @media (max-width: 576px) {
+            .gov-header h3 {
+                font-size: 16px;
+            }
+
+            .card {
+                max-width: 95vw;
+                padding: 20px !important;
+            }
+
+            h4 {
+                font-size: 18px;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .form-control {
+                font-size: 16px;
+                padding: 10px;
+            }
+
+            label {
+                font-size: 14px;
+                margin-bottom: 6px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .gov-header {
+                padding: 10px 8px;
+            }
+
+            .gov-header h3 {
+                font-size: 14px;
+            }
+
+            .card {
+                padding: 15px !important;
+            }
+
+            h4 {
+                font-size: 16px;
+                margin-bottom: 15px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Government Header -->
+    <div class="gov-header">
+        <marquee behavior="alternate" direction="left">
+            <h3>Civic Issue Reporting Portal</h3>
+        </marquee>
+    </div>
+
+    <div class="container">
+        <!-- Card Start -->
+        <div class="card shadow p-4">
+            <h4 class="mb-3 text-center">Track Complaint Status</h4>
+
+            {% if error %}
+            <div class="alert alert-warning text-center" role="alert">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <!-- Complaint ID Form -->
+            <form method="POST">
+                <div class="mb-3">
+                    <label>Complaint ID</label>
+                    <input type="number" class="form-control" placeholder="e.g. 1024" name="complaint_id" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Check Status</button>
+            </form>
+            <!-- Form End -->
+
+            {% if complaint %}
+            <!-- Complaint Details -->
+            <div class="result-box">
+                <dl class="mb-0">
+                    <dt>Complaint ID</dt>
+                    <dd>#{{ complaint.id }}</dd>
+
+                    <dt>Issue Type</dt>
+                    <dd>{{ complaint.issue_type }}</dd>
+
+                    <dt>Status</dt>
+                    <dd>
+                        {% if complaint.status == 'Pending' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        {% elif complaint.status == 'In Progress' %}
+                            <span class="badge bg-info text-dark">In Progress</span>
+                        {% elif complaint.status == 'Resolved' %}
+                            <span class="badge bg-success">Resolved</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt>Assigned Department</dt>
+                    <dd>{{ complaint.department if complaint.department else "Not yet assigned" }}</dd>
+
+                    <dt>Submitted On</dt>
+                    <dd>{{ complaint.created_at }}</dd>
+
+                    {% if complaint.resolution_image %}
+                    <dt>Resolution Proof</dt>
+                    <dd class="resolution-photo">
+                        <img src="{{ url_for('static', filename='uploads/' + complaint.resolution_image) }}" alt="Resolution proof photo">
+                    </dd>
+                    {% endif %}
+                </dl>
+            </div>
+            {% endif %}
+
+            <!-- Back to Login -->
+            <p class="text-center mt-3 mb-0"><a href="/login">Back to Login</a></p>
+        </div>
+        <!-- Card End -->
+    </div>
+
+</body>
+</html>
