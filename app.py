@@ -275,11 +275,19 @@ def my_issues():
 
 
 # ---------------- ADMIN DASHBOARD ---------------
-@app.route("/view_map/<int:id>")
-def view_map(id):
+@app.route("/view_map")
+def view_map():
+    return render_template("view_map.html")
 
    # if "admin" not in session:
        # return redirect("/admin")
+
+    
+@app.route("/view_map/<int:id>")
+def view_map(id):
+
+    if "admin" not in session:
+        return redirect("/admin")
 
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -293,6 +301,9 @@ def view_map(id):
 
     cursor.close()
     db.close()
+
+    if complaint is None:
+        return "Complaint not found"
 
     return render_template(
         "view_map.html",
