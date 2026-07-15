@@ -284,7 +284,7 @@ def view_map():
 
     
 @app.route("/view_map/<int:id>")
-def view_map(id):
+def view_map_single(id):
 
     if "admin" not in session:
         return redirect("/admin")
