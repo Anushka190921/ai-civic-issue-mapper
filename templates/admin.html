@@ -335,7 +335,7 @@
 
     <h4 class="mb-3">All Complaints</h4>
     <!-- SEARCH BAR -->
-    <form action="/admin" method="GET" class="row mb-3">
+    <form action="/dashboard" method="GET" class="row mb-3"></form>
        <div class="col-md-5">
            <input
               type="text"
@@ -387,8 +387,13 @@
                 <td>{{ complaint.issue_type }}</td>
                 <td>{{ complaint.description[:30] }}...</td>
                 <td>
-                    <small>{{ "%.4f" | format(complaint.latitude) }}, {{ "%.4f" | format(complaint.longitude) }}</small>
-                </td>
+                    <small>
+                     {% if complaint.latitude and complaint.longitude %}
+                         {{ "%.4f" | format(complaint.latitude) }}, {{ "%.4f" | format(complaint.longitude) }}
+                     {% else %}
+                        Not available
+                     {% endif %}
+                    </small>
 
                 <!-- MAP BUTTON -->
                 
