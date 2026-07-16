@@ -260,7 +260,9 @@ def delete_admin_issue(id):
     db = get_db()
     cursor = db.cursor()
 
-    # Delete complaint by id
+    # Delete related records first (foreign key constraints)
+    cursor.execute("DELETE FROM notifications WHERE issue_id=%s", (id,))
+    cursor.execute("DELETE FROM feedback WHERE issue_id=%s", (id,))
     cursor.execute("DELETE FROM civic_issues WHERE id=%s", (id,))
     db.commit()
 
@@ -386,6 +388,7 @@ def dashboard():
     complaints=complaints,
     stats=stats
 )
+
 # ---------------- DELETE COMPLAINT ----------------
 @app.route("/delete_my_issue/<int:id>")
 def delete_my_issue(id):
@@ -401,6 +404,9 @@ def delete_my_issue(id):
     issue = cursor.fetchone()
 
     if issue:
+        # Delete related records first (foreign key constraints)
+        cursor.execute("DELETE FROM notifications WHERE issue_id=%s", (id,))
+        cursor.execute("DELETE FROM feedback WHERE issue_id=%s", (id,))
         cursor.execute("DELETE FROM civic_issues WHERE id=%s", (id,))
         db.commit()
 
