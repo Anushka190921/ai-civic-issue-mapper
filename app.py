@@ -33,8 +33,7 @@ limiter = Limiter(
     app=app,
     default_limits=["200 per day", "50 per hour"]
 )
-
-app.secret_key = "anushka123456"
+app.secret_key = os.getenv("SECRET_KEY")
 
 
 # ---------------- EMAIL CONFIGURATION ----------------
@@ -76,6 +75,22 @@ def get_db():
         port=int(os.getenv("DB_PORT", 3306)),
         ssl_disabled=False
     )
+
+
+# ---------- Health Check (keeps Aiven DB + Render awake) ----------
+@app.route("/healthz")
+def healthz():
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return "OK", 200
+    except Exception as e:
+        print("Health check DB error:", e)
+        return "DB unreachable", 500
 
 # ---------------- HOME ----------------
 @app.route("/")
