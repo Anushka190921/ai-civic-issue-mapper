@@ -344,9 +344,10 @@ def dashboard():
          FROM civic_issues
          JOIN users ON civic_issues.user_id = users.id
          WHERE civic_issues.issue_type LIKE %s
-            OR civic_issues.id LIKE %s
+            OR CAST(civic_issues.id AS CHAR) LIKE %s
+            OR civic_issues.description LIKE %s
         ORDER BY civic_issues.id DESC
-        """, (f"%{search}%", f"%{search}%"))
+        """, (f"%{search}%", f"%{search}%", f"%{search}%"))
     else:
         cursor.execute("""
            SELECT civic_issues.*, users.first_name, users.email
@@ -722,5 +723,3 @@ def rate_limit_exceeded(e):
 # ---------------- RUN APPLICATION ----------------
 if __name__ == "__main__":
     app.run(debug=True)
-
-

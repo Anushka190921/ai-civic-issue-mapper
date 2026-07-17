@@ -27,17 +27,18 @@
 
 <script>
 
-var map = L.map('map').setView([28.6139, 77.2090], 15);
+var lat = {{ lat if lat else 28.6139 }};
+var lng = {{ lng if lng else 77.2090 }};
 
-L.marker([28.6139, 77.2090])
+var map = L.map('map').setView([lat, lng], 15);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© OpenStreetMap'
 }).addTo(map);
 
-L.marker([28.6139, 77.2090])
+L.marker([lat, lng])
 .addTo(map)
-.bindPopup("Delhi")
+.bindPopup("Complaint Location")
 .openPopup();
 
 </script>

@@ -335,26 +335,17 @@
 
     <h4 class="mb-3">All Complaints</h4>
     <!-- SEARCH BAR -->
-    <form action="/dashboard" method="GET" class="row mb-3"></form>
-       <div class="col-md-5">
-           <input
-              type="text"
-              name="search"
-              class="form-control"
-              placeholder="Search by Complaint ID or Issue Type..."
-              value="{{ request.args.get('search','') }}">
+    <form action="/dashboard" method="GET" class="row mb-3">
+        <div class="col-md-5">
+            <input type="text" name="search" class="form-control"
+                   placeholder="Search by Complaint ID or Issue Type..."
+                   value="{{ request.args.get('search','') }}">
         </div>
-
         <div class="col-md-2">
-            <button class="btn btn-primary w-100">
-                Search
-            </button>
+            <button class="btn btn-primary w-100">Search</button>
         </div>
-
         <div class="col-md-2">
-            <a href="/admin" class="btn btn-secondary w-100">
-                Reset
-            </a>
+            <a href="/dashboard" class="btn btn-secondary w-100">Reset</a>
         </div>
     </form>
 
@@ -394,9 +385,14 @@
                         Not available
                      {% endif %}
                     </small>
+                </td>
 
                 <!-- MAP BUTTON -->
-                
+                <td>
+                    <a href="/view_map/{{ complaint.id }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                        View
+                    </a>
+                </td>
 
                 <!-- IMAGE -->
                 <td>
