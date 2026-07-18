@@ -16,6 +16,14 @@
 
 ---
 
+## 📌 About
+
+A government-style civic issue reporting portal where citizens can report problems like garbage dumping, broken roads, water leakage, and street light failures. Authorities can track, manage, and resolve issues efficiently while keeping citizens informed.
+
+Aligned with **UN Sustainable Development Goal 11: Sustainable Cities and Communities**.
+
+---
+
 ## 🌐 Live Demo
 
 The application is deployed and live at: **[https://ai-civic-issue-mapper.onrender.com](https://ai-civic-issue-mapper.onrender.com)**
@@ -24,15 +32,7 @@ The application is deployed and live at: **[https://ai-civic-issue-mapper.onrend
 - **Hosting:** Render (Free tier)
 - **Database:** Aiven for MySQL (Free tier)
 - **Email delivery:** Brevo API (bypasses Render's free-tier SMTP restrictions)
-
-> Note: Free tier services may take 30-60 seconds to wake up after periods of inactivity.
-
-
----
-
-## 📌 About
-
-A government-style civic issue reporting portal where citizens can report problems like garbage dumping, broken roads, water leakage, and street light failures. Authorities can track, manage, and resolve issues efficiently while keeping citizens informed.
+- **Uptime:** Monitored via UptimeRobot pinging a `/healthz` endpoint every 5 minutes
 
 ---
 
@@ -45,18 +45,22 @@ A government-style civic issue reporting portal where citizens can report proble
 | Report Issue with Image & Location | ✅ Done |
 | Admin Dashboard | ✅ Done |
 | Dashboard Statistics | ✅ Done |
+| Search & Filter Complaints | ✅ Done |
 | Department Assignment | ✅ Done |
 | Complaint Status Tracking | ✅ Done |
+| Resolution Proof Photo Upload | ✅ Done |
+| Single Complaint Map View (Leaflet.js) | ✅ Done |
 | Email Validation & Password Rules | ✅ Done |
+| Forgot / Reset Password (Email Verification) | ✅ Done |
 | Rate Limiting | ✅ Done |
 | Custom 404 / 500 / 429 Error Pages | ✅ Done |
 | Mobile Responsive Design | ✅ Done |
 | Citizen Feedback System | ✅ Done |
 | Notification System | ✅ Done |
-| Forgot / Reset Password (Email Verification) | ✅ Done |
+| Public Complaint Status Tracker (No Login) | ✅ Done |
+| Full Multi-Complaint Map View | 🚧 In Progress |
 | AI Image Classification | ⏳ Coming Soon |
-| Map Visualization | ⏳ Coming Soon |
-| Search & Filter Dashboard | ⏳ Coming Soon |
+| SLA / Auto-Escalation | ⏳ Coming Soon |
 
 ---
 
@@ -65,10 +69,14 @@ A government-style civic issue reporting portal where citizens can report proble
 | Layer | Technology |
 |-------|-----------|
 | Backend | Python, Flask |
-| Database | MySQL |
+| Database | MySQL (Aiven) |
 | Frontend | HTML, CSS, Bootstrap |
 | Authentication | Flask-Dance, Google OAuth |
-| Security | Werkzeug, python-dotenv |
+| Security | Werkzeug, python-dotenv, Flask-Limiter |
+| Email | Brevo API |
+| Maps | Leaflet.js |
+| Deployment | Render, Gunicorn |
+| Uptime Monitoring | UptimeRobot |
 
 ---
 
@@ -77,7 +85,7 @@ ai-civic-issue-mapper/
 
 ├── static/
 
-│   ├── uploads/        ← complaint images
+│   ├── uploads/        ← complaint & resolution images
 
 │   └── style.css
 
@@ -95,13 +103,37 @@ ai-civic-issue-mapper/
 
 │   ├── admin_login.html
 
+│   ├── notifications.html
+
+│   ├── forgot_password.html
+
+│   ├── reset_password.html
+
+│   ├── track_status.html
+
+│   ├── view_map.html
+
+│   ├── 404.html
+
+│   ├── 500.html
+
+│   ├── 429.html
+
 │   └── success.html
+
+├── docs/
+
+│   └── test_report.html
 
 ├── .env                ← credentials (not on GitHub)
 
 ├── .gitignore
 
 ├── app.py              ← main backend
+
+├── Procfile            ← Render deployment config
+
+├── LICENSE
 
 └── requirements.txt
 
@@ -134,6 +166,10 @@ DB_NAME=civic_issues
 GOOGLE_CLIENT_ID=your_google_client_id
 
 GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+MAIL_USERNAME=your_email
+
+BREVO_API_KEY=your_brevo_api_key
 
 
 **4. Run the app**
@@ -168,14 +204,15 @@ http://127.0.0.1:5000
 |------|------|--------|
 | 👑 Project Lead & Backend Developer | Anushka | [Anushka190921](https://github.com/Anushka190921) |
 | 🎨 Frontend Developer | Kanishka | [Kanishka240306](https://github.com/Kanishka240306) |
-| 🔗 API / Testing / Integration | Anushka srivastava | [Anushka504-S](https://github.com/Anushka504-S)
+| 🔗 API / Testing / Integration | Anushka srivastava | [Anushka504-S](https://github.com/Anushka504-S) |
 
 ---
 
 ## 🔮 Coming Soon
 
+- 🗺️ Full multi-complaint map view (all complaints as color-coded pins)
 - 🤖 AI Image Classification
-- 🗺️ Map Visualization (Leaflet.js)
+- ⏰ SLA / Auto-Escalation
 - 📊 Analytics Dashboard
 
 ---
