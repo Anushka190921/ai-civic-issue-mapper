@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civic Issue Mapper — Report it. Track it. Get it fixed.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2545;
+    --navy-deep:#081B34;
+    --paper:#EDEFE8;
+    --paper-dim:#E1E4DA;
+    --ink:#10151B;
+    --amber:#F2A93B;
+    --amber-ink:#5C3A08;
+    --steel:#3E6C99;
+    --green:#3E9B6F;
+    --red:#D6493B;
+    --line: rgba(237,239,232,0.16);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Archivo Expanded', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.01em;
+    margin:0;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 6vw;
+    background:rgba(11,37,69,0.94);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-brand{
+    color:var(--paper);
+    font-family:'Archivo Expanded', sans-serif;
+    font-weight:800;
+    font-size:18px;
+    letter-spacing:0.03em;
+    text-decoration:none;
+    display:flex; align-items:center; gap:8px;
+  }
+  .nav-brand .dot{width:9px;height:9px;border-radius:50%;background:var(--amber); display:inline-block;}
+  .nav-links{display:flex; align-items:center; gap:22px;}
+  .nav-links a.text-link{
+    color:var(--paper); opacity:0.8; text-decoration:none; font-size:14px;
+  }
+  .nav-links a.text-link:hover{opacity:1;}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:11px 22px;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:600; font-size:14px;
+    text-decoration:none;
+    border-radius:3px;
+    border:1.5px solid transparent;
+    cursor:pointer;
+    transition:transform 0.12s ease, background 0.15s ease;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn-ghost{border-color:rgba(237,239,232,0.4); color:var(--paper);}
+  .btn-ghost:hover{background:rgba(237,239,232,0.1);}
+  .btn-amber{background:var(--amber); color:var(--amber-ink); font-weight:700;}
+  .btn-amber:hover{background:#f5b957;}
+  .btn-navy{background:var(--navy); color:var(--paper); font-weight:700;}
+  .btn-navy:hover{background:var(--navy-deep);}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:var(--navy);
+    color:var(--paper);
+    padding:76px 6vw 90px;
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:56px;
+    align-items:center;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--amber); margin-bottom:18px; display:block;
+  }
+  .hero h1{
+    font-size:clamp(38px, 5vw, 60px);
+    line-height:1.02;
+    color:var(--paper);
+  }
+  .hero h1 span{color:var(--amber);}
+  .hero p.lead{
+    font-size:17px; max-width:46ch; color:rgba(237,239,232,0.82);
+    margin:22px 0 32px;
+  }
+  .hero-ctas{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:34px;}
+  .track-box{
+    border-top:1px solid var(--line);
+    padding-top:22px;
+    max-width:460px;
+  }
+  .track-box label{
+    display:block; font-size:12px; font-family:'IBM Plex Mono', monospace;
+    letter-spacing:0.08em; text-transform:uppercase; color:rgba(237,239,232,0.6);
+    margin-bottom:8px;
+  }
+  .track-form{display:flex; gap:8px;}
+  .track-form input{
+    flex:1; padding:11px 12px; border-radius:3px; border:1px solid rgba(237,239,232,0.3);
+    background:rgba(237,239,232,0.06); color:var(--paper); font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+  }
+  .track-form input::placeholder{color:rgba(237,239,232,0.4);}
+  .track-form button{
+    padding:11px 18px; border-radius:3px; border:1px solid rgba(237,239,232,0.3);
+    background:transparent; color:var(--paper); font-weight:600; font-size:13px; cursor:pointer;
+  }
+  .track-form button:hover{background:rgba(237,239,232,0.1);}
+
+  /* ---------- TICKET ---------- */
+  .ticket-wrap{display:flex; justify-content:center;}
+  .ticket{
+    position:relative;
+    background:var(--paper);
+    color:var(--ink);
+    width:100%; max-width:340px;
+    border-radius:6px;
+    padding:26px 26px 22px;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.5);
+  }
+  .ticket-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;}
+  .ticket-label{font-size:11px; font-family:'IBM Plex Mono', monospace; letter-spacing:0.1em; color:#5c6b52; text-transform:uppercase;}
+  .ticket-id{font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:15px;}
+  .ticket-rows{margin:18px 0 14px;}
+  .ticket-row{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed #c7cabd; font-size:13px;}
+  .ticket-row:last-child{border-bottom:none;}
+  .ticket-row .k{color:#5c6b52; font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em;}
+  .ticket-row .v{font-weight:600;}
+  .perf{
+    position:relative;
+    height:2px;
+    margin:14px -26px;
+    background-image:linear-gradient(to right, #c7cabd 50%, transparent 0%);
+    background-size:10px 2px;
+    background-repeat:repeat-x;
+  }
+  .perf::before, .perf::after{
+    content:""; position:absolute; top:50%; transform:translateY(-50%);
+    width:20px; height:20px; border-radius:50%; background:var(--navy);
+  }
+  .perf::before{left:-36px;}
+  .perf::after{right:-36px;}
+  .stamp{
+    display:inline-flex; align-items:center; gap:8px;
+    margin-top:14px;
+    padding:8px 14px;
+    border:3px solid var(--steel);
+    color:var(--steel);
+    font-family:'Archivo Expanded', sans-serif;
+    font-weight:800;
+    font-size:14px;
+    letter-spacing:0.06em;
+    border-radius:4px;
+    transform:rotate(-4deg) scale(1);
+    animation:stamp-in 0.6s cubic-bezier(.2,1.4,.4,1) 0.4s both;
+  }
+  @keyframes stamp-in{
+    0%{opacity:0; transform:rotate(-4deg) scale(2.2);}
+    70%{opacity:1;}
+    100%{opacity:1; transform:rotate(-4deg) scale(1);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .stamp{animation:none;}
+  }
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:80px 6vw;}
+  .section-head{max-width:640px; margin-bottom:44px;}
+  .section-head .eyebrow{color:var(--steel);}
+  .section-head h2{font-size:clamp(26px,3.2vw,36px); color:var(--navy);}
+  .section-head p{color:#4a5248; font-size:15.5px; margin-top:12px; max-width:56ch;}
+
+  /* categories */
+  .cat-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:2px;
+    background:var(--navy);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  .cat-card{
+    background:var(--paper);
+    padding:30px 26px;
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .cat-icon{width:34px; height:34px; color:var(--navy);}
+  .cat-card h3{font-size:16px; color:var(--navy);}
+  .cat-card p{font-size:13.5px; color:#5c6558; margin:0;}
+
+  /* lifecycle */
+  .lifecycle-strip{
+    display:grid;
+    grid-template-columns:1fr auto 1fr auto 1fr;
+    align-items:center;
+    max-width:760px;
+  }
+  .life-stage{text-align:center; padding:20px 12px; border-radius:6px;}
+  .life-stage .mono{font-size:11px; letter-spacing:0.1em; display:block; margin-bottom:6px; opacity:0.75;}
+  .life-stage .name{font-family:'Archivo Expanded', sans-serif; font-weight:800; font-size:16px;}
+  .life-pending{background:#FCEFDA; color:var(--amber-ink);}
+  .life-progress{background:#E3EBF3; color:var(--steel);}
+  .life-resolved{background:#E1F0E7; color:var(--green);}
+  .life-arrow{color:#9aa196; font-size:22px; padding:0 6px;}
+
+  /* credibility */
+  .credibility{
+    background:var(--navy-deep);
+    color:var(--paper);
+    display:grid;
+    grid-template-columns:1.2fr 0.8fr;
+    gap:40px;
+    align-items:center;
+  }
+  .credibility h2{color:var(--paper);}
+  .credibility p{color:rgba(237,239,232,0.8); font-size:15px; margin-top:14px; max-width:52ch;}
+  .sdg-badge{
+    border:1px solid rgba(237,239,232,0.3);
+    border-radius:6px;
+    padding:22px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:rgba(237,239,232,0.85);
+  }
+  .sdg-badge .num{font-family:'Archivo Expanded', sans-serif; color:var(--amber); font-size:34px; display:block; margin-bottom:6px;}
+
+  /* final cta */
+  .final-cta{
+    text-align:center;
+    background:var(--paper-dim);
+  }
+  .final-cta h2{font-size:clamp(28px,4vw,42px); color:var(--navy); max-width:16ch; margin:0 auto 14px;}
+  .final-cta p{color:#4a5248; margin-bottom:30px;}
+  .final-cta .hero-ctas{justify-content:center;}
+
+  /* footer */
+  footer{
+    background:var(--navy);
+    color:rgba(237,239,232,0.6);
+    padding:30px 6vw;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;
+    font-size:13px;
+  }
+  footer a{text-decoration:none; color:rgba(237,239,232,0.7);}
+  footer a:hover{color:var(--paper);}
+  .footer-links{display:flex; gap:18px; flex-wrap:wrap;}
+
+  @media (max-width: 860px){
+    .hero{grid-template-columns:1fr; padding-top:52px;}
+    .credibility{grid-template-columns:1fr;}
+    .perf::before{left:-16px;}
+    .perf::after{right:-16px;}
+    .lifecycle-strip{grid-template-columns:1fr; gap:10px;}
+    .life-arrow{transform:rotate(90deg); padding:0;}
+    .nav-links a.text-link{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-brand"><span class="dot"></span>CIVIC / MAPPER</a>
+  <div class="nav-links">
+    <a href="#track" class="text-link">Track a complaint</a>
+    <a href="/login" class="btn btn-ghost">Log in</a>
+    <a href="/register" class="btn btn-amber">Register</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div>
+    <span class="eyebrow">Municipal complaint reporting</span>
+    <h1>Report it.<br>Track it.<br><span>Get it fixed.</span></h1>
+    <p class="lead">Snap a photo, drop a pin, and file a civic complaint in under a minute. Every report gets a ticket number your local departments can act on — and you can follow along until it's resolved.</p>
+    <div class="hero-ctas">
+      <a href="/register" class="btn btn-amber">Register to report an issue</a>
+      <a href="/login" class="btn btn-ghost">Log in</a>
+    </div>
+    <div class="track-box" id="track">
+      <label>Already filed a complaint?</label>
+      <form class="track-form" action="/track_status" method="POST">
+        <input type="text" name="complaint_id" placeholder="Enter your complaint ID, e.g. 1042" required>
+        <button type="submit">Track status</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="ticket-wrap">
+    <div class="ticket">
+      <div class="ticket-top">
+        <span class="ticket-label">Civic issue ticket</span>
+        <span class="ticket-id mono">#01042</span>
+      </div>
+      <div class="ticket-rows">
+        <div class="ticket-row"><span class="k">Issue type</span><span class="v">Pothole</span></div>
+        <div class="ticket-row"><span class="k">Department</span><span class="v">Roads &amp; Works</span></div>
+        <div class="ticket-row"><span class="k">Filed</span><span class="v">2 days ago</span></div>
+      </div>
+      <div class="perf"></div>
+      <span class="stamp">In progress</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="section-head">
+    <span class="eyebrow mono">What you can report</span>
+    <h2>Four categories. One tap to file.</h2>
+    <p>Photo and GPS location get attached automatically, so departments know exactly where and what they're dealing with.</p>
+  </div>
+  <div class="cat-grid">
+    <div class="cat-card">
+      <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 12v4M14 12v4"/></svg>
+      <h3>Garbage &amp; dumping</h3>
+      <p>Overflowing bins, illegal dumping, missed collection.</p>
+    </div>
+    <div class="cat-card">
+      <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="15" rx="7" ry="3"/><path d="M5 15v-1c0-3 3-7 7-7s7 4 7 7v1"/></svg>
+      <h3>Potholes &amp; roads</h3>
+      <p>Broken pavement, cracked roads, damaged footpaths.</p>
+    </div>
+    <div class="cat-card">
+      <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>
+      <h3>Water leakage</h3>
+      <p>Burst pipes, leaking mains, standing water on streets.</p>
+    </div>
+    <div class="cat-card">
+      <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v6"/><circle cx="12" cy="12" r="3.2"/><path d="M12 15v6M9 21h6"/></svg>
+      <h3>Street lights</h3>
+      <p>Outages, flickering lamps, poles down or damaged.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <span class="eyebrow mono">How a ticket moves</span>
+    <h2>Every complaint has a status you can trust.</h2>
+    <p>No black box. Once you file, your ticket moves through exactly three states — and you're notified the moment it changes.</p>
+  </div>
+  <div class="lifecycle-strip">
+    <div class="life-stage life-pending"><span class="mono">STATE 01</span><span class="name">Pending</span></div>
+    <span class="life-arrow">→</span>
+    <div class="life-stage life-progress"><span class="mono">STATE 02</span><span class="name">In progress</span></div>
+    <span class="life-arrow">→</span>
+    <div class="life-stage life-resolved"><span class="mono">STATE 03</span><span class="name">Resolved</span></div>
+  </div>
+</section>
+
+<section class="credibility">
+  <div>
+    <span class="eyebrow mono" style="color:var(--amber);">Why this exists</span>
+    <h2>Built for cities, run by citizens.</h2>
+    <p>Civic Issue Mapper gives residents a direct, trackable line to the departments responsible for fixing what's broken — and gives departments a clear queue instead of scattered calls and complaints.</p>
+  </div>
+  <div class="sdg-badge">
+    <span class="num">SDG 11</span>
+    Aligned with the UN Sustainable Development Goal for sustainable cities and communities.
+  </div>
+</section>
+
+<section class="final-cta">
+  <h2>Your street. Your report. Your city, fixed.</h2>
+  <p>It takes less time to file a complaint than to complain about it.</p>
+  <div class="hero-ctas">
+    <a href="/register" class="btn btn-navy">Create an account</a>
+    <a href="/login" class="btn btn-ghost" style="border-color:var(--navy); color:var(--navy);">Log in</a>
+  </div>
+</section>
+
+<footer>
+  <span>&copy; 2026 Civic Issue Mapper &middot; MIT Licensed</span>
+  <div class="footer-links">
+    <a href="#track">Track a complaint</a>
+    <a href="/admin">Admin login</a>
+    <a href="https://github.com/Anushka190921/ai-civic-issue-mapper" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -95,10 +95,9 @@ def healthz():
 # ---------------- HOME ----------------
 @app.route("/")
 def home():
-    # Redirect to login if user is not logged in
     if "user_id" not in session:
-        return redirect("/login")
-    return render_template("form.html")
+        return render_template("landing.html")
+    return render_template("form.html")   # or redirect to wherever the form lives
 
 
 # ---------------- SUBMIT COMPLAINT ----------------
@@ -241,7 +240,7 @@ def admin():
         db.close()
 
         # Verify admin credentials
-        if admin and admin["password"] == password:
+        if admin and check_password_hash(admin["password"], password):
             session["admin"] = admin["id"]
             return redirect("/dashboard")
 
