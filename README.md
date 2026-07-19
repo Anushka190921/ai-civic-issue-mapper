@@ -202,7 +202,7 @@ http://127.0.0.1:5000
 
 | Track Complaint Status | Success Page |
 |-------------------------|--------------|
-| ![Track Status](assets/track.png) | ![Success](assets/success.png) |
+| ![Track Status](assets/track_status.png) | ![Success](assets/success.png) |
 
 ---
 
