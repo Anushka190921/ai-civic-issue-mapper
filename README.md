@@ -18,7 +18,7 @@
 
 ## 📌 About
 
-A government-style civic issue reporting portal where citizens can report problems like garbage dumping, broken roads, water leakage, and street light failures. Authorities can track, manage, and resolve issues efficiently while keeping citizens informed.
+A government-style civic issue reporting portal where citizens can report problems like garbage dumping, broken roads, water leakage, and street light failures — with photo and GPS evidence — and track resolution status. Authorities manage and resolve issues through an admin dashboard with live statistics and department routing.
 
 Aligned with **UN Sustainable Development Goal 11: Sustainable Cities and Communities**.
 
@@ -40,8 +40,10 @@ The application is deployed and live at: **[https://ai-civic-issue-mapper.onrend
 
 | Feature | Status |
 |---------|--------|
+| Landing page (public, pre-login) | ✅ Done |
 | User Registration & Login | ✅ Done |
 | Google OAuth Login | ✅ Done |
+| Secure password hashing (citizens + admin) | ✅ Done |
 | Report Issue with Image & Location | ✅ Done |
 | Admin Dashboard | ✅ Done |
 | Dashboard Statistics | ✅ Done |
@@ -58,9 +60,9 @@ The application is deployed and live at: **[https://ai-civic-issue-mapper.onrend
 | Citizen Feedback System | ✅ Done |
 | Notification System | ✅ Done |
 | Public Complaint Status Tracker (No Login) | ✅ Done |
-| Full Multi-Complaint Map View | 🚧 In Progress |
-| AI Image Classification | ⏳ Coming Soon |
-| SLA / Auto-Escalation | ⏳ Coming Soon |
+| Full Multi-Complaint Map View (color-coded pins) | 🚧 In Progress |
+| AI Image Classification (Teachable Machine) | ⏳ Planned |
+| SLA / Auto-Escalation | ⏳ Planned |
 
 ---
 
@@ -71,7 +73,7 @@ The application is deployed and live at: **[https://ai-civic-issue-mapper.onrend
 | Backend | Python, Flask |
 | Database | MySQL (Aiven) |
 | Frontend | HTML, CSS, Bootstrap |
-| Authentication | Flask-Dance, Google OAuth |
+| Authentication | Flask-Dance, Google OAuth, Werkzeug password hashing |
 | Security | Werkzeug, python-dotenv, Flask-Limiter |
 | Email | Brevo API |
 | Maps | Leaflet.js |
@@ -90,6 +92,8 @@ ai-civic-issue-mapper/
 │   └── style.css
 
 ├── templates/
+
+│   ├── landing.html
 
 │   ├── login.html
 
@@ -131,7 +135,7 @@ ai-civic-issue-mapper/
 
 ├── app.py              ← main backend
 
-├── Procfile            ← Render deployment config
+├── Procfile             ← Render deployment config
 
 ├── LICENSE
 
@@ -184,19 +188,23 @@ http://127.0.0.1:5000
 
 ## 📸 Screenshots
 
-| Login | Register |
-|-------|----------|
-| ![Login](assets/login.png) | ![Register](assets/register.png) |
+| Landing Page | Login |
+|--------------|-------|
+| ![Landing](assets/landing.png) | ![Login](assets/login.png) |
 
-| Report Issue | Success Page |
-|-------------|--------------|
-| ![Form](assets/form.png) | ![Success](assets/success.png) |
+| Register | Report Issue |
+|----------|--------------|
+| ![Register](assets/register.png) | ![Form](assets/form.png) |
 
-| My Complaints |
-|--------------|
-| ![My Issues](assets/my_issues.png) |
+| Admin Dashboard | My Complaints |
+|-----------------|--------------|
+| ![Admin Dashboard](assets/admin.png) | ![My Issues](assets/my_issues.png) |
 
+| Track Complaint Status | Success Page |
+|-------------------------|--------------|
+| ![Track Status](assets/track.png) | ![Success](assets/success.png) |
 
+---
 
 ## 👥 Team
 
@@ -208,7 +216,7 @@ http://127.0.0.1:5000
 
 ---
 
-## 🔮 Coming Soon
+## 🔮 Roadmap
 
 - 🗺️ Full multi-complaint map view (all complaints as color-coded pins)
 - 🤖 AI Image Classification
