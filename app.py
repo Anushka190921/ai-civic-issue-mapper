@@ -145,7 +145,12 @@ def submit():
         return redirect(f"/success/{cursor.lastrowid}")
 
     except Exception as e:
-        return f"Error: {e}"
+        # Log the real error for debugging, but never show internal details to the user
+        app.logger.error(f"Error in /submit for user_id={session.get('user_id')}: {e}")
+        return render_template(
+            "500.html",
+            message="We couldn't submit your complaint right now. Please try again in a moment."
+        ), 500
 
 # ---------------- REGISTER ----------------
 @app.route("/register", methods=["GET", "POST"])
