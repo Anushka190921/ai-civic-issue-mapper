@@ -184,6 +184,7 @@
 
   /* how it works fly-in */
   .flow-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:22px; margin-top:10px;}
+  .flow-cell{position:relative;}
   .flow-step{
     background:var(--navy); color:var(--paper); border-radius:16px; padding:30px 22px;
     box-shadow:0 14px 34px rgba(11,37,69,.18); opacity:0; transition:transform 1s cubic-bezier(.34,1.56,.64,1), opacity .6s ease;
@@ -428,10 +429,10 @@
     <p>No black box. Here's exactly what happens after you hit submit.</p>
   </div>
   <div class="flow-grid">
-    <div class="flow-step fly-left" data-dir="left"><span class="num mono">STEP 01</span><h3>You report it</h3><p>Photo, category, and GPS location, filed in under a minute.</p></div>
-    <div class="flow-step fly-up" data-dir="up"><span class="num mono">STEP 02</span><h3>It's routed</h3><p>Your ticket is assigned to the department responsible for it.</p></div>
-    <div class="flow-step fly-up" data-dir="up"><span class="num mono">STEP 03</span><h3>You're notified</h3><p>Status updates land automatically as work progresses.</p></div>
-    <div class="flow-step fly-right" data-dir="right"><span class="num mono">STEP 04</span><h3>It's resolved</h3><p>Proof-of-resolution photo attached, ticket closed, done.</p></div>
+    <div class="flow-cell"><div class="flow-step fly-left" data-dir="left"><span class="num mono">STEP 01</span><h3>You report it</h3><p>Photo, category, and GPS location, filed in under a minute.</p></div></div>
+    <div class="flow-cell"><div class="flow-step fly-up" data-dir="up"><span class="num mono">STEP 02</span><h3>It's routed</h3><p>Your ticket is assigned to the department responsible for it.</p></div></div>
+    <div class="flow-cell"><div class="flow-step fly-up" data-dir="up"><span class="num mono">STEP 03</span><h3>You're notified</h3><p>Status updates land automatically as work progresses.</p></div></div>
+    <div class="flow-cell"><div class="flow-step fly-right" data-dir="right"><span class="num mono">STEP 04</span><h3>It's resolved</h3><p>Proof-of-resolution photo attached, ticket closed, done.</p></div></div>
   </div>
 </section>
 
@@ -522,11 +523,12 @@
   revealEls.forEach(el=>io.observe(el));
 
   // flow steps fly-in
-  const flowSteps = document.querySelectorAll('.flow-step');
+  const flowCells = document.querySelectorAll('.flow-cell');
   const flowTimers = new WeakMap();
   const flowIO = new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
-      const el = entry.target;
+      const cell = entry.target;
+      const el = cell.querySelector('.flow-step');
       clearTimeout(flowTimers.get(el));
       if(entry.isIntersecting){
         el.classList.add('landed');
@@ -536,8 +538,8 @@
         el.classList.remove('floating','landed');
       }
     });
-  }, {threshold:.35});
-  flowSteps.forEach(s=>flowIO.observe(s));
+  }, {threshold:.2});
+  flowCells.forEach(c=>flowIO.observe(c));
 
   // cursor sparkle (throttled, desktop only)
   if(window.matchMedia('(hover:hover)').matches){
