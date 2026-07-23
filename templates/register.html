@@ -1,202 +1,395 @@
-<html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Citizen Registration</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register — Civic Issue Mapper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2545;
+    --navy-deep:#081B34;
+    --paper:#EDEFE8;
+    --ink:#10151B;
+    --amber:#F2A93B;
+    --amber-ink:#5C3A08;
+    --steel:#3E6C99;
+    --green:#3E9B6F;
+    --line: rgba(237,239,232,0.16);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; background:var(--navy); color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif; display:grid; grid-template-columns:1.05fr .95fr;
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+  }
+  h1{font-family:'Archivo Expanded', sans-serif; text-transform:uppercase; margin:0;}
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
 
-    <!-- Bootstrap CSS for responsive design -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  /* ---------- LEFT: brand / story panel ---------- */
+  .side{
+    background:var(--navy); color:var(--paper); padding:60px 5vw;
+    display:flex; flex-direction:column; justify-content:center; position:relative; overflow:hidden;
+  }
+  .side-glow{
+    position:absolute; inset:0; pointer-events:none; z-index:0;
+    background:radial-gradient(500px 360px at 15% 20%, rgba(242,169,59,.12), transparent 60%),
+               radial-gradient(560px 420px at 90% 70%, rgba(62,108,153,.20), transparent 60%);
+  }
+  .side > *{position:relative; z-index:1;}
+  .brand{
+    display:flex; align-items:center; gap:9px; font-family:'Archivo Expanded', sans-serif; font-weight:800;
+    font-size:16px; letter-spacing:.03em; text-decoration:none; margin-bottom:60px;
+  }
+  .brand .dot-ring{position:relative; width:12px; height:12px;}
+  .brand .dot-ring::before{
+    content:''; position:absolute; inset:0; border-radius:50%; background:var(--amber);
+    box-shadow:0 0 8px rgba(242,169,59,.8); animation:pulse-dot 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse-dot{ 0%,100%{transform:scale(1); opacity:1;} 50%{transform:scale(1.5); opacity:.5;} }
+  .side h1{font-size:clamp(30px,3.4vw,44px); line-height:1.1; max-width:13ch;}
+  .side h1 .grad{
+    background:linear-gradient(120deg, var(--amber), #ffd88a 50%, var(--amber));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    background-size:200% auto; animation:shine 5s linear infinite;
+  }
+  @keyframes shine{ to{background-position:200% center;} }
+  .side p{color:rgba(237,239,232,.75); font-size:15.5px; max-width:38ch; margin:20px 0 40px;}
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  .mini-ticket{
+    border:1px solid var(--line); border-radius:8px; padding:20px 22px; max-width:340px;
+    background:rgba(237,239,232,.04);
+  }
+  .mini-ticket .row{display:flex; justify-content:space-between; font-size:12.5px; padding:6px 0; border-bottom:1px dashed rgba(237,239,232,.18);}
+  .mini-ticket .row:last-child{border-bottom:none;}
+  .mini-ticket .k{color:rgba(237,239,232,.55); font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:.06em; font-size:10.5px;}
+  .mini-ticket .v{font-weight:600;}
+  .stage-dot{display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:6px; background:var(--amber);}
 
-        body {
-            background-color: whitesmoke;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
+  /* smoke drifting behind the story panel */
+  .smoke{position:absolute; bottom:-10%; border-radius:50%; filter:blur(18px); animation:smoke-rise linear infinite; z-index:0;}
+  .smoke.s1{left:12%; width:170px; height:170px; animation-duration:14s; background:radial-gradient(circle, rgba(242,169,59,.14), transparent 70%);}
+  .smoke.s2{left:55%; width:200px; height:200px; animation-duration:17s; animation-delay:2.5s; background:radial-gradient(circle, rgba(62,108,153,.18), transparent 70%);}
+  .smoke.s3{left:75%; width:140px; height:140px; animation-duration:12s; animation-delay:5s; background:radial-gradient(circle, rgba(242,169,59,.12), transparent 70%);}
+  .smoke.s4{left:30%; width:150px; height:150px; animation-duration:16s; animation-delay:1s; background:radial-gradient(circle, rgba(62,108,153,.16), transparent 70%);}
+  .smoke.s5{left:88%; width:120px; height:120px; animation-duration:11s; animation-delay:4s; background:radial-gradient(circle, rgba(242,169,59,.14), transparent 70%);}
+  @keyframes smoke-rise{
+    0%{transform:translateY(0) translateX(0) scale(.8); opacity:0;}
+    12%{opacity:.85;}
+    50%{transform:translateY(-42vh) translateX(20px) scale(1.15);}
+    88%{opacity:.2;}
+    100%{transform:translateY(-90vh) translateX(-14px) scale(1.4); opacity:0;}
+  }
 
-        .gov-header {
-            background-color: rgb(59, 59, 139);
-            color: white;
-            padding: 12px 15px;
-            text-align: center;
-            font-weight: bold;
-        }
+  /* drifting smoke across the whole page */
+  .side-smoke-wrap{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
+  .side-smoke{position:absolute; border-radius:50%; filter:blur(22px); opacity:0; animation-timing-function:linear; animation-iteration-count:infinite;}
+  .side-smoke.from-left{background:radial-gradient(circle, rgba(62,108,153,.14), transparent 70%); animation-name:smoke-from-left;}
+  .side-smoke.from-right{background:radial-gradient(circle, rgba(242,169,59,.12), transparent 70%); animation-name:smoke-from-right;}
+  @keyframes smoke-from-left{
+    0%{transform:translateX(-140px) scale(.7); opacity:0;}
+    14%{opacity:.5;}
+    50%{transform:translateX(50vw) scale(1.2);}
+    86%{opacity:.15;}
+    100%{transform:translateX(108vw) scale(1.5); opacity:0;}
+  }
+  @keyframes smoke-from-right{
+    0%{transform:translateX(140px) scale(.7); opacity:0;}
+    14%{opacity:.5;}
+    50%{transform:translateX(-50vw) scale(1.2);}
+    86%{opacity:.15;}
+    100%{transform:translateX(-108vw) scale(1.5); opacity:0;}
+  }
 
-        .gov-header h3 {
-            margin: 0;
-            font-size: 18px;
-        }
+  /* twinkling stars in the navy panel */
+  .stars{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
+  .star{position:absolute; width:2px; height:2px; border-radius:50%; background:#fff; animation:twinkle ease-in-out infinite;}
+  @keyframes twinkle{ 0%,100%{opacity:.15; transform:scale(1);} 50%{opacity:.9; transform:scale(1.6);} }
 
-        .container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+  /* pop-in bounce on load */
+  .pop-in{opacity:0; transform:scale(.55) translateY(24px); animation:pop-in-anim .7s cubic-bezier(.34,1.56,.64,1) forwards;}
+  @keyframes pop-in-anim{ to{opacity:1; transform:scale(1) translateY(0);} }
+  .pop-1{animation-delay:.1s;}
+  .pop-2{animation-delay:.25s;}
+  .pop-3{animation-delay:.4s;}
+  .pop-4{animation-delay:.55s;}
+  .pop-5{animation-delay:.7s;}
+  .pop-6{animation-delay:.85s;}
 
-        .card {
-            width: 100%;
-            max-width: 450px;
-            border-radius: 10px;
-        }
+  /* click burst particles */
+  .burst-particle{position:absolute; width:5px; height:5px; border-radius:50%; pointer-events:none; animation:burst-out .55s ease-out forwards;}
+  @keyframes burst-out{ to{transform:translate(var(--bx),var(--by)) scale(0); opacity:0;} }
 
-        .form-control, .btn {
-            border-radius: 6px;
-        }
+  /* gentle floating idle bob once landed */
+  .mini-ticket{animation-fill-mode:forwards;}
+  .mini-ticket.floating{animation:ticket-float 3.4s ease-in-out infinite;}
+  @keyframes ticket-float{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+  .form-card.floating .btn-primary{animation:btn-glow-pulse 2.6s ease-in-out infinite;}
+  @keyframes btn-glow-pulse{
+    0%,100%{box-shadow:0 6px 20px rgba(242,169,59,.25);}
+    50%{box-shadow:0 6px 28px rgba(242,169,59,.5);}
+  }
 
-        .form-label {
-            font-weight: 500;
-            margin-bottom: 6px;
-        }
+  /* ---------- RIGHT: form panel ---------- */
+  .form-side{background:var(--paper); display:flex; align-items:center; justify-content:center; padding:60px 6vw;}
+  .form-card{width:100%; max-width:420px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--steel); display:block; margin-bottom:10px;
+  }
+  .form-card h2{font-family:'Archivo Expanded', sans-serif; text-transform:uppercase; font-size:28px; color:var(--navy); margin:0 0 8px;}
+  .form-card .sub{color:#5c6558; font-size:14px; margin-bottom:30px;}
 
-        .google-btn img {
-            width: 20px;
-            margin-right: 8px;
-        }
+  label{display:block; font-size:12px; font-family:'IBM Plex Mono', monospace; letter-spacing:.06em; text-transform:uppercase; color:#5c6558; margin-bottom:6px;}
+  .field{margin-bottom:18px;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  input[type=text], input[type=email], input[type=password]{
+    width:100%; padding:13px 14px; border-radius:4px; border:1.5px solid #c7cabd; background:#fff;
+    font-family:'IBM Plex Sans', sans-serif; font-size:14.5px; color:var(--ink);
+  }
+  input:focus{border-color:var(--steel); outline:none;}
 
-        @media (max-width: 576px) {
-            .gov-header h3 {
-                font-size: 16px;
-            }
+  .btn{
+    width:100%; padding:14px; border-radius:4px; border:none; cursor:pointer; font-weight:700; font-size:14.5px;
+    display:flex; align-items:center; justify-content:center; gap:10px; position:relative; overflow:hidden;
+    transition:transform .2s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--amber); color:var(--amber-ink);}
+  .btn-primary:hover{background:#f5b957;}
+  .btn-google{background:#fff; color:var(--ink); border:1.5px solid #c7cabd; margin-top:12px; font-weight:600;}
+  .btn-google:hover{background:#f7f7f4;}
+  .ripple{position:absolute; border-radius:50%; transform:scale(0); background:rgba(255,255,255,.5); pointer-events:none; animation:ripple-anim .6s ease-out forwards;}
+  @keyframes ripple-anim{ to{transform:scale(1); opacity:0;} }
 
-            .card {
-                max-width: 95vw;
-                padding: 20px !important;
-            }
+  .divider{display:flex; align-items:center; gap:12px; margin:24px 0; color:#8a9083; font-size:12px; text-transform:uppercase; letter-spacing:.08em;}
+  .divider::before, .divider::after{content:""; flex:1; height:1px; background:#d3d6cb;}
 
-            h4 {
-                font-size: 18px;
-            }
+  .footer-line{margin-top:26px; text-align:center; font-size:13.5px; color:#5c6558;}
+  .footer-line a{color:var(--steel); font-weight:700; text-decoration:none;}
+  .footer-line a:hover{text-decoration:underline;}
 
-            .btn {
-                font-size: 14px;
-                padding: 10px;
-            }
+  .sparkle{position:fixed; z-index:200; pointer-events:none; width:5px; height:5px; border-radius:50%; background:var(--amber); box-shadow:0 0 8px 2px rgba(242,169,59,.6); animation:sparkle-fade .7s ease-out forwards;}
+  @keyframes sparkle-fade{ to{transform:translateY(12px) scale(0); opacity:0;} }
 
-            .form-control, .form-select {
-                font-size: 16px;
-                padding: 10px;
-            }
+  .mascot{position:fixed; right:24px; bottom:24px; z-index:150; width:50px; height:50px; cursor:pointer;
+    animation:mascot-float 3.2s ease-in-out infinite; filter:drop-shadow(0 6px 14px rgba(11,37,69,.3));}
+  @keyframes mascot-float{ 0%,100%{transform:translateY(0) rotate(-2deg);} 50%{transform:translateY(-9px) rotate(2deg);} }
+  .mascot:hover{animation-play-state:paused;}
+  .mascot-eye{animation:mascot-blink 4.5s ease-in-out infinite; transform-origin:center;}
+  @keyframes mascot-blink{ 0%,92%,100%{transform:scaleY(1);} 95%{transform:scaleY(.1);} }
+  .mascot-bubble{
+    position:fixed; right:80px; bottom:38px; z-index:150; background:var(--navy); color:var(--paper);
+    border:1px solid var(--line); border-radius:12px; padding:8px 14px; font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px; opacity:0; transform:translateY(6px) scale(.9); pointer-events:none;
+    transition:opacity .3s, transform .3s; white-space:nowrap;
+  }
+  .mascot-bubble.show{opacity:1; transform:translateY(0) scale(1);}
 
-            .form-label {
-                font-size: 14px;
-                margin-bottom: 6px;
-            }
-
-            .text-center a {
-                display: inline-block;
-                margin-top: 10px;
-                font-size: 14px;
-            }
-
-            .google-btn {
-                font-size: 13px !important;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .gov-header {
-                padding: 10px 8px;
-            }
-
-            .gov-header h3 {
-                font-size: 14px;
-            }
-
-            .card {
-                padding: 15px !important;
-            }
-
-            h4 {
-                font-size: 16px;
-                margin-bottom: 15px !important;
-            }
-
-            .form-label {
-                font-size: 13px;
-            }
-        }
-    </style>
+  @media (max-width: 880px){
+    body{grid-template-columns:1fr;}
+    .side{padding:44px 6vw 30px;}
+    .mini-ticket{display:none;}
+    .field-row{grid-template-columns:1fr;}
+  }
+</style>
 </head>
 <body>
-    <!-- Government style header -->
-    <div class="gov-header">
-        <marquee behavior="alternate" direction="left">
-            <h3>Civic Issue Reporting Portal</h3>
-        </marquee>
-    </div>
 
-    <div class="container">
-        <!-- Registration Card -->
-        <div class="card shadow p-4">
-            <h4 class="mb-3 text-center">Citizen Registration</h4>
+<div class="side-smoke-wrap" id="sideSmoke"></div>
 
-            <!-- Registration Form -->
-            <form method="POST">
-                <!-- First Name -->
-                <div class="mb-3">
-                    <label class="form-label">First Name</label>
-                    <input type="text" class="form-control" placeholder="Joe" name="first_name" required>
-                </div>
+<div class="side">
+  <div class="side-glow"></div>
+  <div class="stars" id="stars"></div>
+  <div class="smoke s1"></div>
+  <div class="smoke s2"></div>
+  <div class="smoke s3"></div>
+  <div class="smoke s4"></div>
+  <div class="smoke s5"></div>
 
-                <!-- Last Name -->
-                <div class="mb-3">
-                    <label class="form-label">Last Name</label>
-                    <input type="text" class="form-control" placeholder="Biden" name="last_name" required>
-                </div>
+  <a href="/" class="brand pop-in pop-1"><span class="dot-ring"></span>CIVIC / MAPPER</a>
+  <h1 class="pop-in pop-2">Join your <span class="grad">city's reporting</span> network.</h1>
+  <p class="pop-in pop-3">Create an account to file complaints, get a trackable ticket number for each one, and hear back the moment a status changes.</p>
 
-                <!-- Gmail Validation -->
-                <div class="mb-3">
-                    <label class="form-label">Email (Gmail only)</label>
-                    <input type="email"
-                           class="form-control"
-                           placeholder="akd@gmail.com"
-                           name="email"
-                           pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
-                           title="Please enter a valid Gmail address"
-                           required>
-                </div>
+  <div class="mini-ticket pop-in pop-4" id="miniTicket">
+    <div class="row"><span class="k">Ticket</span><span class="v">#01042</span></div>
+    <div class="row"><span class="k">Issue</span><span class="v">Pothole</span></div>
+    <div class="row"><span class="k">Status</span><span class="v"><span class="stage-dot"></span>In progress</span></div>
+  </div>
+</div>
 
-                <!-- Password Validation -->
-                <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <input type="password"
-                           class="form-control"
-                           name="password"
-                           pattern="^(?=.*[!@#$%^&*]).{8,}$"
-                           title="Password must be at least 8 characters and contain one special character"
-                           required>
-                </div>
+<div class="form-side">
+  <div class="form-card" id="formCard">
+    <span class="eyebrow pop-in pop-3">Citizen access</span>
+    <h2 class="pop-in pop-3">Create account</h2>
+    <p class="sub pop-in pop-3">A few details and you're ready to file your first report.</p>
 
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary w-100">
-                    Register
-                </button>
-
-                <!-- Google sign-in button -->
-                <div class="text-center mt-3">
-                    <a href="/google_login" class="btn btn-light border w-100 google-btn">
-                        <img src="https://developers.google.com/identity/images/g-logo.png" width="20" style="margin-right:8px;">
-                        Register with Google
-                    </a>
-                </div>
-            </form>
-
-            <p class="text-center mt-3 mb-0">
-                Already registered? <a href="/login">login</a>
-            </p>
+    <form action="/register" method="POST" class="pop-in pop-4">
+      <div class="field field-row">
+        <div>
+          <label for="first_name">First name</label>
+          <input type="text" id="first_name" name="first_name" placeholder="Anushka" required>
         </div>
-    </div>
+        <div>
+          <label for="last_name">Last name</label>
+          <input type="text" id="last_name" name="last_name" placeholder="Sharma" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Create account</button>
+    </form>
+
+    <div class="divider pop-in pop-5">or</div>
+
+    <a href="/login/google" class="btn btn-google pop-in pop-5">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.95v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.95a9 9 0 0 0 0 8.1l3.02-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 0 0 .95 4.95l3.02 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </a>
+
+    <p class="footer-line pop-in pop-6">Already have an account? <a href="/login">Log in</a></p>
+  </div>
+</div>
+
+<div class="mascot-bubble" id="mascotBubble">Welcome! 👋</div>
+<svg class="mascot" id="mascot" viewBox="0 0 56 56" fill="none">
+  <defs>
+    <radialGradient id="mascotG" cx="35%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".45" stop-color="#F2A93B"/>
+      <stop offset="1" stop-color="#b9781f"/>
+    </radialGradient>
+  </defs>
+  <circle cx="28" cy="26" r="22" fill="url(#mascotG)"/>
+  <g class="mascot-eye"><circle cx="20" cy="24" r="2.6" fill="#0B2545"/></g>
+  <g class="mascot-eye"><circle cx="34" cy="24" r="2.6" fill="#0B2545"/></g>
+  <path d="M19 32c3 3.5 13 3.5 16 0" stroke="#0B2545" stroke-width="2" stroke-linecap="round" fill="none"/>
+</svg>
+
+<script>
+  // cursor sparkle, desktop only
+  if(window.matchMedia('(hover:hover)').matches){
+    let last = 0;
+    document.addEventListener('mousemove', e=>{
+      const now = Date.now();
+      if(now-last < 70) return;
+      last = now;
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.style.left = e.clientX+'px';
+      s.style.top = e.clientY+'px';
+      document.body.appendChild(s);
+      setTimeout(()=>s.remove(), 700);
+    });
+  }
+
+  // button ripple
+  document.querySelectorAll('.btn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const r = btn.getBoundingClientRect();
+      const circle = document.createElement('span');
+      circle.className = 'ripple';
+      const size = Math.max(r.width, r.height);
+      circle.style.width = circle.style.height = size+'px';
+      circle.style.left = (e.clientX-r.left-size/2)+'px';
+      circle.style.top = (e.clientY-r.top-size/2)+'px';
+      btn.appendChild(circle);
+      setTimeout(()=>circle.remove(), 600);
+    });
+  });
+
+  // twinkling stars in the navy panel
+  const starsWrap = document.getElementById('stars');
+  if(starsWrap){
+    for(let i=0;i<26;i++){
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = Math.random()*100 + '%';
+      s.style.top = Math.random()*100 + '%';
+      const size = Math.random()*1.6 + 1;
+      s.style.width = s.style.height = size + 'px';
+      s.style.animationDuration = (Math.random()*3+2) + 's';
+      s.style.animationDelay = (Math.random()*4) + 's';
+      starsWrap.appendChild(s);
+    }
+  }
+
+  // drifting smoke across the whole page
+  const sideSmokeWrap = document.getElementById('sideSmoke');
+  function addSideSmoke(side, count){
+    for(let i=0;i<count;i++){
+      const s = document.createElement('div');
+      s.className = 'side-smoke from-' + side;
+      const size = 120 + Math.random()*130;
+      s.style.width = s.style.height = size + 'px';
+      s.style.top = (Math.random()*90) + 'vh';
+      if(side === 'left') s.style.left = '-140px';
+      else s.style.right = '-140px';
+      s.style.animationDuration = (16 + Math.random()*10) + 's';
+      s.style.animationDelay = (Math.random()*14) + 's';
+      sideSmokeWrap.appendChild(s);
+    }
+  }
+  addSideSmoke('left', 3);
+  addSideSmoke('right', 3);
+
+  // click burst particles on every button
+  const burstColors = ['#F2A93B', '#3E6C99', '#3E9B6F'];
+  document.querySelectorAll('.btn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const r = btn.getBoundingClientRect();
+      for(let i=0;i<9;i++){
+        const p = document.createElement('span');
+        p.className = 'burst-particle';
+        const angle = (Math.PI*2*i)/9 + Math.random()*.4;
+        const dist = 22 + Math.random()*20;
+        p.style.setProperty('--bx', Math.cos(angle)*dist+'px');
+        p.style.setProperty('--by', Math.sin(angle)*dist+'px');
+        p.style.left = (e.clientX-r.left)+'px';
+        p.style.top = (e.clientY-r.top)+'px';
+        p.style.background = burstColors[i % burstColors.length];
+        btn.appendChild(p);
+        setTimeout(()=>p.remove(), 600);
+      }
+    });
+  });
+
+  // start gentle idle float once pop-in settles
+  setTimeout(()=>{
+    document.getElementById('miniTicket').classList.add('floating');
+    document.getElementById('formCard').classList.add('floating');
+  }, 1000);
+
+  // mascot tip bubble
+  const mascot = document.getElementById('mascot');
+  const bubble = document.getElementById('mascotBubble');
+  const tips = [
+    "You'll get a ticket ID for every report",
+    "No login needed later to track status",
+    "Photos + GPS help departments respond faster",
+    "You'll be notified the moment status changes"
+  ];
+  let bubbleTimeout;
+  mascot.addEventListener('click', ()=>{
+    bubble.textContent = tips[Math.floor(Math.random()*tips.length)];
+    bubble.classList.add('show');
+    clearTimeout(bubbleTimeout);
+    bubbleTimeout = setTimeout(()=>bubble.classList.remove('show'), 2400);
+  });
+</script>
 
 </body>
 </html>
