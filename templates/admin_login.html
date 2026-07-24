@@ -1,169 +1,127 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — Civic Issue Mapper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --ink:#10151B;
+    --amber:#F2A93B; --amber-ink:#5C3A08; --steel:#3E6C99; --line: rgba(237,239,232,0.16);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; background:var(--navy); color:var(--paper);
+    font-family:'IBM Plex Sans', sans-serif; display:flex; align-items:center; justify-content:center;
+    position:relative; overflow:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; animation-iteration-count:1 !important;} }
+  h1{font-family:'Archivo Expanded', sans-serif; text-transform:uppercase; margin:0;}
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
 
-        body {
-            background-color: whitesmoke;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
+  .glow{position:absolute; inset:0; pointer-events:none; z-index:0;
+    background:radial-gradient(560px 380px at 20% 20%, rgba(62,108,153,.22), transparent 60%),
+               radial-gradient(500px 360px at 85% 80%, rgba(242,169,59,.10), transparent 60%);}
+  .smoke{position:absolute; bottom:-10%; border-radius:50%; filter:blur(18px); animation:smoke-rise linear infinite; z-index:0;}
+  .smoke.s1{left:15%; width:170px; height:170px; animation-duration:15s; background:radial-gradient(circle, rgba(62,108,153,.18), transparent 70%);}
+  .smoke.s2{left:70%; width:150px; height:150px; animation-duration:13s; animation-delay:3s; background:radial-gradient(circle, rgba(242,169,59,.12), transparent 70%);}
+  @keyframes smoke-rise{
+    0%{transform:translateY(0) scale(.8); opacity:0;} 12%{opacity:.8;}
+    50%{transform:translateY(-40vh) translateX(16px) scale(1.15);} 88%{opacity:.2;}
+    100%{transform:translateY(-85vh) translateX(-12px) scale(1.4); opacity:0;}
+  }
 
-        .gov-header {
-            background-color: rgb(59, 59, 139);
-            color: white;
-            padding: 12px 15px;
-            text-align: center;
-            font-weight: bold;
-        }
+  .panel{
+    position:relative; z-index:1; width:100%; max-width:380px; margin:20px;
+    background:var(--navy-deep); border:1px solid var(--line); border-radius:14px;
+    padding:40px 36px; box-shadow:0 24px 60px rgba(0,0,0,.45);
+    opacity:0; transform:scale(.6) translateY(24px);
+    animation:pop-in .65s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  @keyframes pop-in{ to{opacity:1; transform:scale(1) translateY(0);} }
 
-        .gov-header h3 {
-            margin: 0;
-            font-size: 18px;
-        }
+  .brand{display:flex; align-items:center; gap:9px; font-family:'Archivo Expanded', sans-serif; font-weight:800; font-size:15px; letter-spacing:.03em; text-decoration:none; margin-bottom:28px; justify-content:center;}
+  .dot-ring{position:relative; width:11px; height:11px;}
+  .dot-ring::before{content:''; position:absolute; inset:0; border-radius:50%; background:var(--amber); box-shadow:0 0 8px rgba(242,169,59,.8); animation:pulse-dot 1.8s ease-in-out infinite;}
+  @keyframes pulse-dot{ 0%,100%{transform:scale(1); opacity:1;} 50%{transform:scale(1.5); opacity:.5;} }
 
-        .container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--steel); display:block; text-align:center; margin-bottom:8px;}
+  h1{font-size:24px; text-align:center; margin-bottom:6px;}
+  .sub{color:rgba(237,239,232,.6); font-size:13.5px; text-align:center; margin-bottom:28px;}
 
-        .card {
-            width: 100%;
-            max-width: 400px;
-            border-radius: 10px;
-        }
+  .error-box{background:rgba(228,80,58,.14); border:1.5px solid rgba(228,80,58,.4); color:#ffb3a3; border-radius:6px; padding:11px 14px; font-size:13px; margin-bottom:20px; text-align:center;}
 
-        .form-control, .btn {
-            border-radius: 6px;
-        }
+  label{display:block; font-size:11.5px; font-family:'IBM Plex Mono', monospace; letter-spacing:.06em; text-transform:uppercase; color:rgba(237,239,232,.55); margin-bottom:6px;}
+  .field{margin-bottom:18px;}
+  input[type=text], input[type=password]{
+    width:100%; padding:12px 14px; border-radius:5px; border:1.5px solid rgba(237,239,232,.2);
+    background:rgba(237,239,232,.06); color:var(--paper); font-family:'IBM Plex Sans', sans-serif; font-size:14px;
+  }
+  input::placeholder{color:rgba(237,239,232,.35);}
+  input:focus{border-color:var(--steel); outline:none; background:rgba(237,239,232,.1);}
 
-        .alert {
-            border-radius: 6px;
-            margin-bottom: 15px;
-        }
+  .btn-primary{
+    width:100%; padding:13px; border-radius:5px; border:none; cursor:pointer; font-weight:700; font-size:14.5px;
+    background:var(--amber); color:var(--amber-ink); position:relative; overflow:hidden; transition:transform .2s ease, background .2s ease;
+  }
+  .btn-primary:hover{background:#f5b957; transform:translateY(-2px);}
+  .btn-primary:active{transform:scale(.98);}
+  .ripple{position:absolute; border-radius:50%; transform:scale(0); background:rgba(255,255,255,.5); pointer-events:none; animation:ripple-anim .6s ease-out forwards;}
+  @keyframes ripple-anim{ to{transform:scale(1); opacity:0;} }
 
-        @media (max-width: 576px) {
-            .gov-header h3 {
-                font-size: 16px;
-            }
-
-            .card {
-                max-width: 95vw;
-                padding: 20px !important;
-            }
-
-            h4 {
-                font-size: 18px;
-            }
-
-            .btn {
-                font-size: 14px;
-                padding: 10px;
-            }
-
-            .form-control, .form-select {
-                font-size: 16px;
-                padding: 10px;
-            }
-
-            label {
-                font-size: 14px;
-                margin-bottom: 6px;
-            }
-
-            .text-center a {
-                display: inline-block;
-                margin-top: 10px;
-                font-size: 14px;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .gov-header {
-                padding: 10px 8px;
-            }
-
-            .gov-header h3 {
-                font-size: 14px;
-            }
-
-            .card {
-                padding: 15px !important;
-            }
-
-            h4 {
-                font-size: 16px;
-                margin-bottom: 15px !important;
-            }
-
-            label {
-                font-size: 13px;
-            }
-
-            .btn {
-                font-size: 13px;
-            }
-        }
-    </style>
+  .back-link{display:block; text-align:center; margin-top:22px; font-size:12.5px; color:rgba(237,239,232,.5); text-decoration:none;}
+  .back-link:hover{color:var(--paper);}
+</style>
 </head>
-<body class="bg-light">
-    <!-- Government Header -->
-    <div class="gov-header">
-        <marquee behavior="alternate" direction="left">
-            <h3>Civic Issue Reporting Portal</h3>
-        </marquee>
+<body>
+
+<div class="glow"></div>
+<div class="smoke s1"></div>
+<div class="smoke s2"></div>
+
+<div class="panel">
+  <a href="/" class="brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
+  <span class="eyebrow">Restricted access</span>
+  <h1>Admin Login</h1>
+  <p class="sub">Sign in to manage complaints and departments.</p>
+
+  {% if error %}
+  <div class="error-box">{{ error }}</div>
+  {% endif %}
+
+  <form action="/admin" method="POST">
+    <div class="field">
+      <label for="admin_username">Username</label>
+      <input type="text" id="admin_username" name="admin_username" placeholder="admin" required>
     </div>
-
-    <div class="container">
-        <div class="card shadow p-4">
-            <h4 class="text-center mb-3">Admin Login</h4>
-
-            {% if error %}
-            <div class="alert alert-danger" role="alert">
-                {{ error }}
-            </div>
-            {% endif %}
-
-            <form method="POST">
-                <div class="mb-3">
-                    <label class="form-label">Admin Username</label>
-                    <input type="text" class="form-control" name="admin_username" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <input type="password" class="form-control" name="admin_password" required>
-                </div>
-
-                <button type="submit" class="btn btn-danger w-100">
-                    Login as Admin
-                </button>
-            </form>
-
-            <hr>
-
-            <div class="text-center">
-                <p class="mb-2" style="font-size: 14px;">Not an admin?</p>
-                <a href="/login" class="btn btn-outline-primary btn-sm">
-                    Back to Citizen Login
-                </a>
-            </div>
-        </div>
+    <div class="field">
+      <label for="admin_password">Password</label>
+      <input type="password" id="admin_password" name="admin_password" placeholder="••••••••" required>
     </div>
+    <button type="submit" class="btn-primary">Log in</button>
+  </form>
+
+  <a href="/" class="back-link">&larr; Back to site</a>
+</div>
+
+<script>
+  document.querySelector('.btn-primary').addEventListener('click', e=>{
+    const btn = e.currentTarget;
+    const r = btn.getBoundingClientRect();
+    const circle = document.createElement('span');
+    circle.className = 'ripple';
+    const size = Math.max(r.width, r.height);
+    circle.style.width = circle.style.height = size+'px';
+    circle.style.left = (e.clientX-r.left-size/2)+'px';
+    circle.style.top = (e.clientY-r.top-size/2)+'px';
+    btn.appendChild(circle);
+    setTimeout(()=>circle.remove(), 600);
+  });
+</script>
 
 </body>
 </html>

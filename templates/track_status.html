@@ -1,211 +1,136 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track Complaint Status</title>
-    <!-- Bootstrap for responsiveness -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Complaint — Civic Issue Mapper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --ink:#10151B;
+    --amber:#F2A93B; --amber-ink:#5C3A08; --steel:#3E6C99; --green:#3E9B6F; --line: rgba(237,239,232,0.16);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; min-height:100vh; background:var(--navy); color:var(--paper); font-family:'IBM Plex Sans', sans-serif;}
+  h1,h2{font-family:'Archivo Expanded', sans-serif; text-transform:uppercase; margin:0;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:18px 6vw; border-bottom:1px solid var(--line);}
+  .nav-brand{color:var(--paper); font-family:'Archivo Expanded', sans-serif; font-weight:800; font-size:16px; letter-spacing:.03em; text-decoration:none; display:flex; align-items:center; gap:9px;}
+  .dot-ring{position:relative; width:11px; height:11px;}
+  .dot-ring::before{content:''; position:absolute; inset:0; border-radius:50%; background:var(--amber); box-shadow:0 0 8px rgba(242,169,59,.8); animation:pulse-dot 1.8s ease-in-out infinite;}
+  @keyframes pulse-dot{ 0%,100%{transform:scale(1); opacity:1;} 50%{transform:scale(1.5); opacity:.5;} }
+  .nav a.back{color:var(--paper); opacity:.75; text-decoration:none; font-size:13px;}
 
-        body {
-            background-color: whitesmoke;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
+  .wrap{max-width:520px; margin:0 auto; padding:60px 6vw 90px;}
+  .pop-in{opacity:0; transform:scale(.6) translateY(20px); animation:pop-in-anim .6s cubic-bezier(.34,1.56,.64,1) forwards;}
+  @keyframes pop-in-anim{ to{opacity:1; transform:scale(1) translateY(0);} }
 
-        .gov-header {
-            background-color: rgb(59, 59, 139);
-            color: white;
-            padding: 12px 15px;
-            text-align: center;
-            font-weight: bold;
-        }
+  .head{text-align:center; margin-bottom:30px;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber); display:block; margin-bottom:10px;}
+  .head h1{font-size:clamp(24px,3vw,32px);}
 
-        .gov-header h3 {
-            margin: 0;
-            font-size: 18px;
-        }
+  .search-panel{background:rgba(237,239,232,.06); border:1px solid var(--line); border-radius:12px; padding:26px;}
+  .search-panel form{display:flex; gap:10px;}
+  .search-panel input{
+    flex:1; padding:13px 14px; border-radius:5px; border:1.5px solid rgba(237,239,232,.25);
+    background:rgba(237,239,232,.06); color:var(--paper); font-family:'IBM Plex Mono', monospace; font-size:14px;
+  }
+  .search-panel input::placeholder{color:rgba(237,239,232,.4);}
+  .search-panel input:focus{border-color:var(--amber); outline:none;}
+  .search-panel button{
+    padding:13px 20px; border-radius:5px; border:none; background:var(--amber); color:var(--amber-ink);
+    font-weight:700; font-size:13.5px; cursor:pointer; transition:transform .2s ease;
+  }
+  .search-panel button:hover{transform:translateY(-2px);}
 
-        .container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+  .error-box{background:rgba(228,80,58,.14); border:1.5px solid rgba(228,80,58,.4); color:#ffb3a3; border-radius:8px; padding:14px 18px; margin-top:24px; font-size:13.5px; text-align:center;}
 
-        .card {
-            width: 100%;
-            max-width: 480px;
-            border-radius: 10px;
-        }
+  .result-card{
+    background:#fff; color:var(--ink); border-radius:12px; padding:26px; margin-top:24px;
+    box-shadow:0 20px 50px rgba(0,0,0,.3);
+  }
+  .r-top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;}
+  .r-id{font-family:'IBM Plex Mono', monospace; font-size:12px; color:#5c6558;}
+  .r-type{font-family:'Archivo Expanded', sans-serif; font-size:22px; color:var(--navy); margin-top:2px;}
+  .badge{display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:100px; font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; font-weight:600;}
+  .badge-dot{width:6px; height:6px; border-radius:50%;}
+  .badge.pending{background:#FCEFDA; color:var(--amber-ink);} .badge.pending .badge-dot{background:var(--amber);}
+  .badge.inprogress{background:#E3EBF3; color:var(--steel);} .badge.inprogress .badge-dot{background:var(--steel);}
+  .badge.resolved{background:#E1F0E7; color:var(--green);} .badge.resolved .badge-dot{background:var(--green);}
+  .r-row{display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px dashed #d9dcd1; font-size:13.5px;}
+  .r-row:last-child{border-bottom:none;}
+  .r-row .k{color:#5c6558; font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:.06em;}
+  .r-row .v{font-weight:600;}
 
-        .form-control, .btn {
-            border-radius: 6px;
-        }
-
-        .badge {
-            font-size: 13px;
-            padding: 6px 10px;
-        }
-
-        .result-box {
-            background-color: #f9f9fb;
-            border: 1px solid #e0e0e6;
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 20px;
-        }
-
-        .result-box dt {
-            font-size: 12px;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        .result-box dd {
-            font-size: 15px;
-            margin-bottom: 12px;
-        }
-
-        .resolution-photo img {
-            width: 100%;
-            max-height: 280px;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid #e0e0e6;
-        }
-
-        @media (max-width: 576px) {
-            .gov-header h3 {
-                font-size: 16px;
-            }
-
-            .card {
-                max-width: 95vw;
-                padding: 20px !important;
-            }
-
-            h4 {
-                font-size: 18px;
-            }
-
-            .btn {
-                font-size: 14px;
-                padding: 10px;
-            }
-
-            .form-control {
-                font-size: 16px;
-                padding: 10px;
-            }
-
-            label {
-                font-size: 14px;
-                margin-bottom: 6px;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .gov-header {
-                padding: 10px 8px;
-            }
-
-            .gov-header h3 {
-                font-size: 14px;
-            }
-
-            .card {
-                padding: 15px !important;
-            }
-
-            h4 {
-                font-size: 16px;
-                margin-bottom: 15px !important;
-            }
-        }
-    </style>
+  .lifecycle-mini{display:flex; align-items:center; justify-content:center; gap:8px; margin-top:18px;}
+  .step{width:10px; height:10px; border-radius:50%; background:#d9dcd1;}
+  .step.done{background:var(--green);}
+  .step.current{background:var(--amber); box-shadow:0 0 0 4px rgba(242,169,59,.25);}
+  .step-line{flex:1; height:2px; background:#d9dcd1;}
+  .step-line.done{background:var(--green);}
+</style>
 </head>
 <body>
-    <!-- Government Header -->
-    <div class="gov-header">
-        <marquee behavior="alternate" direction="left">
-            <h3>Civic Issue Reporting Portal</h3>
-        </marquee>
+
+<nav class="nav">
+  <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
+  <a href="/" class="back">&larr; Back to home</a>
+</nav>
+
+<div class="wrap">
+  <div class="head pop-in">
+    <span class="eyebrow">Public lookup</span>
+    <h1>Track your complaint</h1>
+  </div>
+
+  <div class="search-panel pop-in" style="animation-delay:.1s;">
+    <form action="/track_status" method="POST">
+      <input type="text" name="complaint_id" placeholder="Enter your complaint ID, e.g. 1042" required>
+      <button type="submit">Track</button>
+    </form>
+  </div>
+
+  {% if error %}
+  <div class="error-box pop-in" style="animation-delay:.15s;">{{ error }}</div>
+  {% endif %}
+
+  {% if complaint %}
+  <div class="result-card pop-in" style="animation-delay:.15s;">
+    <div class="r-top">
+      <div>
+        <span class="r-id">TICKET #{{ complaint.id }}</span>
+        <div class="r-type">{{ complaint.issue_type }}</div>
+      </div>
+      {% if complaint.status == 'Resolved' %}
+        <span class="badge resolved"><span class="badge-dot"></span>Resolved</span>
+      {% elif complaint.status == 'In Progress' %}
+        <span class="badge inprogress"><span class="badge-dot"></span>In progress</span>
+      {% else %}
+        <span class="badge pending"><span class="badge-dot"></span>Pending</span>
+      {% endif %}
     </div>
 
-    <div class="container">
-        <!-- Card Start -->
-        <div class="card shadow p-4">
-            <h4 class="mb-3 text-center">Track Complaint Status</h4>
+    <div class="r-row"><span class="k">Department</span><span class="v">{{ complaint.department or 'Awaiting assignment' }}</span></div>
+    <div class="r-row"><span class="k">Filed on</span><span class="v mono">{{ complaint.created_at }}</span></div>
+    {% if complaint.resolution_image %}
+      <div class="r-row"><span class="k">Resolution proof</span><span class="v"><a href="/static/uploads/{{ complaint.resolution_image }}" target="_blank" style="color:var(--steel);">View photo</a></span></div>
+    {% endif %}
 
-            {% if error %}
-            <div class="alert alert-warning text-center" role="alert">
-                {{ error }}
-            </div>
-            {% endif %}
-
-            <!-- Complaint ID Form -->
-            <form method="POST">
-                <div class="mb-3">
-                    <label>Complaint ID</label>
-                    <input type="number" class="form-control" placeholder="e.g. 1024" name="complaint_id" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Check Status</button>
-            </form>
-            <!-- Form End -->
-
-            {% if complaint %}
-            <!-- Complaint Details -->
-            <div class="result-box">
-                <dl class="mb-0">
-                    <dt>Complaint ID</dt>
-                    <dd>#{{ complaint.id }}</dd>
-
-                    <dt>Issue Type</dt>
-                    <dd>{{ complaint.issue_type }}</dd>
-
-                    <dt>Status</dt>
-                    <dd>
-                        {% if complaint.status == 'Pending' %}
-                            <span class="badge bg-warning text-dark">Pending</span>
-                        {% elif complaint.status == 'In Progress' %}
-                            <span class="badge bg-info text-dark">In Progress</span>
-                        {% elif complaint.status == 'Resolved' %}
-                            <span class="badge bg-success">Resolved</span>
-                        {% endif %}
-                    </dd>
-
-                    <dt>Assigned Department</dt>
-                    <dd>{{ complaint.department if complaint.department else "Not yet assigned" }}</dd>
-
-                    <dt>Submitted On</dt>
-                    <dd>{{ complaint.created_at }}</dd>
-
-                    {% if complaint.resolution_image %}
-                    <dt>Resolution Proof</dt>
-                    <dd class="resolution-photo">
-                        <img src="{{ url_for('static', filename='uploads/' + complaint.resolution_image) }}" alt="Resolution proof photo">
-                    </dd>
-                    {% endif %}
-                </dl>
-            </div>
-            {% endif %}
-
-            <!-- Back to Login -->
-            <p class="text-center mt-3 mb-0"><a href="/login">Back to Login</a></p>
-        </div>
-        <!-- Card End -->
+    <div class="lifecycle-mini">
+      <div class="step done"></div>
+      <div class="step-line {% if complaint.status in ['In Progress','Resolved'] %}done{% endif %}"></div>
+      <div class="step {% if complaint.status == 'In Progress' %}current{% elif complaint.status == 'Resolved' %}done{% endif %}"></div>
+      <div class="step-line {% if complaint.status == 'Resolved' %}done{% endif %}"></div>
+      <div class="step {% if complaint.status == 'Resolved' %}current{% endif %}"></div>
     </div>
+  </div>
+  {% endif %}
+</div>
 
 </body>
 </html>
