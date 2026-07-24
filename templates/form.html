@@ -1,255 +1,332 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Civic Issue</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report an Issue — Civic Issue Mapper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --paper-dim:#E1E4DA; --ink:#10151B;
+    --amber:#F2A93B; --amber-ink:#5C3A08; --steel:#3E6C99; --green:#3E9B6F; --line: rgba(237,239,232,0.16);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:'IBM Plex Sans', sans-serif; overflow-x:hidden;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;} }
+  h1,h2{font-family:'Archivo Expanded', sans-serif; text-transform:uppercase; letter-spacing:.01em; margin:0;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
 
-        body {
-            background-color: #f4f6f9;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
+  /* ---------- NAV ---------- */
+  .nav{
+    position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
+    padding:16px 6vw; background:rgba(11,37,69,.94); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);
+  }
+  .nav-brand{color:var(--paper); font-family:'Archivo Expanded', sans-serif; font-weight:800; font-size:17px; letter-spacing:.03em; text-decoration:none; display:flex; align-items:center; gap:9px;}
+  .dot-ring{position:relative; width:12px; height:12px;}
+  .dot-ring::before{content:''; position:absolute; inset:0; border-radius:50%; background:var(--amber); box-shadow:0 0 8px rgba(242,169,59,.8); animation:pulse-dot 1.8s ease-in-out infinite;}
+  @keyframes pulse-dot{ 0%,100%{transform:scale(1); opacity:1;} 50%{transform:scale(1.5); opacity:.5;} }
+  .nav-links{display:flex; align-items:center; gap:16px;}
+  .nav-links a.text-link{color:var(--paper); opacity:.8; text-decoration:none; font-size:13.5px;}
+  .nav-links a.text-link:hover{opacity:1;}
+  .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 18px; font-weight:600; font-size:13.5px; text-decoration:none; border-radius:3px; border:1.5px solid transparent; cursor:pointer; position:relative; overflow:hidden; transition:transform .2s ease;}
+  .btn:hover{transform:translateY(-2px);}
+  .btn:active{transform:scale(.97);}
+  .btn-ghost{border-color:rgba(237,239,232,.4); color:var(--paper);}
+  .btn-ghost:hover{background:rgba(237,239,232,.1);}
+  .ripple{position:absolute; border-radius:50%; transform:scale(0); background:rgba(255,255,255,.5); pointer-events:none; animation:ripple-anim .6s ease-out forwards;}
+  @keyframes ripple-anim{ to{transform:scale(1); opacity:0;} }
 
-        .header {
-            background-color: #0d6efd;
-            color: white;
-            padding: 15px;
-            font-size: 20px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+  /* ---------- HEADER ---------- */
+  .page-head{background:var(--navy); color:var(--paper); padding:56px 6vw 60px; position:relative; overflow:hidden;}
+  .head-glow{position:absolute; inset:0; pointer-events:none; z-index:0; background:radial-gradient(600px 380px at 15% 20%, rgba(242,169,59,.10), transparent 60%), radial-gradient(600px 420px at 85% 60%, rgba(62,108,153,.20), transparent 60%);}
+  .smoke{position:absolute; bottom:-10%; border-radius:50%; filter:blur(18px); animation:smoke-rise linear infinite; z-index:0;}
+  .smoke.s1{left:10%; width:160px; height:160px; animation-duration:14s; background:radial-gradient(circle, rgba(242,169,59,.14), transparent 70%);}
+  .smoke.s2{left:70%; width:190px; height:190px; animation-duration:17s; animation-delay:2s; background:radial-gradient(circle, rgba(62,108,153,.18), transparent 70%);}
+  @keyframes smoke-rise{
+    0%{transform:translateY(0) translateX(0) scale(.8); opacity:0;} 12%{opacity:.8;}
+    50%{transform:translateY(-40vh) translateX(18px) scale(1.15);} 88%{opacity:.2;}
+    100%{transform:translateY(-85vh) translateX(-14px) scale(1.4); opacity:0;}
+  }
+  .page-head > *{position:relative; z-index:1;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber); margin-bottom:14px; display:inline-flex; align-items:center; gap:8px;}
+  .eyebrow::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--amber); box-shadow:0 0 8px var(--amber); animation:pulse-dot 1.6s ease-in-out infinite;}
+  .page-head h1{font-size:clamp(30px,4vw,44px); line-height:1.05;}
+  .page-head h1 .grad{background:linear-gradient(120deg, var(--amber), #ffd88a 50%, var(--amber)); -webkit-background-clip:text; background-clip:text; color:transparent; background-size:200% auto; animation:shine 5s linear infinite;}
+  @keyframes shine{ to{background-position:200% center;} }
+  .page-head p{color:rgba(237,239,232,.8); font-size:15px; max-width:56ch; margin-top:14px;}
 
-        .header-title {
-            flex: 1;
-            min-width: 200px;
-        }
+  /* ---------- FORM LAYOUT ---------- */
+  .wrap{max-width:760px; margin:0 auto; padding:50px 6vw 90px;}
+  .pop-in{opacity:0; transform:scale(.6) translateY(24px); animation:pop-in-anim .65s cubic-bezier(.34,1.56,.64,1) forwards;}
+  @keyframes pop-in-anim{ to{opacity:1; transform:scale(1) translateY(0);} }
+  .pop-1{animation-delay:.05s;} .pop-2{animation-delay:.15s;} .pop-3{animation-delay:.25s;} .pop-4{animation-delay:.35s;} .pop-5{animation-delay:.45s;}
 
-        .top-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+  .form-block{background:#fff; border:1px solid #d9dcd1; border-radius:12px; padding:28px 26px; margin-bottom:22px; box-shadow:0 10px 26px rgba(11,37,69,.06);}
+  .block-label{font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--steel); margin-bottom:14px; display:block;}
 
-        .top-buttons .btn {
-            font-size: 13px;
-            padding: 6px 12px;
-            white-space: nowrap;
-        }
+  .cat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+  .cat-option{display:none;}
+  .cat-card{
+    border:2px solid #d9dcd1; border-radius:10px; padding:18px 10px; text-align:center; cursor:pointer;
+    transition:border-color .2s, transform .2s, box-shadow .2s; user-select:none;
+  }
+  .cat-card svg{width:30px; height:30px; margin:0 auto 8px; display:block; color:var(--navy); transition:transform .3s ease;}
+  .cat-card span{display:block; font-size:12.5px; font-weight:600; color:var(--navy);}
+  .cat-card:hover{transform:translateY(-3px); border-color:var(--steel);}
+  .cat-option:checked + .cat-card{border-color:var(--amber); background:#FCF3E2; box-shadow:0 0 0 3px rgba(242,169,59,.18);}
+  .cat-option:checked + .cat-card svg{transform:scale(1.15);}
 
-        .card {
-            border-radius: 10px;
-        }
+  textarea{
+    width:100%; padding:13px 14px; border-radius:6px; border:1.5px solid #c7cabd; background:#fff;
+    font-family:'IBM Plex Sans', sans-serif; font-size:14.5px; color:var(--ink); resize:vertical; min-height:100px;
+  }
+  textarea:focus{border-color:var(--steel); outline:none;}
 
-        .form-control, .form-select, .btn {
-            border-radius: 6px;
-        }
+  .geo-row{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  .geo-btn{
+    background:var(--paper-dim); border:1.5px solid #c7cabd; border-radius:6px; padding:11px 16px;
+    font-weight:600; font-size:13.5px; cursor:pointer; display:flex; align-items:center; gap:8px; color:var(--navy);
+    transition:background .2s, border-color .2s;
+  }
+  .geo-btn:hover{background:#d7dbcd; border-color:var(--steel);}
+  .geo-btn svg{width:16px; height:16px;}
+  .geo-status{font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:#5c6558;}
+  .geo-status.ok{color:var(--green); font-weight:600;}
+  .geo-pulse{display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--green); margin-right:6px; animation:pulse-dot 1.4s ease-in-out infinite;}
 
-        .container {
-            padding: 15px;
-        }
+  .upload-zone{
+    border:2px dashed #c7cabd; border-radius:10px; padding:30px 20px; text-align:center; cursor:pointer;
+    transition:border-color .2s, background .2s; position:relative;
+  }
+  .upload-zone:hover, .upload-zone.drag{border-color:var(--amber); background:#FCF3E2;}
+  .upload-zone svg{width:34px; height:34px; color:var(--steel); margin:0 auto 10px; display:block;}
+  .upload-zone p{margin:0; font-size:13.5px; color:#5c6558;}
+  .upload-zone input[type=file]{position:absolute; inset:0; opacity:0; cursor:pointer;}
+  #previewWrap{margin-top:14px; display:none;}
+  #previewImg{max-width:100%; max-height:220px; border-radius:8px; display:block; margin:0 auto; box-shadow:0 8px 22px rgba(11,37,69,.15);}
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
+  .submit-btn{
+    width:100%; padding:16px; border-radius:6px; border:none; cursor:pointer; font-weight:700; font-size:15.5px;
+    background:var(--amber); color:var(--amber-ink); display:flex; align-items:center; justify-content:center; gap:10px;
+    position:relative; overflow:hidden; transition:transform .2s ease, background .2s ease;
+    box-shadow:0 8px 24px rgba(242,169,59,.25);
+  }
+  .submit-btn:hover{background:#f5b957; transform:translateY(-2px); box-shadow:0 12px 30px rgba(242,169,59,.4);}
+  .submit-btn:active{transform:scale(.98);}
 
-            .card {
-                padding: 20px !important;
-            }
+  .burst-particle{position:absolute; width:5px; height:5px; border-radius:50%; pointer-events:none; animation:burst-out .55s ease-out forwards;}
+  @keyframes burst-out{ to{transform:translate(var(--bx),var(--by)) scale(0); opacity:0;} }
 
-            h3 {
-                font-size: 20px;
-            }
+  .sparkle{position:fixed; z-index:200; pointer-events:none; width:5px; height:5px; border-radius:50%; background:var(--amber); box-shadow:0 0 8px 2px rgba(242,169,59,.6); animation:sparkle-fade .7s ease-out forwards;}
+  @keyframes sparkle-fade{ to{transform:translateY(12px) scale(0); opacity:0;} }
 
-            .header {
-                font-size: 18px;
-                padding: 12px;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .header-title {
-                width: 100%;
-            }
-
-            .top-buttons {
-                width: 100%;
-            }
-
-            .top-buttons .btn {
-                flex: 1;
-                min-width: 120px;
-            }
-
-            .form-control, .form-select {
-                font-size: 16px;
-                padding: 10px;
-            }
-
-            label {
-                font-size: 14px;
-                margin-bottom: 6px;
-            }
-
-            textarea {
-                min-height: 100px;
-            }
-
-            .btn {
-                font-size: 14px;
-                padding: 10px;
-            }
-        }
-
-        @media (max-width: 500px) {
-            .container {
-                padding: 8px;
-                margin-top: 15px !important;
-            }
-
-            .card {
-                padding: 15px !important;
-                box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-            }
-
-            h3 {
-                font-size: 18px;
-                margin-bottom: 15px !important;
-            }
-
-            .header {
-                font-size: 16px;
-                padding: 10px;
-            }
-
-            .top-buttons .btn {
-                font-size: 12px;
-                padding: 8px 10px;
-                min-width: 100px;
-            }
-
-            .form-control, .form-select {
-                font-size: 15px;
-            }
-
-            label {
-                font-size: 13px;
-            }
-
-            textarea {
-                min-height: 80px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .header {
-                font-size: 14px;
-            }
-
-            .top-buttons {
-                gap: 5px;
-            }
-
-            .top-buttons .btn {
-                font-size: 11px;
-                padding: 6px 8px;
-            }
-
-            .card {
-                padding: 12px !important;
-            }
-
-            h3 {
-                font-size: 16px;
-            }
-        }
-    </style>
+  @media (max-width: 640px){
+    .cat-grid{grid-template-columns:1fr 1fr;}
+    .nav-links a.text-link{display:none;}
+  }
+</style>
 </head>
 <body>
 
-<!-- Header -->
-<div class="header">
-    <div class="header-title">Civic Issue Reporting Portal</div>
-    <div class="top-buttons">
-        <a href="/my_issues" class="btn btn-light btn-sm">My Complaints</a>
-        <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+<nav class="nav">
+  <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
+  <div class="nav-links">
+    <a href="/my_issues" class="text-link">My issues</a>
+    <a href="/notifications" class="text-link">Notifications</a>
+    <a href="/logout" class="btn btn-ghost">Log out</a>
+  </div>
+</nav>
+
+<header class="page-head">
+  <div class="head-glow"></div>
+  <div class="smoke s1"></div>
+  <div class="smoke s2"></div>
+  <span class="eyebrow">New report</span>
+  <h1>File a complaint,<br><span class="grad">get a ticket in seconds.</span></h1>
+  <p>Pick a category, describe what's wrong, attach a photo, and drop your location. We'll route it to the right department automatically.</p>
+</header>
+
+<div class="wrap">
+  <form action="/submit" method="POST" enctype="multipart/form-data" id="reportForm">
+
+    <div class="form-block pop-in pop-1">
+      <span class="block-label">// 01 — What's the issue?</span>
+      <div class="cat-grid">
+        <label>
+          <input class="cat-option" type="radio" name="issue_type" value="Garbage" required>
+          <div class="cat-card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 12v4M14 12v4"/></svg>
+            <span>Garbage &amp; Dumping</span>
+          </div>
+        </label>
+        <label>
+          <input class="cat-option" type="radio" name="issue_type" value="Pothole">
+          <div class="cat-card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="15" rx="7" ry="3"/><path d="M5 15v-1c0-3 3-7 7-7s7 4 7 7v1"/></svg>
+            <span>Potholes &amp; Roads</span>
+          </div>
+        </label>
+        <label>
+          <input class="cat-option" type="radio" name="issue_type" value="Water Leakage">
+          <div class="cat-card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>
+            <span>Water Leakage</span>
+          </div>
+        </label>
+        <label>
+          <input class="cat-option" type="radio" name="issue_type" value="Street Light">
+          <div class="cat-card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v6"/><circle cx="12" cy="12" r="3.2"/><path d="M12 15v6M9 21h6"/></svg>
+            <span>Street Lights</span>
+          </div>
+        </label>
+      </div>
     </div>
+
+    <div class="form-block pop-in pop-2">
+      <span class="block-label">// 02 — Describe it</span>
+      <textarea name="description" placeholder="e.g. Large pothole in the middle of the road, been growing for two weeks, cars swerving to avoid it." required></textarea>
+    </div>
+
+    <div class="form-block pop-in pop-3">
+      <span class="block-label">// 03 — Where is it?</span>
+      <div class="geo-row">
+        <button type="button" class="geo-btn" id="geoBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          Use my current location
+        </button>
+        <span class="geo-status" id="geoStatus">No location captured yet</span>
+      </div>
+      <input type="hidden" name="latitude" id="latitude">
+      <input type="hidden" name="longitude" id="longitude">
+    </div>
+
+    <div class="form-block pop-in pop-4">
+      <span class="block-label">// 04 — Add a photo</span>
+      <div class="upload-zone" id="uploadZone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+        <p><strong>Click to upload</strong> or drag a photo here</p>
+        <input type="file" name="image" id="imageInput" accept="image/*">
+      </div>
+      <div id="previewWrap"><img id="previewImg" alt="Preview of uploaded photo"></div>
+    </div>
+
+    <button type="submit" class="submit-btn pop-in pop-5">SUBMIT COMPLAINT <span style="font-size:18px;">→</span></button>
+  </form>
 </div>
 
-<!-- Form Container -->
-<div class="container mt-5">
-    <div class="card shadow p-4">
-        <h3 class="mb-3">Report an Issue</h3>
-
-        <form method="POST" action="/submit" enctype="multipart/form-data">
-
-            <!-- Issue Type -->
-            <div class="mb-3">
-                <label>Issue Type</label>
-                <select name="issue_type" class="form-control" required>
-                    <option value="">Select Issue</option>
-                    <option>Garbage</option>
-                    <option>Pothole</option>
-                    <option>Water Leakage</option>
-                    <option>Street Light</option>
-                    <option>Drainage</option>
-                </select>
-            </div>
-
-            <!-- Description -->
-            <div class="mb-3">
-                <label>Description</label>
-                <textarea name="description" class="form-control" required></textarea>
-            </div>
-
-            <!-- Location -->
-            <div class="mb-3">
-                <label>Location</label><br>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="getLocation()">Get Location</button>
-                <p id="locationText" class="mt-2 text-success"></p>
-
-                <input type="hidden" name="latitude" id="latitude">
-                <input type="hidden" name="longitude" id="longitude">
-            </div>
-
-            <!-- Image Upload -->
-            <div class="mb-3">
-                <label>Upload Image</label>
-                <input type="file" name="image" class="form-control">
-            </div>
-
-            <!-- Submit -->
-            <button type="submit" class="btn btn-primary w-100">Submit Issue</button>
-
-        </form>
-    </div>
-</div>
-
-<!-- Location Script -->
 <script>
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            document.getElementById("latitude").value = position.coords.latitude;
-            document.getElementById("longitude").value = position.coords.longitude;
-            document.getElementById("locationText").innerHTML = "Location captured successfully!";
-        });
-    } else {
-        alert("Geolocation is not supported by this browser.");
+  // cursor sparkle, desktop only
+  if(window.matchMedia('(hover:hover)').matches){
+    let last = 0;
+    document.addEventListener('mousemove', e=>{
+      const now = Date.now();
+      if(now-last < 80) return;
+      last = now;
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.style.left = e.clientX+'px';
+      s.style.top = e.clientY+'px';
+      document.body.appendChild(s);
+      setTimeout(()=>s.remove(), 700);
+    });
+  }
+
+  // ripple + burst on buttons
+  const burstColors = ['#F2A93B', '#3E6C99', '#3E9B6F'];
+  document.querySelectorAll('.btn, .submit-btn, .geo-btn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const r = btn.getBoundingClientRect();
+      const circle = document.createElement('span');
+      circle.className = 'ripple';
+      const size = Math.max(r.width, r.height);
+      circle.style.width = circle.style.height = size+'px';
+      circle.style.left = (e.clientX-r.left-size/2)+'px';
+      circle.style.top = (e.clientY-r.top-size/2)+'px';
+      btn.appendChild(circle);
+      setTimeout(()=>circle.remove(), 600);
+
+      for(let i=0;i<8;i++){
+        const p = document.createElement('span');
+        p.className = 'burst-particle';
+        const angle = (Math.PI*2*i)/8 + Math.random()*.4;
+        const dist = 20 + Math.random()*18;
+        p.style.setProperty('--bx', Math.cos(angle)*dist+'px');
+        p.style.setProperty('--by', Math.sin(angle)*dist+'px');
+        p.style.left = (e.clientX-r.left)+'px';
+        p.style.top = (e.clientY-r.top)+'px';
+        p.style.background = burstColors[i % burstColors.length];
+        btn.appendChild(p);
+        setTimeout(()=>p.remove(), 600);
+      }
+    });
+  });
+
+  // geolocation capture
+  const geoBtn = document.getElementById('geoBtn');
+  const geoStatus = document.getElementById('geoStatus');
+  const latInput = document.getElementById('latitude');
+  const lngInput = document.getElementById('longitude');
+  geoBtn.addEventListener('click', ()=>{
+    if(!navigator.geolocation){
+      geoStatus.textContent = 'Geolocation not supported on this browser';
+      return;
     }
-}
+    geoStatus.textContent = 'Requesting location…';
+    navigator.geolocation.getCurrentPosition(
+      pos=>{
+        latInput.value = pos.coords.latitude;
+        lngInput.value = pos.coords.longitude;
+        geoStatus.innerHTML = '<span class="geo-pulse"></span>Location captured (' + pos.coords.latitude.toFixed(4) + ', ' + pos.coords.longitude.toFixed(4) + ')';
+        geoStatus.classList.add('ok');
+      },
+      err=>{
+        geoStatus.textContent = 'Could not get location — please allow access and try again';
+      },
+      { enableHighAccuracy:true, timeout:10000 }
+    );
+  });
+
+  // image preview + drag & drop
+  const uploadZone = document.getElementById('uploadZone');
+  const imageInput = document.getElementById('imageInput');
+  const previewWrap = document.getElementById('previewWrap');
+  const previewImg = document.getElementById('previewImg');
+
+  function showPreview(file){
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = e=>{
+      previewImg.src = e.target.result;
+      previewWrap.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+  imageInput.addEventListener('change', ()=> showPreview(imageInput.files[0]));
+  ['dragenter','dragover'].forEach(evt=>{
+    uploadZone.addEventListener(evt, e=>{ e.preventDefault(); uploadZone.classList.add('drag'); });
+  });
+  ['dragleave','drop'].forEach(evt=>{
+    uploadZone.addEventListener(evt, e=>{ e.preventDefault(); uploadZone.classList.remove('drag'); });
+  });
+  uploadZone.addEventListener('drop', e=>{
+    const file = e.dataTransfer.files[0];
+    if(file){ imageInput.files = e.dataTransfer.files; showPreview(file); }
+  });
+
+  // require a category is picked before allowing submit (extra nicety, backend still validates)
+  document.getElementById('reportForm').addEventListener('submit', e=>{
+    const picked = document.querySelector('input[name="issue_type"]:checked');
+    if(!picked){
+      e.preventDefault();
+      alert('Please choose a category for your report.');
+    }
+  });
 </script>
 
 </body>
