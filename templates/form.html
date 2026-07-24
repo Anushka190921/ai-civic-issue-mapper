@@ -20,7 +20,7 @@
   .mono{font-family:'IBM Plex Mono', monospace;}
   a{color:inherit;}
   :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
-
+ 
   /* ---------- NAV ---------- */
   .nav{
     position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
@@ -40,7 +40,7 @@
   .btn-ghost:hover{background:rgba(237,239,232,.1);}
   .ripple{position:absolute; border-radius:50%; transform:scale(0); background:rgba(255,255,255,.5); pointer-events:none; animation:ripple-anim .6s ease-out forwards;}
   @keyframes ripple-anim{ to{transform:scale(1); opacity:0;} }
-
+ 
   /* ---------- HEADER ---------- */
   .page-head{background:var(--navy); color:var(--paper); padding:56px 6vw 60px; position:relative; overflow:hidden;}
   .head-glow{position:absolute; inset:0; pointer-events:none; z-index:0; background:radial-gradient(600px 380px at 15% 20%, rgba(242,169,59,.10), transparent 60%), radial-gradient(600px 420px at 85% 60%, rgba(62,108,153,.20), transparent 60%);}
@@ -59,16 +59,16 @@
   .page-head h1 .grad{background:linear-gradient(120deg, var(--amber), #ffd88a 50%, var(--amber)); -webkit-background-clip:text; background-clip:text; color:transparent; background-size:200% auto; animation:shine 5s linear infinite;}
   @keyframes shine{ to{background-position:200% center;} }
   .page-head p{color:rgba(237,239,232,.8); font-size:15px; max-width:56ch; margin-top:14px;}
-
+ 
   /* ---------- FORM LAYOUT ---------- */
   .wrap{max-width:760px; margin:0 auto; padding:50px 6vw 90px;}
   .pop-in{opacity:0; transform:scale(.6) translateY(24px); animation:pop-in-anim .65s cubic-bezier(.34,1.56,.64,1) forwards;}
   @keyframes pop-in-anim{ to{opacity:1; transform:scale(1) translateY(0);} }
-  .pop-1{animation-delay:.05s;} .pop-2{animation-delay:.15s;} .pop-3{animation-delay:.25s;} .pop-4{animation-delay:.35s;} .pop-5{animation-delay:.45s;}
-
+  .pop-1{animation-delay:.05s;} .pop-2{animation-delay:.15s;} .pop-3{animation-delay:.25s;} .pop-4{animation-delay:.35s;} .pop-5{animation-delay:.45s;} .pop-6{animation-delay:.55s;}
+ 
   .form-block{background:#fff; border:1px solid #d9dcd1; border-radius:12px; padding:28px 26px; margin-bottom:22px; box-shadow:0 10px 26px rgba(11,37,69,.06);}
   .block-label{font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--steel); margin-bottom:14px; display:block;}
-
+ 
   .cat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
   .cat-option{display:none;}
   .cat-card{
@@ -80,13 +80,13 @@
   .cat-card:hover{transform:translateY(-3px); border-color:var(--steel);}
   .cat-option:checked + .cat-card{border-color:var(--amber); background:#FCF3E2; box-shadow:0 0 0 3px rgba(242,169,59,.18);}
   .cat-option:checked + .cat-card svg{transform:scale(1.15);}
-
+ 
   textarea{
     width:100%; padding:13px 14px; border-radius:6px; border:1.5px solid #c7cabd; background:#fff;
     font-family:'IBM Plex Sans', sans-serif; font-size:14.5px; color:var(--ink); resize:vertical; min-height:100px;
   }
   textarea:focus{border-color:var(--steel); outline:none;}
-
+ 
   .geo-row{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
   .geo-btn{
     background:var(--paper-dim); border:1.5px solid #c7cabd; border-radius:6px; padding:11px 16px;
@@ -98,7 +98,7 @@
   .geo-status{font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:#5c6558;}
   .geo-status.ok{color:var(--green); font-weight:600;}
   .geo-pulse{display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--green); margin-right:6px; animation:pulse-dot 1.4s ease-in-out infinite;}
-
+ 
   .upload-zone{
     border:2px dashed #c7cabd; border-radius:10px; padding:30px 20px; text-align:center; cursor:pointer;
     transition:border-color .2s, background .2s; position:relative;
@@ -109,7 +109,7 @@
   .upload-zone input[type=file]{position:absolute; inset:0; opacity:0; cursor:pointer;}
   #previewWrap{margin-top:14px; display:none;}
   #previewImg{max-width:100%; max-height:220px; border-radius:8px; display:block; margin:0 auto; box-shadow:0 8px 22px rgba(11,37,69,.15);}
-
+ 
   .submit-btn{
     width:100%; padding:16px; border-radius:6px; border:none; cursor:pointer; font-weight:700; font-size:15.5px;
     background:var(--amber); color:var(--amber-ink); display:flex; align-items:center; justify-content:center; gap:10px;
@@ -118,13 +118,45 @@
   }
   .submit-btn:hover{background:#f5b957; transform:translateY(-2px); box-shadow:0 12px 30px rgba(242,169,59,.4);}
   .submit-btn:active{transform:scale(.98);}
-
+ 
   .burst-particle{position:absolute; width:5px; height:5px; border-radius:50%; pointer-events:none; animation:burst-out .55s ease-out forwards;}
   @keyframes burst-out{ to{transform:translate(var(--bx),var(--by)) scale(0); opacity:0;} }
-
+ 
   .sparkle{position:fixed; z-index:200; pointer-events:none; width:5px; height:5px; border-radius:50%; background:var(--amber); box-shadow:0 0 8px 2px rgba(242,169,59,.6); animation:sparkle-fade .7s ease-out forwards;}
   @keyframes sparkle-fade{ to{transform:translateY(12px) scale(0); opacity:0;} }
-
+ 
+  /* ---------- URGENCY PICKER ---------- */
+  .urgency-row{display:flex; gap:10px; flex-wrap:wrap;}
+  .urgency-option{display:none;}
+  .urgency-pill{
+    display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:100px;
+    border:2px solid #d9dcd1; font-size:13.5px; font-weight:600; color:var(--navy); cursor:pointer;
+    transition:border-color .2s, background .2s, transform .2s; user-select:none;
+  }
+  .urgency-pill:hover{transform:translateY(-2px);}
+  .urgency-dot{width:9px; height:9px; border-radius:50%; flex-shrink:0;}
+  .urgency-option[value="Low"] + .urgency-pill .urgency-dot{background:var(--green);}
+  .urgency-option[value="Medium"] + .urgency-pill .urgency-dot{background:var(--amber);}
+  .urgency-option[value="High"] + .urgency-pill .urgency-dot{background:#E08B3E;}
+  .urgency-option[value="Critical"] + .urgency-pill .urgency-dot{background:var(--red, #C1443A);}
+  .urgency-option:checked + .urgency-pill{border-color:var(--steel); background:#EAF1F8; box-shadow:0 0 0 3px rgba(62,108,153,.15);}
+  .urgency-option[value="Critical"]:checked + .urgency-pill{border-color:var(--red, #C1443A); background:#FBEAE8; box-shadow:0 0 0 3px rgba(193,68,58,.15);}
+  .urgency-hint{font-size:12.5px; color:#5c6558; margin-top:10px;}
+ 
+  /* ---------- DUPLICATE-CHECK MODAL ---------- */
+  .dup-overlay{position:fixed; inset:0; background:rgba(11,37,69,.55); display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px;}
+  .dup-modal{background:#fff; border-radius:12px; max-width:480px; width:100%; padding:26px; box-shadow:0 20px 60px rgba(0,0,0,.3);}
+  .dup-modal h3{font-family:'Archivo Expanded', sans-serif; text-transform:uppercase; color:var(--navy); margin:0 0 6px; font-size:19px;}
+  .dup-modal p.sub{margin:0 0 16px; color:#5c6558; font-size:13.5px;}
+  .dup-item{border:1px solid #d9dcd1; border-radius:8px; padding:12px 14px; margin-bottom:10px; display:flex; gap:12px; align-items:flex-start;}
+  .dup-item .match-pct{font-weight:700; color:var(--amber-ink); font-size:12.5px; white-space:nowrap; background:#FCEFDA; padding:3px 8px; border-radius:100px;}
+  .dup-item .dup-meta{font-size:12px; color:#5c6558; margin-top:4px;}
+  .dup-actions{display:flex; gap:10px; margin-top:18px;}
+  .dup-actions button{flex:1; padding:11px 14px; border-radius:6px; border:none; font-weight:600; font-size:13.5px; cursor:pointer;}
+  .dup-btn-secondary{background:var(--paper-dim); border:1.5px solid #c7cabd !important; color:var(--navy);}
+  .dup-btn-primary{background:var(--navy); color:var(--paper);}
+  .dup-btn-primary:hover{background:var(--navy-deep);}
+ 
   @media (max-width: 640px){
     .cat-grid{grid-template-columns:1fr 1fr;}
     .nav-links a.text-link{display:none;}
@@ -132,16 +164,17 @@
 </style>
 </head>
 <body>
-
+ 
 <nav class="nav">
   <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
   <div class="nav-links">
     <a href="/my_issues" class="text-link">My issues</a>
     <a href="/notifications" class="text-link">Notifications</a>
+    <a href="/transparency" class="text-link">Transparency</a>
     <a href="/logout" class="btn btn-ghost">Log out</a>
   </div>
 </nav>
-
+ 
 <header class="page-head">
   <div class="head-glow"></div>
   <div class="smoke s1"></div>
@@ -150,10 +183,10 @@
   <h1>File a complaint,<br><span class="grad">get a ticket in seconds.</span></h1>
   <p>Pick a category, describe what's wrong, attach a photo, and drop your location. We'll route it to the right department automatically.</p>
 </header>
-
+ 
 <div class="wrap">
   <form action="/submit" method="POST" enctype="multipart/form-data" id="reportForm">
-
+ 
     <div class="form-block pop-in pop-1">
       <span class="block-label">// 01 — What's the issue?</span>
       <div class="cat-grid">
@@ -187,14 +220,32 @@
         </label>
       </div>
     </div>
-
+ 
     <div class="form-block pop-in pop-2">
-      <span class="block-label">// 02 — Describe it</span>
-      <textarea name="description" placeholder="e.g. Large pothole in the middle of the road, been growing for two weeks, cars swerving to avoid it." required></textarea>
+      <span class="block-label">// 02 — How urgent is it?</span>
+      <div class="urgency-row" role="radiogroup" aria-label="Issue urgency">
+        <input class="urgency-option" type="radio" id="urgency-low" name="urgency" value="Low">
+        <label for="urgency-low" class="urgency-pill"><span class="urgency-dot"></span>Low — can wait</label>
+ 
+        <input class="urgency-option" type="radio" id="urgency-medium" name="urgency" value="Medium" checked>
+        <label for="urgency-medium" class="urgency-pill"><span class="urgency-dot"></span>Medium — needs attention</label>
+ 
+        <input class="urgency-option" type="radio" id="urgency-high" name="urgency" value="High">
+        <label for="urgency-high" class="urgency-pill"><span class="urgency-dot"></span>High — risk to people</label>
+ 
+        <input class="urgency-option" type="radio" id="urgency-critical" name="urgency" value="Critical">
+        <label for="urgency-critical" class="urgency-pill"><span class="urgency-dot"></span>Critical — immediate danger</label>
+      </div>
+      <p class="urgency-hint">Pick honestly — this is what admins use to decide what gets fixed first.</p>
     </div>
-
+ 
     <div class="form-block pop-in pop-3">
-      <span class="block-label">// 03 — Where is it?</span>
+      <span class="block-label">// 03 — Describe it</span>
+      <textarea name="description" id="descriptionInput" placeholder="e.g. Large pothole in the middle of the road, been growing for two weeks, cars swerving to avoid it." required></textarea>
+    </div>
+ 
+    <div class="form-block pop-in pop-4">
+      <span class="block-label">// 04 — Where is it?</span>
       <div class="geo-row">
         <button type="button" class="geo-btn" id="geoBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
@@ -205,9 +256,9 @@
       <input type="hidden" name="latitude" id="latitude">
       <input type="hidden" name="longitude" id="longitude">
     </div>
-
-    <div class="form-block pop-in pop-4">
-      <span class="block-label">// 04 — Add a photo</span>
+ 
+    <div class="form-block pop-in pop-5">
+      <span class="block-label">// 05 — Add a photo</span>
       <div class="upload-zone" id="uploadZone">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
         <p><strong>Click to upload</strong> or drag a photo here</p>
@@ -215,11 +266,11 @@
       </div>
       <div id="previewWrap"><img id="previewImg" alt="Preview of uploaded photo"></div>
     </div>
-
-    <button type="submit" class="submit-btn pop-in pop-5">SUBMIT COMPLAINT <span style="font-size:18px;">→</span></button>
+ 
+    <button type="submit" class="submit-btn pop-in pop-6">SUBMIT COMPLAINT <span style="font-size:18px;">→</span></button>
   </form>
 </div>
-
+ 
 <script>
   // cursor sparkle, desktop only
   if(window.matchMedia('(hover:hover)').matches){
@@ -236,7 +287,7 @@
       setTimeout(()=>s.remove(), 700);
     });
   }
-
+ 
   // ripple + burst on buttons
   const burstColors = ['#F2A93B', '#3E6C99', '#3E9B6F'];
   document.querySelectorAll('.btn, .submit-btn, .geo-btn').forEach(btn=>{
@@ -250,7 +301,7 @@
       circle.style.top = (e.clientY-r.top-size/2)+'px';
       btn.appendChild(circle);
       setTimeout(()=>circle.remove(), 600);
-
+ 
       for(let i=0;i<8;i++){
         const p = document.createElement('span');
         p.className = 'burst-particle';
@@ -266,7 +317,7 @@
       }
     });
   });
-
+ 
   // geolocation capture
   const geoBtn = document.getElementById('geoBtn');
   const geoStatus = document.getElementById('geoStatus');
@@ -291,13 +342,13 @@
       { enableHighAccuracy:true, timeout:10000 }
     );
   });
-
+ 
   // image preview + drag & drop
   const uploadZone = document.getElementById('uploadZone');
   const imageInput = document.getElementById('imageInput');
   const previewWrap = document.getElementById('previewWrap');
   const previewImg = document.getElementById('previewImg');
-
+ 
   function showPreview(file){
     if(!file) return;
     const reader = new FileReader();
@@ -318,16 +369,92 @@
     const file = e.dataTransfer.files[0];
     if(file){ imageInput.files = e.dataTransfer.files; showPreview(file); }
   });
-
+ 
   // require a category is picked before allowing submit (extra nicety, backend still validates)
-  document.getElementById('reportForm').addEventListener('submit', e=>{
+  const reportForm = document.getElementById('reportForm');
+  let confirmedSubmit = false;
+ 
+  reportForm.addEventListener('submit', async e=>{
     const picked = document.querySelector('input[name="issue_type"]:checked');
     if(!picked){
       e.preventDefault();
       alert('Please choose a category for your report.');
+      return;
     }
+ 
+    if(confirmedSubmit) return; // second submit, after "Report anyway"
+    e.preventDefault();
+ 
+    const issue_type = picked.value;
+    const description = document.getElementById('descriptionInput').value;
+    const latitude = latInput.value || null;
+    const longitude = lngInput.value || null;
+ 
+    let duplicates = [];
+    try{
+      const res = await fetch('/api/check-duplicate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ issue_type, description, latitude, longitude })
+      });
+      if(res.ok){
+        const data = await res.json();
+        duplicates = data.duplicates || [];
+      }
+    }catch(err){
+      console.error('Duplicate check failed, submitting normally:', err);
+    }
+ 
+    if(duplicates.length === 0){
+      confirmedSubmit = true;
+      reportForm.submit();
+      return;
+    }
+ 
+    showDuplicateModal(duplicates);
   });
+ 
+  function showDuplicateModal(duplicates){
+    const overlay = document.createElement('div');
+    overlay.className = 'dup-overlay';
+ 
+    const itemsHtml = duplicates.slice(0, 3).map(d => `
+      <div class="dup-item">
+        <div style="flex:1">
+          <strong>Ticket #${d.id} — ${escapeHtml(d.title)}</strong>
+          <div class="dup-meta">${escapeHtml(d.distance_label)} · status: ${escapeHtml(d.status)}</div>
+        </div>
+        <div class="match-pct">${Math.round(d.similarity * 100)}% match</div>
+      </div>
+    `).join('');
+ 
+    overlay.innerHTML = `
+      <div class="dup-modal" role="dialog" aria-modal="true">
+        <h3>This might already be reported</h3>
+        <p class="sub">We found ${duplicates.length} similar complaint${duplicates.length > 1 ? 's' : ''} nearby. Take a look before submitting a new one:</p>
+        ${itemsHtml}
+        <div class="dup-actions">
+          <button type="button" class="dup-btn-secondary" id="dupCancelBtn">Cancel, it's a duplicate</button>
+          <button type="button" class="dup-btn-primary" id="dupContinueBtn">Report anyway</button>
+        </div>
+      </div>`;
+ 
+    document.body.appendChild(overlay);
+    overlay.querySelector('#dupCancelBtn').addEventListener('click', ()=> overlay.remove());
+    overlay.querySelector('#dupContinueBtn').addEventListener('click', ()=>{
+      confirmedSubmit = true;
+      overlay.remove();
+      reportForm.submit();
+    });
+  }
+ 
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
 </script>
-
+ 
 </body>
 </html>
+ 
