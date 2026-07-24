@@ -100,6 +100,18 @@ def home():
     return render_template("form.html")   # or redirect to wherever the form lives
 
 
+# ---------------- DEPARTMENT AUTO-ROUTING ----------------
+# Maps each issue category to the department responsible for it.
+# NOTE: keys must exactly match the issue_type values sent by the report form.
+DEPARTMENT_MAP = {
+    "Garbage": "Sanitation Department",
+    "Pothole": "Roads & Infrastructure",
+    "Water Leakage": "Water Board",
+    "Street Light": "Electricity Department",
+}
+DEFAULT_DEPARTMENT = "General Administration"
+
+
 # ---------------- SUBMIT COMPLAINT ----------------
 @app.route("/submit", methods=["POST"])
 @limiter.limit("10 per hour")
@@ -115,6 +127,9 @@ def submit():
         description = request.form.get("description")
         latitude = request.form.get("latitude")
         longitude = request.form.get("longitude")
+
+        # Auto-route to the responsible department based on category
+        department = DEPARTMENT_MAP.get(issue_type, DEFAULT_DEPARTMENT)
 
         # Handle image upload
         image = request.files.get("image")
@@ -134,9 +149,9 @@ def submit():
 
         cursor.execute("""
             INSERT INTO civic_issues
-            (issue_type, description, latitude, longitude, image, user_id)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (issue_type, description, latitude, longitude, image_name, user_id))
+            (issue_type, description, latitude, longitude, image, user_id, department)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (issue_type, description, latitude, longitude, image_name, user_id, department))
 
         db.commit()
         cursor.close()
