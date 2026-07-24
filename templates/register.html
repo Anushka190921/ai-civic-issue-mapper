@@ -231,6 +231,12 @@
     <h2 class="pop-in pop-3">Create account</h2>
     <p class="sub pop-in pop-3">A few details and you're ready to file your first report.</p>
 
+    {% if error %}
+    <div class="pop-in pop-3" style="background:#FCE8E6; border:1.5px solid #E4A199; color:#8C2E22; border-radius:6px; padding:12px 14px; font-size:13.5px; margin-bottom:20px;">
+      {{ error }}
+    </div>
+    {% endif %}
+
     <form action="/register" method="POST" class="pop-in pop-4">
       <div class="field field-row">
         <div>

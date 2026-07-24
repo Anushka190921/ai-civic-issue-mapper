@@ -137,6 +137,12 @@
     <h2>Log in</h2>
     <p class="sub">Enter your details to access your account.</p>
 
+    {% if error %}
+    <div style="background:#FCE8E6; border:1.5px solid #E4A199; color:#8C2E22; border-radius:6px; padding:12px 14px; font-size:13.5px; margin-bottom:20px;">
+      {{ error }}
+    </div>
+    {% endif %}
+
     <form action="/login" method="POST">
       <div class="field">
         <label for="email">Email address</label>
