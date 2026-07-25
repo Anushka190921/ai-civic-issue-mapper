@@ -18,7 +18,7 @@
   .mono{font-family:'IBM Plex Mono', monospace;}
   a{color:inherit;}
   :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
-
+ 
   .nav{
     position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
     padding:16px 4vw; background:rgba(11,37,69,.96); border-bottom:1px solid var(--line);
@@ -29,13 +29,13 @@
   @keyframes pulse-dot{ 0%,100%{transform:scale(1); opacity:1;} 50%{transform:scale(1.5); opacity:.5;} }
   .nav a.logout{color:var(--paper); opacity:.75; text-decoration:none; font-size:13px;}
   .nav a.logout:hover{opacity:1;}
-
+ 
   .wrap{max-width:1180px; margin:0 auto; padding:34px 4vw 70px;}
   .fade-in{opacity:0; transform:translateY(16px); animation:fade-in-anim .5s ease forwards;}
   @keyframes fade-in-anim{ to{opacity:1; transform:translateY(0);} }
-
+ 
   /* stat cards */
-  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:30px;}
+  .stats{display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-bottom:30px;}
   .stat-card{
     background:var(--navy); color:var(--paper); border-radius:10px; padding:20px 22px;
     box-shadow:0 10px 26px rgba(11,37,69,.15);
@@ -45,7 +45,8 @@
   .stat-card.amber .num{color:var(--amber);}
   .stat-card.steel .num{color:#7fb3e0;}
   .stat-card.green .num{color:#7fd9ab;}
-
+  .stat-card.red{background:var(--red);} .stat-card.red .num{color:#fff;} .stat-card.red .label{color:rgba(255,255,255,.75);}
+ 
   /* search */
   .search-row{margin-bottom:24px;}
   .search-row form{display:flex; gap:10px; max-width:480px;}
@@ -59,7 +60,7 @@
     font-weight:600; font-size:13.5px; cursor:pointer; transition:background .2s;
   }
   .search-row button:hover{background:var(--navy-deep);}
-
+ 
   /* complaint cards */
   .complaint-card{
     background:#fff; border:1px solid #d9dcd1; border-radius:10px; padding:20px 22px; margin-bottom:14px;
@@ -77,12 +78,39 @@
   .badge.pending{background:#FCEFDA; color:var(--amber-ink);} .badge.pending .badge-dot{background:var(--amber);}
   .badge.inprogress{background:#E3EBF3; color:var(--steel);} .badge.inprogress .badge-dot{background:var(--steel);}
   .badge.resolved{background:#E1F0E7; color:var(--green);} .badge.resolved .badge-dot{background:var(--green);}
-
+ 
+  /* priority / urgency badge, shown next to the status badge */
+  .badge.urg-low{background:#E1F0E7; color:var(--green);} .badge.urg-low .badge-dot{background:var(--green);}
+  .badge.urg-medium{background:#FCEFDA; color:var(--amber-ink);} .badge.urg-medium .badge-dot{background:var(--amber);}
+  .badge.urg-high{background:#FBE9DA; color:#A15A26;} .badge.urg-high .badge-dot{background:#E08B3E;}
+  .badge.urg-critical{background:#FBEAE8; color:var(--red);} .badge.urg-critical .badge-dot{background:var(--red);}
+ 
+  /* severity highlight strip on the complaint card, left edge */
+  .complaint-card{border-left:4px solid transparent;}
+  .complaint-card.urg-low{border-left-color:var(--green);}
+  .complaint-card.urg-medium{border-left-color:var(--amber);}
+  .complaint-card.urg-high{border-left-color:#E08B3E; background:#FFFDFA;}
+  .complaint-card.urg-critical{
+    border-left-color:var(--red); background:#FFFAF9;
+    animation:pulse-critical 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse-critical{ 0%,100%{box-shadow:0 6px 18px rgba(11,37,69,.05);} 50%{box-shadow:0 6px 18px rgba(193,68,58,.18);} }
+  @media (prefers-reduced-motion: reduce){ .complaint-card.urg-critical{animation:none;} }
+ 
+  /* sort toggle */
+  .sort-row{display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap;}
+  .sort-link{
+    padding:8px 14px; border-radius:100px; border:1.5px solid #c7cabd; font-size:12.5px; font-weight:600;
+    color:var(--navy); text-decoration:none; background:#fff; transition:border-color .2s, background .2s;
+  }
+  .sort-link:hover{border-color:var(--steel);}
+  .sort-link.active{background:var(--navy); color:var(--paper); border-color:var(--navy);}
+ 
   .c-desc{color:#3a4038; font-size:14px; line-height:1.5; margin-bottom:14px;}
   .c-meta{display:flex; flex-wrap:wrap; gap:18px; font-size:12.5px; color:#5c6558; margin-bottom:16px;}
   .c-meta b{color:var(--ink);}
   .c-meta .mono{color:#5c6558;}
-
+ 
   .c-actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center; border-top:1px dashed #d9dcd1; padding-top:14px;}
   .c-actions form{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
   select, .file-btn{
@@ -99,21 +127,24 @@
   .link-btn:hover{text-decoration:underline;}
   .link-btn.danger{color:var(--red);}
   .thumb{width:44px; height:44px; border-radius:6px; object-fit:cover; border:1px solid #d9dcd1;}
-
+ 
   .empty-state{text-align:center; padding:60px 20px; color:#5c6558;}
-
+ 
   @media (max-width: 900px){
     .stats{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width: 560px){
+    .stats{grid-template-columns:1fr;}
   }
 </style>
 </head>
 <body>
-
+ 
 <nav class="nav">
   <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER — ADMIN</a>
   <a href="/logout" class="logout">Log out</a>
 </nav>
-
+ 
 <div class="wrap">
   <div class="stats">
     <div class="stat-card fade-in" style="animation-delay:.05s;">
@@ -132,34 +163,48 @@
       <div class="num">{{ stats.resolved }}</div>
       <div class="label">Resolved</div>
     </div>
+    <div class="stat-card red fade-in" style="animation-delay:.45s;">
+      <div class="num">{{ stats.high_risk_open }}</div>
+      <div class="label">High-risk open</div>
+    </div>
   </div>
-
+ 
+  <div class="sort-row fade-in" style="animation-delay:.5s;">
+    <a href="/dashboard?sort=priority{% if request.args.get('search') %}&search={{ request.args.get('search') }}{% endif %}"
+       class="sort-link {% if sort_mode == 'priority' %}active{% endif %}">⚑ Highest priority first</a>
+    <a href="/dashboard?sort=recent{% if request.args.get('search') %}&search={{ request.args.get('search') }}{% endif %}"
+       class="sort-link {% if sort_mode != 'priority' %}active{% endif %}">🕐 Newest first</a>
+  </div>
+ 
   <div class="search-row fade-in" style="animation-delay:.4s;">
     <form action="/dashboard" method="GET">
       <input type="text" name="search" placeholder="Search by ID, type, or description…" value="{{ request.args.get('search', '') }}">
       <button type="submit">Search</button>
     </form>
   </div>
-
+ 
   {% if complaints %}
     {% for c in complaints %}
-    <div class="complaint-card fade-in" style="animation-delay:{{ (loop.index0 * 0.04) + 0.45 }}s;">
+    <div class="complaint-card urg-{{ (c.urgency or 'medium')|lower }} fade-in" style="animation-delay:{{ (loop.index0 * 0.04) + 0.55 }}s;">
       <div class="c-top">
         <div>
           <span class="c-id">TICKET #{{ c.id }}</span>
           <div class="c-type">{{ c.issue_type }}</div>
         </div>
-        {% if c.status == 'Resolved' %}
-          <span class="badge resolved"><span class="badge-dot"></span>Resolved</span>
-        {% elif c.status == 'In Progress' %}
-          <span class="badge inprogress"><span class="badge-dot"></span>In progress</span>
-        {% else %}
-          <span class="badge pending"><span class="badge-dot"></span>Pending</span>
-        {% endif %}
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="badge urg-{{ (c.urgency or 'medium')|lower }}"><span class="badge-dot"></span>{{ c.urgency or 'Medium' }}</span>
+          {% if c.status == 'Resolved' %}
+            <span class="badge resolved"><span class="badge-dot"></span>Resolved</span>
+          {% elif c.status == 'In Progress' %}
+            <span class="badge inprogress"><span class="badge-dot"></span>In progress</span>
+          {% else %}
+            <span class="badge pending"><span class="badge-dot"></span>Pending</span>
+          {% endif %}
+        </div>
       </div>
-
+ 
       <p class="c-desc">{{ c.description }}</p>
-
+ 
       <div class="c-meta">
         <span><b>Citizen:</b> {{ c.first_name }} ({{ c.email }})</span>
         <span><b>Department:</b> {{ c.department or 'Unassigned' }}</span>
@@ -169,7 +214,7 @@
         {% endif %}
         <a href="/view_map/{{ c.id }}" class="link-btn">View on map</a>
       </div>
-
+ 
       <div class="c-actions">
         <form action="/update_status/{{ c.id }}" method="POST" enctype="multipart/form-data">
           <select name="status">
@@ -180,7 +225,7 @@
           <input class="file-btn" type="file" name="resolution_image" title="Attach resolution proof (only used if marking Resolved)">
           <button type="submit" class="mini-btn amber">Update status</button>
         </form>
-
+ 
         <form action="/assign_department/{{ c.id }}" method="POST">
           <select name="department">
             <option value="Sanitation Department" {% if c.department == 'Sanitation Department' %}selected{% endif %}>Sanitation Department</option>
@@ -191,7 +236,7 @@
           </select>
           <button type="submit" class="mini-btn">Reassign</button>
         </form>
-
+ 
         <a href="/delete_admin_issue/{{ c.id }}" class="link-btn danger" onclick="return confirm('Delete this complaint permanently?');">Delete</a>
       </div>
     </div>
@@ -200,6 +245,6 @@
     <div class="empty-state fade-in">No complaints found.</div>
   {% endif %}
 </div>
-
+ 
 </body>
 </html>

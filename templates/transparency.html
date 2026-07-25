@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transparency — Civic Issue Mapper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --paper-dim:#E1E4DA; --ink:#10151B;
+    --amber:#F2A93B; --amber-ink:#5C3A08; --steel:#3E6C99; --green:#3E9B6F; --red:#C1443A; --line: rgba(237,239,232,0.16);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:'IBM Plex Sans', sans-serif;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;} }
+  h1,h2,h3{font-family:'Archivo Expanded', sans-serif; text-transform:uppercase; letter-spacing:.01em; margin:0;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
+ 
+  .nav{
+    position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
+    padding:16px 6vw; background:rgba(11,37,69,.94); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);
+  }
+  .nav-brand{color:var(--paper); font-family:'Archivo Expanded', sans-serif; font-weight:800; font-size:17px; letter-spacing:.03em; text-decoration:none; display:flex; align-items:center; gap:9px;}
+  .dot-ring{position:relative; width:12px; height:12px;}
+  .dot-ring::before{content:''; position:absolute; inset:0; border-radius:50%; background:var(--amber); box-shadow:0 0 8px rgba(242,169,59,.8); animation:pulse-dot 1.8s ease-in-out infinite;}
+  @keyframes pulse-dot{ 0%,100%{transform:scale(1); opacity:1;} 50%{transform:scale(1.5); opacity:.5;} }
+  .nav-links{display:flex; align-items:center; gap:16px;}
+  .nav-links a.text-link{color:var(--paper); opacity:.8; text-decoration:none; font-size:13.5px;}
+  .nav-links a.text-link:hover{opacity:1;}
+  .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 18px; font-weight:600; font-size:13.5px; text-decoration:none; border-radius:3px; border:1.5px solid transparent;}
+  .btn-amber{background:var(--amber); color:var(--amber-ink);}
+  .btn-ghost{border-color:rgba(237,239,232,.4); color:var(--paper);}
+ 
+  .page-head{background:var(--navy); color:var(--paper); padding:56px 6vw 60px; position:relative; overflow:hidden;}
+  .head-glow{position:absolute; inset:0; pointer-events:none; z-index:0; background:radial-gradient(600px 380px at 15% 20%, rgba(242,169,59,.10), transparent 60%), radial-gradient(600px 420px at 85% 60%, rgba(62,108,153,.20), transparent 60%);}
+  .page-head > *{position:relative; z-index:1;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber); margin-bottom:14px; display:inline-flex; align-items:center; gap:8px;}
+  .eyebrow::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--amber); box-shadow:0 0 8px var(--amber); animation:pulse-dot 1.6s ease-in-out infinite;}
+  .page-head h1{font-size:clamp(28px,4vw,42px); line-height:1.05;}
+  .page-head p{color:rgba(237,239,232,.8); font-size:15px; max-width:60ch; margin-top:14px;}
+ 
+  .wrap{max-width:960px; margin:0 auto; padding:50px 6vw 90px;}
+  .fade-in{opacity:0; transform:translateY(16px); animation:fade-in-anim .5s ease forwards;}
+  @keyframes fade-in-anim{ to{opacity:1; transform:translateY(0);} }
+ 
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin:0 0 40px;}
+  .stat-card{background:var(--navy); color:var(--paper); border-radius:10px; padding:22px 24px; box-shadow:0 10px 26px rgba(11,37,69,.15);}
+  .stat-card .num{font-family:'Archivo Expanded', sans-serif; font-weight:800; font-size:34px;}
+  .stat-card .label{font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:rgba(237,239,232,.6); margin-top:4px;}
+  .stat-card.amber .num{color:var(--amber);}
+  .stat-card.steel .num{color:#7fb3e0;}
+  .stat-card.green .num{color:#7fd9ab;}
+ 
+  .section-block{background:#fff; border:1px solid #d9dcd1; border-radius:12px; padding:28px 26px; margin-bottom:22px; box-shadow:0 10px 26px rgba(11,37,69,.06);}
+  .block-label{font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--steel); margin-bottom:18px; display:block;}
+ 
+  .cat-row{display:flex; align-items:center; gap:14px; margin-bottom:14px;}
+  .cat-row:last-child{margin-bottom:0;}
+  .cat-name{width:130px; font-size:13.5px; font-weight:600; color:var(--navy); flex-shrink:0;}
+  .cat-bar-track{flex:1; background:var(--paper-dim); border-radius:6px; height:10px; overflow:hidden;}
+  .cat-bar-fill{height:100%; background:var(--steel); border-radius:6px;}
+  .cat-count{width:36px; text-align:right; font-size:13px; color:#5c6558; flex-shrink:0;}
+ 
+  .urg-badges{display:flex; gap:10px; flex-wrap:wrap;}
+  .urg-badge{
+    display:inline-flex; align-items:center; gap:7px; padding:7px 14px; border-radius:100px;
+    font-family:'IBM Plex Mono', monospace; font-size:11.5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em;
+  }
+  .urg-badge .d{width:8px; height:8px; border-radius:50%;}
+  .urg-badge.low{background:#E1F0E7; color:var(--green);} .urg-badge.low .d{background:var(--green);}
+  .urg-badge.medium{background:#FCEFDA; color:var(--amber-ink);} .urg-badge.medium .d{background:var(--amber);}
+  .urg-badge.high{background:#FBE9DA; color:#A15A26;} .urg-badge.high .d{background:#E08B3E;}
+  .urg-badge.critical{background:#FBEAE8; color:var(--red);} .urg-badge.critical .d{background:var(--red);}
+ 
+  .resolved-list{list-style:none; margin:0; padding:0;}
+  .resolved-list li{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    padding:12px 0; border-bottom:1px dashed #d9dcd1; font-size:13.5px;
+  }
+  .resolved-list li:last-child{border-bottom:none;}
+  .resolved-list .r-title{color:var(--navy); font-weight:600;}
+  .resolved-list .r-dept{color:#5c6558; font-size:12.5px;}
+  .resolved-list .r-date{color:#5c6558; font-family:'IBM Plex Mono', monospace; font-size:12px; white-space:nowrap;}
+  .empty-note{color:#5c6558; font-size:13.5px; padding:8px 0;}
+ 
+  @media (max-width: 640px){
+    .nav-links a.text-link{display:none;}
+    .cat-name{width:90px;}
+  }
+</style>
+</head>
+<body>
+ 
+<nav class="nav">
+  <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
+  <div class="nav-links">
+    <a href="/track_status" class="text-link">Track a complaint</a>
+    <a href="/login" class="btn btn-ghost">Log in</a>
+    <a href="/register" class="btn btn-amber">Register</a>
+  </div>
+</nav>
+ 
+<header class="page-head">
+  <div class="head-glow"></div>
+  <span class="eyebrow">Public data</span>
+  <h1>What's been reported,<br>and how fast it's fixed.</h1>
+  <p>A live, unfiltered look at civic issues in your area — no login required. This is the same data admins see, just without personal details.</p>
+</header>
+ 
+<div class="wrap">
+ 
+  <div class="stat-grid">
+    <div class="stat-card fade-in" style="animation-delay:.05s;">
+      <div class="num">{{ stats.total_reported }}</div>
+      <div class="label">Reported</div>
+    </div>
+    <div class="stat-card green fade-in" style="animation-delay:.15s;">
+      <div class="num">{{ stats.total_resolved }}</div>
+      <div class="label">Resolved</div>
+    </div>
+    <div class="stat-card amber fade-in" style="animation-delay:.25s;">
+      <div class="num">{{ stats.resolution_rate }}%</div>
+      <div class="label">Resolution rate</div>
+    </div>
+    <div class="stat-card steel fade-in" style="animation-delay:.35s;">
+      <div class="num">{{ stats.avg_resolution_days }}d</div>
+      <div class="label">Avg. time to fix</div>
+    </div>
+  </div>
+ 
+  <div class="section-block fade-in" style="animation-delay:.4s;">
+    <span class="block-label">// By category</span>
+    {% for cat in stats.by_category %}
+    <div class="cat-row">
+      <div class="cat-name">{{ cat.name }}</div>
+      <div class="cat-bar-track">
+        <div class="cat-bar-fill" style="width:{{ (cat.count / stats.total_reported * 100) if stats.total_reported else 0 }}%;"></div>
+      </div>
+      <div class="cat-count">{{ cat.count }}</div>
+    </div>
+    {% else %}
+    <p class="empty-note">No issues reported yet.</p>
+    {% endfor %}
+  </div>
+ 
+  <div class="section-block fade-in" style="animation-delay:.45s;">
+    <span class="block-label">// By urgency</span>
+    <div class="urg-badges">
+      <span class="urg-badge low"><span class="d"></span>Low: {{ stats.by_urgency.low }}</span>
+      <span class="urg-badge medium"><span class="d"></span>Medium: {{ stats.by_urgency.medium }}</span>
+      <span class="urg-badge high"><span class="d"></span>High: {{ stats.by_urgency.high }}</span>
+      <span class="urg-badge critical"><span class="d"></span>Critical: {{ stats.by_urgency.critical }}</span>
+    </div>
+  </div>
+ 
+  <div class="section-block fade-in" style="animation-delay:.5s;">
+    <span class="block-label">// Recently resolved</span>
+    <ul class="resolved-list">
+      {% for item in stats.recent_resolved %}
+      <li>
+        <div>
+          <div class="r-title">{{ item.issue_type }}</div>
+          <div class="r-dept">{{ item.department or 'Unassigned' }}</div>
+        </div>
+        <div class="r-date">{{ item.updated_at }}</div>
+      </li>
+      {% else %}
+      <li><span class="empty-note">Nothing resolved yet — check back soon.</span></li>
+      {% endfor %}
+    </ul>
+  </div>
+ 
+</div>
+ 
+</body>
+</html>

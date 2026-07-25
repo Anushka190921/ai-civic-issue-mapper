@@ -34,13 +34,13 @@
   .mono{font-family:'IBM Plex Mono', monospace;}
   a{color:inherit;}
   :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
-
+ 
   .progress-bar{
     position:fixed; top:0; left:0; height:3px; z-index:300;
     background:linear-gradient(90deg, var(--amber), var(--steel));
     width:0%; box-shadow:0 0 10px rgba(242,169,59,.5); transition:width .08s linear;
   }
-
+ 
   /* ---------- NAV ---------- */
   .nav{
     position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
@@ -77,7 +77,7 @@
   .btn-navy:hover{background:var(--navy-deep);}
   .ripple{position:absolute; border-radius:50%; transform:scale(0); background:rgba(255,255,255,.5); pointer-events:none; animation:ripple-anim .6s ease-out forwards;}
   @keyframes ripple-anim{ to{transform:scale(1); opacity:0;} }
-
+ 
   /* ---------- HERO ---------- */
   .hero{
     background:var(--navy); color:var(--paper); padding:76px 6vw 70px;
@@ -113,7 +113,7 @@
   .track-form input::placeholder{color:rgba(237,239,232,.4);}
   .track-form button{padding:11px 18px; border-radius:3px; border:1px solid rgba(237,239,232,.3); background:transparent; color:var(--paper); font-weight:600; font-size:13px; cursor:pointer;}
   .track-form button:hover{background:rgba(237,239,232,.1);}
-
+ 
   /* ---------- orbit hero visual ---------- */
   .orbit-wrap{ position:relative; width:100%; aspect-ratio:1/1; max-width:440px; margin:0 auto; }
   .orbit-ring{ position:absolute; top:50%; left:50%; border:1px dashed rgba(237,239,232,.16); border-radius:50%; transform:translate(-50%,-50%); }
@@ -146,14 +146,14 @@
   @keyframes orbitB{ from{transform:translate(-50%,-50%) rotate(90deg) translateX(198px) rotate(-90deg);} to{transform:translate(-50%,-50%) rotate(450deg) translateX(198px) rotate(-450deg);} }
   @keyframes orbitC{ from{transform:translate(-50%,-50%) rotate(180deg) translateX(140px) rotate(-180deg);} to{transform:translate(-50%,-50%) rotate(540deg) translateX(140px) rotate(-540deg);} }
   @keyframes orbitD{ from{transform:translate(-50%,-50%) rotate(270deg) translateX(198px) rotate(-270deg);} to{transform:translate(-50%,-50%) rotate(630deg) translateX(198px) rotate(-630deg);} }
-
+ 
   /* ---------- marquee ---------- */
   .marquee-wrap{padding:22px 0; background:var(--navy-deep); border-top:1px solid var(--line); border-bottom:1px solid var(--line); overflow:hidden;}
   .marquee{display:flex; width:max-content; animation:marquee 24s linear infinite;}
   .marquee span{font-family:'IBM Plex Mono', monospace; font-size:13px; letter-spacing:.06em; color:rgba(237,239,232,.55); padding:0 34px; white-space:nowrap; display:flex; align-items:center; gap:10px;}
   .marquee span::before{content:'\25C6'; color:var(--amber); font-size:9px;}
   @keyframes marquee{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
-
+ 
   /* ---------- reveal ---------- */
   .reveal{opacity:0; transform:translateY(40px); transition:opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1);}
   .reveal.active{opacity:1; transform:translateY(0);}
@@ -166,13 +166,13 @@
   .r-child:nth-child(2){transition-delay:.18s;}
   .r-child:nth-child(3){transition-delay:.31s;}
   .r-child:nth-child(4){transition-delay:.44s;}
-
+ 
   section{padding:80px 6vw; position:relative;}
   .section-head{max-width:640px; margin-bottom:44px;}
   .kicker{font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--steel); display:block; margin-bottom:10px;}
   .section-head h2{font-size:clamp(26px,3.2vw,36px); color:var(--navy);}
   .section-head p{color:#4a5248; font-size:15.5px; margin-top:12px; max-width:56ch;}
-
+ 
   /* categories */
   .cat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:2px; background:var(--navy); border-radius:10px; overflow:hidden;}
   .cat-card{background:var(--paper); padding:30px 26px; display:flex; flex-direction:column; gap:12px; position:relative; transition:transform .3s ease;}
@@ -181,7 +181,7 @@
   .cat-card:hover .cat-icon{transform:scale(1.15) rotate(-6deg); color:var(--steel);}
   .cat-card h3{font-size:16px; color:var(--navy);}
   .cat-card p{font-size:13.5px; color:#5c6558; margin:0;}
-
+ 
   /* how it works fly-in */
   .flow-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:22px; margin-top:10px;}
   .flow-cell{position:relative;}
@@ -201,7 +201,7 @@
   .flow-step:nth-child(3).floating{animation-delay:.5s;}
   .flow-step:nth-child(4).floating{animation-delay:.75s;}
   @keyframes flow-float{ 0%,100%{margin-top:0;} 50%{margin-top:-8px;} }
-
+ 
   /* lifecycle */
   .lifecycle-strip{display:grid; grid-template-columns:1fr auto 1fr auto 1fr; align-items:center; max-width:760px;}
   .life-stage{text-align:center; padding:20px 12px; border-radius:6px; transition:transform .3s ease;}
@@ -212,13 +212,13 @@
   .life-progress{background:#E3EBF3; color:var(--steel);}
   .life-resolved{background:#E1F0E7; color:var(--green);}
   .life-arrow{color:#9aa196; font-size:22px; padding:0 6px;}
-
+ 
   /* build facts instead of fake stats */
   .facts{padding:70px 6vw; background:var(--navy-deep); display:grid; grid-template-columns:repeat(4,1fr); gap:24px;}
   .fact{text-align:center;}
   .fact .num{font-family:'Archivo Expanded', sans-serif; font-weight:800; font-size:clamp(28px,4vw,42px); color:var(--amber);}
   .fact .label{margin-top:8px; font-size:12.5px; color:rgba(237,239,232,.65); font-family:'IBM Plex Mono', monospace; letter-spacing:.05em;}
-
+ 
   /* credibility */
   .credibility{background:var(--navy-deep); color:var(--paper); display:grid; grid-template-columns:1.2fr .8fr; gap:40px; align-items:center;}
   .credibility h2{color:var(--paper);}
@@ -226,20 +226,20 @@
   .sdg-badge{border:1px solid rgba(237,239,232,.3); border-radius:6px; padding:22px; font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:rgba(237,239,232,.85); transition:box-shadow .3s ease;}
   .sdg-badge:hover{box-shadow:0 0 30px rgba(242,169,59,.15);}
   .sdg-badge .num{font-family:'Archivo Expanded', sans-serif; color:var(--amber); font-size:34px; display:block; margin-bottom:6px;}
-
+ 
   .final-cta{text-align:center; background:var(--paper-dim);}
   .final-cta h2{font-size:clamp(28px,4vw,42px); color:var(--navy); max-width:16ch; margin:0 auto 14px;}
   .final-cta p{color:#4a5248; margin-bottom:30px;}
   .final-cta .hero-ctas{justify-content:center;}
-
+ 
   footer{background:var(--navy); color:rgba(237,239,232,.6); padding:30px 6vw; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; font-size:13px;}
   footer a{text-decoration:none; color:rgba(237,239,232,.7);}
   footer a:hover{color:var(--paper);}
   .footer-links{display:flex; gap:18px; flex-wrap:wrap;}
-
+ 
   .sparkle{position:fixed; z-index:200; pointer-events:none; width:5px; height:5px; border-radius:50%; background:var(--amber); box-shadow:0 0 8px 2px rgba(242,169,59,.6); animation:sparkle-fade .7s ease-out forwards;}
   @keyframes sparkle-fade{ to{transform:translateY(12px) scale(0); opacity:0;} }
-
+ 
   /* ---------- smoke drifting up inside hero ---------- */
   .smoke-wrap{position:absolute; inset:0; overflow:hidden; z-index:0; pointer-events:none;}
   .smoke{position:absolute; bottom:-10%; border-radius:50%; filter:blur(18px); animation:smoke-rise linear infinite;}
@@ -255,7 +255,7 @@
     88%{opacity:.25;}
     100%{transform:translateY(-95vh) translateX(-16px) scale(1.4); opacity:0;}
   }
-
+ 
   /* ---------- drifting smoke across the whole page ---------- */
   .side-smoke-wrap{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
   .side-smoke{position:absolute; border-radius:50%; filter:blur(22px); opacity:0; animation-timing-function:linear; animation-iteration-count:infinite;}
@@ -275,20 +275,20 @@
     86%{opacity:.15;}
     100%{transform:translateX(-108vw) scale(1.5); opacity:0;}
   }
-
+ 
   /* ---------- twinkle stars, hero only ---------- */
   .stars{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
   .star{position:absolute; width:2px; height:2px; border-radius:50%; background:#fff; animation:twinkle ease-in-out infinite;}
   @keyframes twinkle{ 0%,100%{opacity:.15; transform:scale(1);} 50%{opacity:.9; transform:scale(1.6);} }
-
+ 
   /* ---------- pop-in bounce for cards/steps ---------- */
   .pop{opacity:0; transform:scale(.55) translateY(20px); transition:opacity .55s ease, transform .7s cubic-bezier(.34,1.56,.64,1);}
   .reveal-stagger.active .pop{opacity:1; transform:scale(1) translateY(0);}
-
+ 
   /* ---------- click burst particles ---------- */
   .burst-particle{position:absolute; width:5px; height:5px; border-radius:50%; pointer-events:none; animation:burst-out .55s ease-out forwards;}
   @keyframes burst-out{ to{transform:translate(var(--bx),var(--by)) scale(0); opacity:0;} }
-
+ 
   /* ---------- mascot ---------- */
   .mascot{position:fixed; right:24px; bottom:24px; z-index:150; width:52px; height:52px; cursor:pointer;
     animation:mascot-float 3.2s ease-in-out infinite; filter:drop-shadow(0 6px 14px rgba(11,37,69,.35));}
@@ -303,7 +303,7 @@
     transition:opacity .3s, transform .3s; white-space:nowrap;
   }
   .mascot-bubble.show{opacity:1; transform:translateY(0) scale(1);}
-
+ 
   @media (max-width: 860px){
     .hero{grid-template-columns:1fr; padding-top:52px;}
     .credibility{grid-template-columns:1fr;}
@@ -317,20 +317,21 @@
 </style>
 </head>
 <body>
-
+ 
 <div class="progress-bar" id="progressBar"></div>
 <div class="side-smoke-wrap" id="sideSmoke"></div>
-
+ 
 <nav class="nav">
   <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
   <div class="nav-links">
     <a href="#how" class="text-link">How it works</a>
     <a href="#track" class="text-link">Track a complaint</a>
+    <a href="/transparency" class="text-link">Transparency</a>
     <a href="/login" class="btn btn-ghost">Log in</a>
     <a href="/register" class="btn btn-amber">Register</a>
   </div>
 </nav>
-
+ 
 <header class="hero">
   <div class="hero-glow"></div>
   <div class="stars" id="stars"></div>
@@ -362,7 +363,7 @@
       </form>
     </div>
   </div>
-
+ 
   <div class="orbit-wrap">
     <div class="orbit-ring ring3"></div>
     <div class="orbit-ring ring2"></div>
@@ -384,14 +385,14 @@
     </div>
   </div>
 </header>
-
+ 
 <div class="marquee-wrap">
   <div class="marquee">
     <span>GARBAGE &amp; DUMPING</span><span>POTHOLES &amp; ROADS</span><span>WATER LEAKAGE</span><span>STREET LIGHTS</span><span>PENDING</span><span>IN PROGRESS</span><span>RESOLVED</span>
     <span>GARBAGE &amp; DUMPING</span><span>POTHOLES &amp; ROADS</span><span>WATER LEAKAGE</span><span>STREET LIGHTS</span><span>PENDING</span><span>IN PROGRESS</span><span>RESOLVED</span>
   </div>
 </div>
-
+ 
 <section>
   <div class="section-head reveal">
     <span class="kicker mono">What you can report</span>
@@ -421,7 +422,7 @@
     </div>
   </div>
 </section>
-
+ 
 <section id="how">
   <div class="section-head reveal">
     <span class="kicker mono">How it works</span>
@@ -435,7 +436,7 @@
     <div class="flow-cell"><div class="flow-step fly-right" data-dir="right"><span class="num mono">STEP 04</span><h3>It's resolved</h3><p>Proof-of-resolution photo attached, ticket closed, done.</p></div></div>
   </div>
 </section>
-
+ 
 <section>
   <div class="section-head reveal">
     <span class="kicker mono">Every ticket's status</span>
@@ -450,14 +451,14 @@
     <div class="life-stage life-resolved"><span class="mono">STATE 03</span><span class="name">Resolved</span></div>
   </div>
 </section>
-
+ 
 <section class="facts reveal-stagger">
   <div class="fact r-child"><div class="num">4</div><div class="label">ISSUE CATEGORIES</div></div>
   <div class="fact r-child"><div class="num">3</div><div class="label">TICKET STATES</div></div>
   <div class="fact r-child"><div class="num">0</div><div class="label">LOGIN NEEDED TO TRACK</div></div>
   <div class="fact r-child"><div class="num">MIT</div><div class="label">OPEN SOURCE LICENSE</div></div>
 </section>
-
+ 
 <section class="credibility">
   <div class="reveal">
     <span class="kicker mono" style="color:var(--amber);">Why this exists</span>
@@ -469,7 +470,7 @@
     Aligned with the UN Sustainable Development Goal for sustainable cities and communities.
   </div>
 </section>
-
+ 
 <section class="final-cta">
   <div class="reveal">
     <h2>Your street. Your report. Your city, fixed.</h2>
@@ -480,7 +481,7 @@
     </div>
   </div>
 </section>
-
+ 
 <footer>
   <span>&copy; 2026 Civic Issue Mapper &middot; MIT Licensed</span>
   <div class="footer-links">
@@ -489,7 +490,7 @@
     <a href="https://github.com/Anushka190921/ai-civic-issue-mapper" target="_blank" rel="noopener">GitHub</a>
   </div>
 </footer>
-
+ 
 <div class="mascot-bubble" id="mascotBubble">Need a hand? 👋</div>
 <svg class="mascot" id="mascot" viewBox="0 0 56 56" fill="none">
   <defs>
@@ -505,7 +506,7 @@
   <g class="mascot-eye"><circle cx="34" cy="24" r="2.6" fill="#0B2545"/></g>
   <path d="M19 32c3 3.5 13 3.5 16 0" stroke="#0B2545" stroke-width="2" stroke-linecap="round" fill="none"/>
 </svg>
-
+ 
 <script>
   // scroll progress bar
   const progressBar = document.getElementById('progressBar');
@@ -514,14 +515,14 @@
     const pct = docHeight > 0 ? (window.scrollY/docHeight)*100 : 0;
     progressBar.style.width = pct + '%';
   }, {passive:true});
-
+ 
   // scroll reveal
   const revealEls = document.querySelectorAll('.reveal, .reveal-stagger');
   const io = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('active'); });
   }, {threshold:.2});
   revealEls.forEach(el=>io.observe(el));
-
+ 
   // flow steps fly-in
   const flowCells = document.querySelectorAll('.flow-cell');
   const flowTimers = new WeakMap();
@@ -540,7 +541,7 @@
     });
   }, {threshold:.2});
   flowCells.forEach(c=>flowIO.observe(c));
-
+ 
   // cursor sparkle (throttled, desktop only)
   if(window.matchMedia('(hover:hover)').matches){
     let last = 0;
@@ -556,7 +557,7 @@
       setTimeout(()=>s.remove(), 700);
     });
   }
-
+ 
   // button ripple + confetti-style burst
   const burstColors = ['#F2A93B', '#3E6C99', '#3E9B6F'];
   document.querySelectorAll('.btn').forEach(btn=>{
@@ -570,7 +571,7 @@
       circle.style.top = (e.clientY-r.top-size/2)+'px';
       btn.appendChild(circle);
       setTimeout(()=>circle.remove(), 600);
-
+ 
       for(let i=0;i<9;i++){
         const p = document.createElement('span');
         p.className = 'burst-particle';
@@ -586,7 +587,7 @@
       }
     });
   });
-
+ 
   // twinkling stars, confined to the hero
   const starsWrap = document.getElementById('stars');
   if(starsWrap){
@@ -602,7 +603,7 @@
       starsWrap.appendChild(s);
     }
   }
-
+ 
   // drifting smoke across the whole page
   const sideSmokeWrap = document.getElementById('sideSmoke');
   function addSideSmoke(side, count){
@@ -621,7 +622,7 @@
   }
   addSideSmoke('left', 3);
   addSideSmoke('right', 3);
-
+ 
   // mascot tip bubble
   const mascot = document.getElementById('mascot');
   const bubble = document.getElementById('mascotBubble');
@@ -640,6 +641,6 @@
     bubbleTimeout = setTimeout(()=>bubble.classList.remove('show'), 2400);
   });
 </script>
-
+ 
 </body>
 </html>
