@@ -11,6 +11,7 @@ import time
 import socket
 import math
 from difflib import SequenceMatcher
+from datetime import datetime
 socket.getfqdn = lambda name="": "localhost"
 from dotenv import load_dotenv
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -112,6 +113,18 @@ DEPARTMENT_MAP = {
     "Street Light": "Electricity Department",
 }
 DEFAULT_DEPARTMENT = "General Administration"
+
+
+# ---------------- SLA TARGETS ----------------
+# Target number of days to resolve each category. Adjust these to match
+# whatever response times your team actually wants to commit to.
+SLA_TARGETS = {
+    "Garbage": 2,
+    "Pothole": 7,
+    "Water Leakage": 3,
+    "Street Light": 5,
+}
+DEFAULT_SLA_DAYS = 5
 
 
 # ---------------- DUPLICATE DETECTION ----------------
@@ -490,6 +503,16 @@ def dashboard():
 
     complaints = cursor.fetchall()
 
+    # SLA check: flag any still-open complaint that's past its category's target resolution time
+    now = datetime.now()
+    for c in complaints:
+        target_days = SLA_TARGETS.get(c["issue_type"], DEFAULT_SLA_DAYS)
+        if c["status"] != "Resolved" and c.get("created_at"):
+            age_days = (now - c["created_at"]).total_seconds() / 86400
+            c["is_overdue"] = age_days > target_days
+        else:
+            c["is_overdue"] = False
+
     # Count total complaints
     cursor.execute("SELECT COUNT(*) AS count FROM civic_issues")
     total = cursor.fetchone()["count"]
@@ -513,6 +536,21 @@ def dashboard():
     """)
     high_risk_open = cursor.fetchone()["count"]
 
+    # Count complaints that have blown past their category's SLA target and are still open.
+    # Built dynamically from SLA_TARGETS so there's a single source of truth for the targets.
+    case_when_sql = " ".join(
+        f"WHEN '{category}' THEN {days}" for category, days in SLA_TARGETS.items()
+    )
+    cursor.execute(f"""
+        SELECT COUNT(*) AS count FROM civic_issues
+        WHERE status != 'Resolved'
+          AND DATEDIFF(NOW(), created_at) > CASE issue_type
+              {case_when_sql}
+              ELSE {DEFAULT_SLA_DAYS}
+          END
+    """)
+    overdue_open = cursor.fetchone()["count"]
+
     cursor.close()
     db.close()
 
@@ -521,7 +559,8 @@ def dashboard():
         "pending": pending,
         "in_progress": in_progress,
         "resolved": resolved,
-        "high_risk_open": high_risk_open
+        "high_risk_open": high_risk_open,
+        "overdue_open": overdue_open
     }
 
     return render_template(
@@ -634,6 +673,22 @@ def transparency():
     avg_hours = avg_hours_row["avg_hours"] if avg_hours_row and avg_hours_row["avg_hours"] else 0
     avg_resolution_days = round(avg_hours / 24, 1) if avg_hours else 0
 
+    # SLA compliance: of the complaints that got resolved, what share were resolved
+    # within their category's target time?
+    cursor.execute("""
+        SELECT issue_type, created_at, updated_at
+        FROM civic_issues
+        WHERE status = 'Resolved' AND updated_at IS NOT NULL
+    """)
+    resolved_rows = cursor.fetchall()
+    within_target = 0
+    for r in resolved_rows:
+        target_days = SLA_TARGETS.get(r["issue_type"], DEFAULT_SLA_DAYS)
+        actual_days = (r["updated_at"] - r["created_at"]).total_seconds() / 86400
+        if actual_days <= target_days:
+            within_target += 1
+    sla_compliance_rate = round((within_target / len(resolved_rows)) * 100) if resolved_rows else 0
+
     # Counts by category, in the fixed display order used across the site
     by_category = []
     for label in ["Garbage", "Pothole", "Water Leakage", "Street Light"]:
@@ -664,6 +719,7 @@ def transparency():
         "total_resolved": total_resolved,
         "resolution_rate": resolution_rate,
         "avg_resolution_days": avg_resolution_days,
+        "sla_compliance_rate": sla_compliance_rate,
         "by_category": by_category,
         "by_urgency": by_urgency,
         "recent_resolved": recent_resolved,
