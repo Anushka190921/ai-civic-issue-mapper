@@ -20,7 +20,7 @@
   .mono{font-family:'IBM Plex Mono', monospace;}
   a{color:inherit;}
   :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
- 
+
   .nav{
     position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
     padding:16px 6vw; background:rgba(11,37,69,.94); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);
@@ -35,7 +35,7 @@
   .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 18px; font-weight:600; font-size:13.5px; text-decoration:none; border-radius:3px; border:1.5px solid transparent;}
   .btn-amber{background:var(--amber); color:var(--amber-ink);}
   .btn-ghost{border-color:rgba(237,239,232,.4); color:var(--paper);}
- 
+
   .page-head{background:var(--navy); color:var(--paper); padding:56px 6vw 60px; position:relative; overflow:hidden;}
   .head-glow{position:absolute; inset:0; pointer-events:none; z-index:0; background:radial-gradient(600px 380px at 15% 20%, rgba(242,169,59,.10), transparent 60%), radial-gradient(600px 420px at 85% 60%, rgba(62,108,153,.20), transparent 60%);}
   .page-head > *{position:relative; z-index:1;}
@@ -43,29 +43,30 @@
   .eyebrow::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--amber); box-shadow:0 0 8px var(--amber); animation:pulse-dot 1.6s ease-in-out infinite;}
   .page-head h1{font-size:clamp(28px,4vw,42px); line-height:1.05;}
   .page-head p{color:rgba(237,239,232,.8); font-size:15px; max-width:60ch; margin-top:14px;}
- 
+
   .wrap{max-width:960px; margin:0 auto; padding:50px 6vw 90px;}
   .fade-in{opacity:0; transform:translateY(16px); animation:fade-in-anim .5s ease forwards;}
   @keyframes fade-in-anim{ to{opacity:1; transform:translateY(0);} }
- 
-  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin:0 0 40px;}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:16px; margin:0 0 40px;}
   .stat-card{background:var(--navy); color:var(--paper); border-radius:10px; padding:22px 24px; box-shadow:0 10px 26px rgba(11,37,69,.15);}
   .stat-card .num{font-family:'Archivo Expanded', sans-serif; font-weight:800; font-size:34px;}
   .stat-card .label{font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:rgba(237,239,232,.6); margin-top:4px;}
   .stat-card.amber .num{color:var(--amber);}
   .stat-card.steel .num{color:#7fb3e0;}
   .stat-card.green .num{color:#7fd9ab;}
- 
+  .stat-card.orange .num{color:#f0a878;}
+
   .section-block{background:#fff; border:1px solid #d9dcd1; border-radius:12px; padding:28px 26px; margin-bottom:22px; box-shadow:0 10px 26px rgba(11,37,69,.06);}
   .block-label{font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--steel); margin-bottom:18px; display:block;}
- 
+
   .cat-row{display:flex; align-items:center; gap:14px; margin-bottom:14px;}
   .cat-row:last-child{margin-bottom:0;}
   .cat-name{width:130px; font-size:13.5px; font-weight:600; color:var(--navy); flex-shrink:0;}
   .cat-bar-track{flex:1; background:var(--paper-dim); border-radius:6px; height:10px; overflow:hidden;}
   .cat-bar-fill{height:100%; background:var(--steel); border-radius:6px;}
   .cat-count{width:36px; text-align:right; font-size:13px; color:#5c6558; flex-shrink:0;}
- 
+
   .urg-badges{display:flex; gap:10px; flex-wrap:wrap;}
   .urg-badge{
     display:inline-flex; align-items:center; gap:7px; padding:7px 14px; border-radius:100px;
@@ -76,7 +77,7 @@
   .urg-badge.medium{background:#FCEFDA; color:var(--amber-ink);} .urg-badge.medium .d{background:var(--amber);}
   .urg-badge.high{background:#FBE9DA; color:#A15A26;} .urg-badge.high .d{background:#E08B3E;}
   .urg-badge.critical{background:#FBEAE8; color:var(--red);} .urg-badge.critical .d{background:var(--red);}
- 
+
   .resolved-list{list-style:none; margin:0; padding:0;}
   .resolved-list li{
     display:flex; justify-content:space-between; align-items:center; gap:12px;
@@ -87,7 +88,7 @@
   .resolved-list .r-dept{color:#5c6558; font-size:12.5px;}
   .resolved-list .r-date{color:#5c6558; font-family:'IBM Plex Mono', monospace; font-size:12px; white-space:nowrap;}
   .empty-note{color:#5c6558; font-size:13.5px; padding:8px 0;}
- 
+
   @media (max-width: 640px){
     .nav-links a.text-link{display:none;}
     .cat-name{width:90px;}
@@ -95,7 +96,7 @@
 </style>
 </head>
 <body>
- 
+
 <nav class="nav">
   <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
   <div class="nav-links">
@@ -104,16 +105,16 @@
     <a href="/register" class="btn btn-amber">Register</a>
   </div>
 </nav>
- 
+
 <header class="page-head">
   <div class="head-glow"></div>
   <span class="eyebrow">Public data</span>
   <h1>What's been reported,<br>and how fast it's fixed.</h1>
   <p>A live, unfiltered look at civic issues in your area — no login required. This is the same data admins see, just without personal details.</p>
 </header>
- 
+
 <div class="wrap">
- 
+
   <div class="stat-grid">
     <div class="stat-card fade-in" style="animation-delay:.05s;">
       <div class="num">{{ stats.total_reported }}</div>
@@ -131,8 +132,12 @@
       <div class="num">{{ stats.avg_resolution_days }}d</div>
       <div class="label">Avg. time to fix</div>
     </div>
+    <div class="stat-card orange fade-in" style="animation-delay:.45s;">
+      <div class="num">{{ stats.sla_compliance_rate }}%</div>
+      <div class="label">Fixed on time (SLA)</div>
+    </div>
   </div>
- 
+
   <div class="section-block fade-in" style="animation-delay:.4s;">
     <span class="block-label">// By category</span>
     {% for cat in stats.by_category %}
@@ -147,7 +152,7 @@
     <p class="empty-note">No issues reported yet.</p>
     {% endfor %}
   </div>
- 
+
   <div class="section-block fade-in" style="animation-delay:.45s;">
     <span class="block-label">// By urgency</span>
     <div class="urg-badges">
@@ -157,7 +162,7 @@
       <span class="urg-badge critical"><span class="d"></span>Critical: {{ stats.by_urgency.critical }}</span>
     </div>
   </div>
- 
+
   <div class="section-block fade-in" style="animation-delay:.5s;">
     <span class="block-label">// Recently resolved</span>
     <ul class="resolved-list">
@@ -174,8 +179,8 @@
       {% endfor %}
     </ul>
   </div>
- 
+
 </div>
- 
+
 </body>
 </html>
