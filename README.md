@@ -227,9 +227,13 @@ http://127.0.0.1:5000
 |-----------------|--------------------|
 | ![Admin Dashboard](assets/admin.png) | ![Transparency](assets/transparency.png) |
 
-| Track Complaint Status | My Issues |
-|-------------------------|-----------|
-| ![Track Status](assets/track_status.png) | ![My Issues](assets/my_issues.png) |
+| Transparency Page (scrolled) | Track Complaint Status |
+|-------------------------------|--------------------------|
+| ![Transparency Scrolled](assets/transparency-scrolled.png) | ![Track Status](assets/track_status.png) |
+
+| My Issues |
+|-----------|
+| ![My Issues](assets/my_issues.png) |
 
 ---
 
