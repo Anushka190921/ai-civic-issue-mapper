@@ -18,7 +18,7 @@
 
 ## 📌 About
 
-A government-style civic issue reporting portal where citizens can report problems like garbage dumping, broken roads, water leakage, and street light failures — with photo and GPS evidence — and track resolution status. Authorities manage and resolve issues through an admin dashboard with live statistics and department routing.
+A civic issue reporting portal where citizens report problems like garbage dumping, broken roads, water leakage, and street light failures — with photo and GPS evidence — and track resolution through to completion. Departments get automatic routing, priority-sorted queues, and measurable SLA accountability. Citizens get real-time duplicate detection, transparent public stats, and status tracking with no account required.
 
 Aligned with **UN Sustainable Development Goal 11: Sustainable Cities and Communities**.
 
@@ -44,13 +44,18 @@ The application is deployed and live at: **[https://ai-civic-issue-mapper.onrend
 | User Registration & Login | ✅ Done |
 | Google OAuth Login | ✅ Done |
 | Secure password hashing (citizens + admin) | ✅ Done |
-| Report Issue with Image & Location | ✅ Done |
-| Admin Dashboard | ✅ Done |
-| Dashboard Statistics | ✅ Done |
+| Report Issue with Image & GPS Location | ✅ Done |
+| Severity / urgency self-rating (Low–Critical) | ✅ Done |
+| Automatic department routing by category | ✅ Done |
+| Real-time duplicate detection (GPS + text similarity) | ✅ Done |
+| Admin Dashboard with live stats | ✅ Done |
+| Priority-based sorting (urgency + newest) | ✅ Done |
 | Search & Filter Complaints | ✅ Done |
-| Department Assignment | ✅ Done |
+| Manual department reassignment | ✅ Done |
 | Complaint Status Tracking | ✅ Done |
 | Resolution Proof Photo Upload | ✅ Done |
+| SLA tracking with per-category targets & overdue flagging | ✅ Done |
+| Public Transparency Page (stats, SLA compliance, no login) | ✅ Done |
 | Single Complaint Map View (Leaflet.js) | ✅ Done |
 | Email Validation & Password Rules | ✅ Done |
 | Forgot / Reset Password (Email Verification) | ✅ Done |
@@ -61,8 +66,8 @@ The application is deployed and live at: **[https://ai-civic-issue-mapper.onrend
 | Notification System | ✅ Done |
 | Public Complaint Status Tracker (No Login) | ✅ Done |
 | Full Multi-Complaint Map View (color-coded pins) | 🚧 In Progress |
-| AI Image Classification (Teachable Machine) | ⏳ Planned |
-| SLA / Auto-Escalation | ⏳ Planned |
+| Geo-spatial Heatmaps | ⏳ Planned (depends on map view above) |
+| AI Image Classification | ⏳ Planned |
 
 ---
 
@@ -72,12 +77,13 @@ The application is deployed and live at: **[https://ai-civic-issue-mapper.onrend
 |-------|-----------|
 | Backend | Python, Flask |
 | Database | MySQL (Aiven) |
-| Frontend | HTML, CSS, Bootstrap |
+| Frontend | HTML, CSS, JavaScript — custom navy & amber design system |
 | Authentication | Flask-Dance, Google OAuth, Werkzeug password hashing |
 | Security | Werkzeug, python-dotenv, Flask-Limiter |
+| Duplicate detection | Haversine GPS-distance calculation, Python `difflib` text similarity |
 | Email | Brevo API |
 | Maps | Leaflet.js |
-| Deployment | Render, Gunicorn |
+| Deployment | Render, Gunicorn (deployed via `git push`, no CI/CD pipeline) |
 | Uptime Monitoring | UptimeRobot |
 
 ---
@@ -114,6 +120,8 @@ ai-civic-issue-mapper/
 │   ├── reset_password.html
 
 │   ├── track_status.html
+
+│   ├── transparency.html
 
 │   ├── view_map.html
 
@@ -176,13 +184,32 @@ MAIL_USERNAME=your_email
 BREVO_API_KEY=your_brevo_api_key
 
 
-**4. Run the app**
+**4. Set up the database schema**
+
+Run this migration to add the columns needed for severity scoring and SLA tracking:
+```sql
+ALTER TABLE civic_issues ADD COLUMN urgency VARCHAR(20) DEFAULT 'Medium';
+ALTER TABLE civic_issues ADD COLUMN updated_at DATETIME NULL;
+```
+
+**5. Run the app**
 ```bash
 python app.py
 ```
 
-**5. Open browser**
+**6. Open browser**
 http://127.0.0.1:5000
+
+---
+
+## 🎯 How Severity, Routing & SLA Work Together
+
+1. A citizen files a complaint and self-rates its urgency (Low / Medium / High / Critical).
+2. Before submitting, the system checks for likely duplicate reports nearby (GPS proximity + text similarity) and prompts the citizen to confirm an existing report instead of filing a new one.
+3. The complaint is automatically routed to the correct department based on its category.
+4. Each category carries a target resolution time — Garbage: 2 days, Water Leakage: 3 days, Street Lights: 5 days, Potholes: 7 days.
+5. The admin dashboard surfaces the highest-priority and SLA-overdue complaints first.
+6. Once resolved, the public transparency page reflects the real resolution rate, average time to fix, and SLA compliance percentage — no login required to view it.
 
 ---
 
@@ -196,13 +223,13 @@ http://127.0.0.1:5000
 |----------|--------------|
 | ![Register](assets/register.png) | ![Form](assets/form.png) |
 
-| Admin Dashboard | My Complaints |
-|-----------------|--------------|
-| ![Admin Dashboard](assets/admin.png) | ![My Issues](assets/my_issues.png) |
+| Admin Dashboard | Transparency Page |
+|-----------------|--------------------|
+| ![Admin Dashboard](assets/admin.png) | ![Transparency](assets/transparency.png) |
 
-| Track Complaint Status | Success Page |
-|-------------------------|--------------|
-| ![Track Status](assets/track_status.png) | ![Success](assets/success.png) |
+| Track Complaint Status | My Issues |
+|-------------------------|-----------|
+| ![Track Status](assets/track_status.png) | ![My Issues](assets/my_issues.png) |
 
 ---
 
@@ -212,16 +239,24 @@ http://127.0.0.1:5000
 |------|------|--------|
 | 👑 Project Lead & Backend Developer | Anushka | [Anushka190921](https://github.com/Anushka190921) |
 | 🎨 Frontend Developer | Kanishka | [Kanishka240306](https://github.com/Kanishka240306) |
-| 🔗 API / Testing / Integration | Anushka srivastava | [Anushka504-S](https://github.com/Anushka504-S) |
+| 🔗 API / Testing / Integration | Anushka Srivastava | [Anushka504-S](https://github.com/Anushka504-S) |
 
 ---
 
 ## 🔮 Roadmap
 
 - 🗺️ Full multi-complaint map view (all complaints as color-coded pins)
-- 🤖 AI Image Classification
-- ⏰ SLA / Auto-Escalation
-- 📊 Analytics Dashboard
+- 🌡️ Geo-spatial heatmaps of issue hotspots by ward/neighborhood
+- 🤖 AI image classification for automatic category detection
+
+---
+
+## ⚠️ Known Limitations
+
+Being upfront about what this project currently does *not* have:
+- No CI/CD pipeline or automated test suite — deployment is a manual `git push` to Render
+- No SMS or WhatsApp reporting channel — web only
+- AI image classification is planned but not yet implemented, despite the project name
 
 ---
 
