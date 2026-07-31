@@ -66,8 +66,9 @@ app.register_blueprint(google_bp, url_prefix="/login")
 UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# ---------------- DATABASE CONNECTION ----------------
+# ---------------- DATABASE CONNECTION ----------------\
 def get_db():
+
     return mysql.connector.connect(
         host=os.getenv("DB_HOST"),
         user=os.getenv("DB_USER"),
@@ -275,9 +276,6 @@ def my_issues():
 
 
 # ---------------- ADMIN DASHBOARD ---------------
-@app.route("/view_map")
-def view_map():
-    return render_template("view_map.html")
 
    # if "admin" not in session:
        # return redirect("/admin")
@@ -292,24 +290,25 @@ def view_map(id):
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute(
-        "SELECT latitude, longitude FROM civic_issues WHERE id=%s",
-        (id,)
-    )
+    cursor.execute("""
+         SELECT id, issue_type, latitude, longitude, status
+        FROM civic_issues
+        WHERE latitude IS NOT NULL
+        AND longitude IS NOT NULL
+        """)
 
-    complaint = cursor.fetchone()
+    complaints = cursor.fetchall()
 
     cursor.close()
     db.close()
 
-    if complaint is None:
-        return "Complaint not found"
+    if not complaints:
+      return "No complaints found"
 
     return render_template(
-        "view_map.html",
-        lat=complaint["latitude"],
-        lng=complaint["longitude"]
-    )
+    "view_map.html",
+    complaints=complaints
+)
 @app.route("/dashboard")
 def dashboard():
     # Only admin can access dashboard

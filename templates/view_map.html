@@ -35,10 +35,31 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© OpenStreetMap'
 }).addTo(map);
 
-L.marker([28.6139, 77.2090])
-.addTo(map)
-.bindPopup("Delhi")
-.openPopup();
+</script>
+
+var map = L.map('map').setView([28.6139, 77.2090], 12);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+}).addTo(map);
+
+// Complaints received from Flask
+var complaints = {{ complaints | tojson }};
+
+// Create one marker for each complaint
+complaints.forEach(function(c) {
+
+    L.marker([parseFloat(c.latitude), parseFloat(c.longitude)])
+        .addTo(map)
+        .bindPopup(
+            "<b>Issue:</b> " + c.issue_type +
+            "<br><b>Status:</b> " + c.status +
+            "<br><b>ID:</b> " + c.id
+        );
+
+});
+
+</script>
 
 </script>
 
