@@ -215,25 +215,30 @@ http://127.0.0.1:5000
 
 ## 📸 Screenshots
 
-| Landing Page | Login |
-|--------------|-------|
-| ![Landing](assets/landing.png) | ![Login](assets/login.png) |
+**Landing Page**
 
-| Register | Report Issue |
-|----------|--------------|
-| ![Register](assets/register.png) | ![Form](assets/form.png) |
+| | | |
+|---|---|---|
+| ![Landing 1](assets/landing-1.png) | ![Landing 2](assets/landing-2.png) | ![Landing 3](assets/landing-3.png) |
+| ![Landing 4](assets/landing-4.png) | ![Landing 5](assets/landing-5.png) | ![Landing 6](assets/landing-6.png) |
 
-| Admin Dashboard | Transparency Page |
-|-----------------|--------------------|
-| ![Admin Dashboard](assets/admin.png) | ![Transparency](assets/transparency.png) |
+**Core App Pages**
 
-| Transparency Page (scrolled) | Track Complaint Status |
-|-------------------------------|--------------------------|
-| ![Transparency Scrolled](assets/transparency-scrolled.png) | ![Track Status](assets/track_status.png) |
+| Login | Register |
+|-------|----------|
+| ![Login](assets/login.png) | ![Register](assets/register.png) |
 
-| My Issues |
-|-----------|
-| ![My Issues](assets/my_issues.png) |
+| Report Issue | Admin Dashboard |
+|--------------|------------------|
+| ![Form](assets/form.png) | ![Admin Dashboard](assets/admin.png) |
+
+| Transparency Page | Transparency Page (scrolled) |
+|--------------------|-------------------------------|
+| ![Transparency](assets/transparency.png) | ![Transparency Scrolled](assets/transparency-scrolled.png) |
+
+| Track Complaint Status | My Issues |
+|-------------------------|-----------|
+| ![Track Status](assets/track_status.png) | ![My Issues](assets/my_issues.png) |
 
 ---
 
