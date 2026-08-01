@@ -1,163 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>429 - Too Many Requests</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-        }
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #fff5e6 0%, #ffe6e6 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .error-container {
-            background: #fff;
-            border-radius: 16px;
-            padding: 40px 36px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        .icon-circle {
-            width: 80px;
-            height: 80px;
-            background: #ffe6e6;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            font-size: 40px;
-        }
-        h1 {
-            color: #d32f2f;
-            font-size: 28px;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-        .error-code {
-            color: #999;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-        .message {
-            color: #555;
-            font-size: 16px;
-            margin-bottom: 10px;
-            line-height: 1.6;
-        }
-        .details {
-            background: #f5f5f5;
-            border-left: 4px solid #ff9800;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 24px 0;
-            text-align: left;
-            font-size: 14px;
-            color: #666;
-        }
-        .details strong {
-            color: #333;
-        }
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 28px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .btn-back {
-            background: #6c757d;
-            color: white;
-            padding: 12px 28px;
-            border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.3s;
-            display: inline-block;
-        }
-        .btn-back:hover {
-            background: #5a6268;
-            text-decoration: none;
-            color: white;
-        }
-        .btn-login {
-            background: #0d6efd;
-            color: white;
-            padding: 12px 28px;
-            border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.3s;
-            display: inline-block;
-        }
-        .btn-login:hover {
-            background: #0b5ed7;
-            text-decoration: none;
-            color: white;
-        }
-        .timer {
-            font-size: 18px;
-            color: #d32f2f;
-            font-weight: 600;
-            margin: 16px 0;
-        }
-        @media (max-width: 500px) {
-            .error-container {
-                padding: 30px 20px;
-            }
-            h1 {
-                font-size: 24px;
-            }
-            .button-group {
-                flex-direction: column;
-            }
-            .btn-back, .btn-login {
-                width: 100%;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Too Many Requests — Civic Issue Mapper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --ink:#10151B;
+    --amber:#F2A93B; --amber-ink:#5C3A08; --steel:#3E6C99; --line: rgba(237,239,232,0.16);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; min-height:100vh; background:var(--navy); color:var(--paper); font-family:'IBM Plex Sans', sans-serif; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; text-align:center;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; animation-iteration-count:1 !important;} }
+  h1{font-family:'Archivo Expanded', sans-serif; text-transform:uppercase; margin:0;}
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
+
+  .glow{position:absolute; inset:0; pointer-events:none; z-index:0; background:radial-gradient(560px 380px at 20% 25%, rgba(62,108,153,.20), transparent 60%), radial-gradient(500px 360px at 85% 75%, rgba(242,169,59,.10), transparent 60%);}
+
+  .panel{position:relative; z-index:1; max-width:440px; margin:20px; padding:20px;
+    opacity:0; transform:scale(.6) translateY(24px); animation:pop-in .65s cubic-bezier(.34,1.56,.64,1) forwards;}
+  @keyframes pop-in{ to{opacity:1; transform:scale(1) translateY(0);} }
+
+  .brand{display:flex; align-items:center; gap:9px; font-family:'Archivo Expanded', sans-serif; font-weight:800; font-size:15px; letter-spacing:.03em; text-decoration:none; margin-bottom:36px; justify-content:center;}
+  .dot-ring{position:relative; width:11px; height:11px;}
+  .dot-ring::before{content:''; position:absolute; inset:0; border-radius:50%; background:var(--amber); box-shadow:0 0 8px rgba(242,169,59,.8); animation:pulse-dot 1.8s ease-in-out infinite;}
+  @keyframes pulse-dot{ 0%,100%{transform:scale(1); opacity:1;} 50%{transform:scale(1.5); opacity:.5;} }
+
+  .code{font-family:'Archivo Expanded', sans-serif; font-weight:800; font-size:96px; line-height:1; color:var(--amber); text-shadow:0 0 40px rgba(242,169,59,.3);}
+  h1{font-size:24px; margin:14px 0 12px;}
+  p.sub{color:rgba(237,239,232,.7); font-size:14.5px; max-width:38ch; margin:0 auto 30px; line-height:1.6;}
+
+  .btn{display:inline-flex; padding:12px 24px; border-radius:5px; font-weight:700; font-size:14px; text-decoration:none; background:var(--amber); color:var(--amber-ink); transition:transform .2s ease;}
+  .btn:hover{transform:translateY(-2px);}
+</style>
 </head>
 <body>
-    <div class="error-container">
-        <div class="icon-circle">⏱️</div>
-        <h1>Too Many Requests</h1>
-        <p class="error-code">Error Code: 429</p>
-        
-        <p class="message">
-            <strong>Too many attempts — please wait a moment and try again.</strong>
-        </p>
-        
-        <div class="details">
-            <strong>Why did this happen?</strong><br>
-            You've made too many requests in a short period of time. To protect our system, we limit requests to <strong>5 per minute</strong>.<br><br>
-            <strong>What can you do?</strong><br>
-            Please wait a moment before trying again. Your request limit will reset shortly.
-        </div>
 
-        <div class="timer">
-            ⏳ Please wait before making another request
-        </div>
+<div class="glow"></div>
 
-        <div class="button-group">
-            <button class="btn-back" onclick="history.back()">← Go Back</button>
-            <a href="/login" class="btn-login">🔐 Login Page</a>
-        </div>
-    </div>
+<div class="panel">
+  <a href="/" class="brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
+  <div class="code">429</div>
+  <h1>Slow down a little</h1>
+  <p class="sub">You've made too many requests in a short time. Please wait a minute before trying again.</p>
+  <a href="/" class="btn">Back to home</a>
+</div>
+
 </body>
 </html>

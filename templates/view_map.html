@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Test</title>
+    <title>All Complaint Locations</title>
 
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -27,39 +27,44 @@
 
 <script>
 
-var map = L.map('map').setView([28.6139, 77.2090], 15);
+var map = L.map('map').setView([28.6139,77.2090],12);
 
-L.marker([28.6139, 77.2090])
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
     attribution:'© OpenStreetMap'
 }).addTo(map);
 
-</script>
+var complaints = {{ complaints|tojson }};
 
-var map = L.map('map').setView([28.6139, 77.2090], 12);
+var bounds = [];
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
-}).addTo(map);
+complaints.forEach(function(c){
 
-// Complaints received from Flask
-var complaints = {{ complaints | tojson }};
+    if(c.latitude && c.longitude){
 
-// Create one marker for each complaint
-complaints.forEach(function(c) {
+        var marker=L.marker([
+            parseFloat(c.latitude),
+            parseFloat(c.longitude)
+        ]).addTo(map);
 
-    L.marker([parseFloat(c.latitude), parseFloat(c.longitude)])
-        .addTo(map)
-        .bindPopup(
-            "<b>Issue:</b> " + c.issue_type +
-            "<br><b>Status:</b> " + c.status +
-            "<br><b>ID:</b> " + c.id
+        marker.bindPopup(
+            "<b>Complaint ID :</b> "+c.id+
+            "<br><b>Issue :</b> "+c.issue_type+
+            "<br><b>Status :</b> "+c.status
         );
+
+        bounds.push([
+            parseFloat(c.latitude),
+            parseFloat(c.longitude)
+        ]);
+    }
 
 });
 
-</script>
+if(bounds.length>0){
+    map.fitBounds(bounds);
+}
 
 </script>
 

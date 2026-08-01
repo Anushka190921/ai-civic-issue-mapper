@@ -3,12 +3,17 @@
 # Backend: Python Flask | Database: MySQL
 # ============================================================
 
-from flask import Flask, request, render_template, redirect, session, flash
+from typing import Counter
+
+from flask import Flask, request, render_template, redirect, session, flash, jsonify
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import time
 import socket
+import math
+from difflib import SequenceMatcher
+from datetime import datetime
 socket.getfqdn = lambda name="": "localhost"
 from dotenv import load_dotenv
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -33,8 +38,7 @@ limiter = Limiter(
     app=app,
     default_limits=["200 per day", "50 per hour"]
 )
-
-app.secret_key = "anushka123456"
+app.secret_key = os.getenv("SECRET_KEY")
 
 
 # ---------------- EMAIL CONFIGURATION ----------------
@@ -78,13 +82,139 @@ def get_db():
         ssl_disabled=False
     )
 
+
+# ---------- Health Check (keeps Aiven DB + Render awake) ----------
+@app.route("/healthz")
+def healthz():
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return "OK", 200
+    except Exception as e:
+        print("Health check DB error:", e)
+        return "DB unreachable", 500
+
 # ---------------- HOME ----------------
 @app.route("/")
 def home():
-    # Redirect to login if user is not logged in
     if "user_id" not in session:
-        return redirect("/login")
-    return render_template("form.html")
+        return render_template("landing.html")
+    return render_template("form.html")   # or redirect to wherever the form lives
+
+
+# ---------------- DEPARTMENT AUTO-ROUTING ----------------
+# Maps each issue category to the department responsible for it.
+# NOTE: keys must exactly match the issue_type values sent by the report form.
+DEPARTMENT_MAP = {
+    "Garbage": "Sanitation Department",
+    "Pothole": "Roads & Infrastructure",
+    "Water Leakage": "Water Board",
+    "Street Light": "Electricity Department",
+}
+DEFAULT_DEPARTMENT = "General Administration"
+
+
+# ---------------- SLA TARGETS ----------------
+# Target number of days to resolve each category. Adjust these to match
+# whatever response times your team actually wants to commit to.
+SLA_TARGETS = {
+    "Garbage": 2,
+    "Pothole": 7,
+    "Water Leakage": 3,
+    "Street Light": 5,
+}
+DEFAULT_SLA_DAYS = 5
+
+
+# ---------------- DUPLICATE DETECTION ----------------
+def _haversine_meters(lat1, lon1, lat2, lon2):
+    """Distance in meters between two lat/lng points."""
+    R = 6371000  # Earth radius in meters
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+    a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
+    return 2 * R * math.asin(math.sqrt(a))
+
+
+def _distance_label(meters):
+    if meters < 1000:
+        return f"~{int(meters)}m away"
+    return f"~{meters / 1000:.1f}km away"
+
+
+DUPLICATE_RADIUS_METERS = 150
+DUPLICATE_LOOKBACK_DAYS = 30
+
+
+@app.route("/api/check-duplicate", methods=["POST"])
+def check_duplicate():
+    # Only logged-in users can check for duplicates (mirrors who can submit)
+    if "user_id" not in session:
+        return jsonify({"duplicates": []}), 401
+
+    data = request.get_json(silent=True) or {}
+    issue_type = data.get("issue_type")
+    description = data.get("description") or ""
+    latitude = data.get("latitude")
+    longitude = data.get("longitude")
+
+    if not issue_type:
+        return jsonify({"duplicates": []})
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Candidates: same category, not resolved, filed in the last 30 days
+    cursor.execute("""
+        SELECT id, issue_type, description, latitude, longitude, status, created_at
+        FROM civic_issues
+        WHERE issue_type = %s
+          AND status != 'Resolved'
+          AND created_at >= NOW() - INTERVAL %s DAY
+    """, (issue_type, DUPLICATE_LOOKBACK_DAYS))
+    candidates = cursor.fetchall()
+    cursor.close()
+    db.close()
+
+    duplicates = []
+    has_location = latitude not in (None, "") and longitude not in (None, "")
+
+    for c in candidates:
+        text_similarity = SequenceMatcher(None, description.lower(), (c["description"] or "").lower()).ratio()
+
+        proximity_score = None
+        distance_m = None
+        if has_location and c["latitude"] and c["longitude"]:
+            distance_m = _haversine_meters(float(latitude), float(longitude), float(c["latitude"]), float(c["longitude"]))
+            if distance_m > DUPLICATE_RADIUS_METERS:
+                continue  # too far away, not a candidate
+            proximity_score = max(0.0, 1 - (distance_m / DUPLICATE_RADIUS_METERS))
+
+        # If we have location for both, weight proximity heavily; otherwise rely on text alone
+        if proximity_score is not None:
+            similarity = (0.65 * proximity_score) + (0.35 * text_similarity)
+        else:
+            similarity = text_similarity * 0.7  # no location match possible, be more conservative
+
+        # Only surface genuinely likely matches
+        if similarity < 0.35:
+            continue
+
+        duplicates.append({
+            "id": c["id"],
+            "title": c["issue_type"],
+            "status": c["status"],
+            "distance_label": _distance_label(distance_m) if distance_m is not None else "distance unknown",
+            "similarity": round(similarity, 2)
+        })
+
+    duplicates.sort(key=lambda d: d["similarity"], reverse=True)
+    return jsonify({"duplicates": duplicates[:3]})
 
 
 # ---------------- SUBMIT COMPLAINT ----------------
@@ -102,6 +232,14 @@ def submit():
         description = request.form.get("description")
         latitude = request.form.get("latitude")
         longitude = request.form.get("longitude")
+
+        # Severity/urgency picked by the citizen — default to Medium if somehow missing
+        urgency = request.form.get("urgency") or "Medium"
+        if urgency not in ("Low", "Medium", "High", "Critical"):
+            urgency = "Medium"
+
+        # Auto-route to the responsible department based on category
+        department = DEPARTMENT_MAP.get(issue_type, DEFAULT_DEPARTMENT)
 
         # Handle image upload
         image = request.files.get("image")
@@ -121,9 +259,9 @@ def submit():
 
         cursor.execute("""
             INSERT INTO civic_issues
-            (issue_type, description, latitude, longitude, image, user_id)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (issue_type, description, latitude, longitude, image_name, user_id))
+            (issue_type, description, latitude, longitude, image, user_id, department, urgency)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (issue_type, description, latitude, longitude, image_name, user_id, department, urgency))
 
         db.commit()
         cursor.close()
@@ -132,7 +270,12 @@ def submit():
         return redirect(f"/success/{cursor.lastrowid}")
 
     except Exception as e:
-        return f"Error: {e}"
+        # Log the real error for debugging, but never show internal details to the user
+        app.logger.error(f"Error in /submit for user_id={session.get('user_id')}: {e}")
+        return render_template(
+            "500.html",
+            message="We couldn't submit your complaint right now. Please try again in a moment."
+        ), 500
 
 # ---------------- REGISTER ----------------
 @app.route("/register", methods=["GET", "POST"])
@@ -227,7 +370,7 @@ def admin():
         db.close()
 
         # Verify admin credentials
-        if admin and admin["password"] == password:
+        if admin and check_password_hash(admin["password"], password):
             session["admin"] = admin["id"]
             return redirect("/dashboard")
 
@@ -246,7 +389,9 @@ def delete_admin_issue(id):
     db = get_db()
     cursor = db.cursor()
 
-    # Delete complaint by id
+    # Delete related records first (foreign key constraints)
+    cursor.execute("DELETE FROM notifications WHERE issue_id=%s", (id,))
+    cursor.execute("DELETE FROM feedback WHERE issue_id=%s", (id,))
     cursor.execute("DELETE FROM civic_issues WHERE id=%s", (id,))
     db.commit()
 
@@ -281,8 +426,36 @@ def my_issues():
        # return redirect("/admin")
 
     
-@app.route("/view_map/<int:id>")
-def view_map(id):
+@app.route("/view_map")
+def view_map():
+
+    if "admin" not in session:
+        return redirect("/admin")
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            id,
+            issue_type,
+            latitude,
+            longitude,
+            status
+        FROM civic_issues
+        WHERE latitude IS NOT NULL
+        AND longitude IS NOT NULL
+    """)
+
+    complaints = cursor.fetchall()
+
+    cursor.close()
+    db.close()
+
+    return render_template(
+        "view_map.html",
+        complaints=complaints
+    )
 
     if "admin" not in session:
         return redirect("/admin")
@@ -314,30 +487,86 @@ def dashboard():
     # Only admin can access dashboard
     if "admin" not in session:
         return redirect("/admin")
-    
+
     search = request.args.get("search", "").strip()
+    sort_mode = request.args.get("sort", "recent")
 
     # Fetch all complaints with user details
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    if search:
-       cursor.execute(""" 
-         SELECT civic_issues.*, users.first_name, users.email
-         FROM civic_issues
-         JOIN users ON civic_issues.user_id = users.id
-         WHERE civic_issues.issue_type LIKE %s
-            OR civic_issues.id LIKE %s
-        ORDER BY civic_issues.id DESC
-        """, (f"%{search}%", f"%{search}%"))
+
+    # Priority sort ranks Critical > High > Medium > Low, then newest first within each tier.
+    # Recent sort is just newest first, same as before.
+    if sort_mode == "priority":
+        order_clause = """
+            ORDER BY
+                CASE civic_issues.urgency
+                    WHEN 'Critical' THEN 4
+                    WHEN 'High' THEN 3
+                    WHEN 'Medium' THEN 2
+                    WHEN 'Low' THEN 1
+                    ELSE 2
+                END DESC,
+                civic_issues.id DESC
+        """
     else:
-        cursor.execute("""
+        order_clause = "ORDER BY civic_issues.id DESC"
+
+    if search:
+        cursor.execute(f"""
            SELECT civic_issues.*, users.first_name, users.email
            FROM civic_issues
            JOIN users ON civic_issues.user_id = users.id
-            ORDER BY civic_issues.id DESC
+           WHERE civic_issues.issue_type LIKE %s
+              OR CAST(civic_issues.id AS CHAR) LIKE %s
+              OR civic_issues.description LIKE %s
+           {order_clause}
+        """, (f"%{search}%", f"%{search}%", f"%{search}%"))
+    else:
+        cursor.execute(f"""
+           SELECT civic_issues.*, users.first_name, users.email
+           FROM civic_issues
+           JOIN users ON civic_issues.user_id = users.id
+           {order_clause}
         """)
-    
+
     complaints = cursor.fetchall()
+    from collections import Counter
+
+    # Top Issue
+    issue_counter = Counter()
+
+    critical_count = 0
+    today_count = 0
+    department_counter = Counter()
+
+    today = datetime.now().date()
+
+    for c in complaints:
+
+       issue_counter[c["issue_type"]] += 1
+
+       department_counter[c["department"]] += 1
+
+       if c["urgency"] == "Critical":
+          critical_count += 1
+
+       if c["created_at"]:
+           if c["created_at"].date() == today:
+            today_count += 1
+
+    top_issue = issue_counter.most_common(1)
+    top_department = department_counter.most_common(1)
+
+    # SLA check: flag any still-open complaint that's past its category's target resolution time
+    now = datetime.now()
+    for c in complaints:
+        target_days = SLA_TARGETS.get(c["issue_type"], DEFAULT_SLA_DAYS)
+        if c["status"] != "Resolved" and c.get("created_at"):
+            age_days = (now - c["created_at"]).total_seconds() / 86400
+            c["is_overdue"] = age_days > target_days
+        else:
+            c["is_overdue"] = False
 
     # Count total complaints
     cursor.execute("SELECT COUNT(*) AS count FROM civic_issues")
@@ -355,6 +584,28 @@ def dashboard():
     cursor.execute("SELECT COUNT(*) AS count FROM civic_issues WHERE status='Resolved'")
     resolved = cursor.fetchone()["count"]
 
+    # Count high-risk complaints still open (High or Critical urgency, not yet resolved)
+    cursor.execute("""
+        SELECT COUNT(*) AS count FROM civic_issues
+        WHERE urgency IN ('High', 'Critical') AND status != 'Resolved'
+    """)
+    high_risk_open = cursor.fetchone()["count"]
+
+    # Count complaints that have blown past their category's SLA target and are still open.
+    # Built dynamically from SLA_TARGETS so there's a single source of truth for the targets.
+    case_when_sql = " ".join(
+        f"WHEN '{category}' THEN {days}" for category, days in SLA_TARGETS.items()
+    )
+    cursor.execute(f"""
+        SELECT COUNT(*) AS count FROM civic_issues
+        WHERE status != 'Resolved'
+          AND DATEDIFF(NOW(), created_at) > CASE issue_type
+              {case_when_sql}
+              ELSE {DEFAULT_SLA_DAYS}
+          END
+    """)
+    overdue_open = cursor.fetchone()["count"]
+
     cursor.close()
     db.close()
 
@@ -362,14 +613,22 @@ def dashboard():
         "total": total,
         "pending": pending,
         "in_progress": in_progress,
-        "resolved": resolved
+        "resolved": resolved,
+        "high_risk_open": high_risk_open,
+        "overdue_open": overdue_open
     }
-
     return render_template(
-    "admin.html",
-    complaints=complaints,
-    stats=stats
+       "admin.html",
+        complaints=complaints,
+        stats=stats,
+        sort_mode=sort_mode,
+
+        top_issue=top_issue,
+        today_count=today_count,
+        critical_count=critical_count,
+        top_department=top_department
 )
+
 # ---------------- DELETE COMPLAINT ----------------
 @app.route("/delete_my_issue/<int:id>")
 def delete_my_issue(id):
@@ -385,6 +644,9 @@ def delete_my_issue(id):
     issue = cursor.fetchone()
 
     if issue:
+        # Delete related records first (foreign key constraints)
+        cursor.execute("DELETE FROM notifications WHERE issue_id=%s", (id,))
+        cursor.execute("DELETE FROM feedback WHERE issue_id=%s", (id,))
         cursor.execute("DELETE FROM civic_issues WHERE id=%s", (id,))
         db.commit()
 
@@ -416,15 +678,16 @@ def update_status(id):
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    # Update status, and resolution image only if one was uploaded
+    # Update status, and resolution image only if one was uploaded.
+    # updated_at is stamped every status change so we can measure resolution time later.
     if resolution_image_name:
         cursor.execute(
-            "UPDATE civic_issues SET status=%s, resolution_image=%s WHERE id=%s",
+            "UPDATE civic_issues SET status=%s, resolution_image=%s, updated_at=NOW() WHERE id=%s",
             (new_status, resolution_image_name, id)
         )
     else:
         cursor.execute(
-            "UPDATE civic_issues SET status=%s WHERE id=%s",
+            "UPDATE civic_issues SET status=%s, updated_at=NOW() WHERE id=%s",
             (new_status, id)
         )
 
@@ -444,6 +707,85 @@ def update_status(id):
     db.close()
 
     return redirect("/dashboard")
+
+# ---------------- PUBLIC TRANSPARENCY PAGE ----------------
+@app.route("/transparency")
+def transparency():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT COUNT(*) AS count FROM civic_issues")
+    total_reported = cursor.fetchone()["count"]
+
+    cursor.execute("SELECT COUNT(*) AS count FROM civic_issues WHERE status='Resolved'")
+    total_resolved = cursor.fetchone()["count"]
+
+    resolution_rate = round((total_resolved / total_reported) * 100) if total_reported else 0
+
+    # Average days between filing and resolution, for issues that have both timestamps
+    cursor.execute("""
+        SELECT AVG(TIMESTAMPDIFF(HOUR, created_at, updated_at)) AS avg_hours
+        FROM civic_issues
+        WHERE status = 'Resolved' AND updated_at IS NOT NULL
+    """)
+    avg_hours_row = cursor.fetchone()
+    avg_hours = avg_hours_row["avg_hours"] if avg_hours_row and avg_hours_row["avg_hours"] else 0
+    avg_resolution_days = round(avg_hours / 24, 1) if avg_hours else 0
+
+    # SLA compliance: of the complaints that got resolved, what share were resolved
+    # within their category's target time?
+    cursor.execute("""
+        SELECT issue_type, created_at, updated_at
+        FROM civic_issues
+        WHERE status = 'Resolved' AND updated_at IS NOT NULL
+    """)
+    resolved_rows = cursor.fetchall()
+    within_target = 0
+    for r in resolved_rows:
+        target_days = SLA_TARGETS.get(r["issue_type"], DEFAULT_SLA_DAYS)
+        actual_days = (r["updated_at"] - r["created_at"]).total_seconds() / 86400
+        if actual_days <= target_days:
+            within_target += 1
+    sla_compliance_rate = round((within_target / len(resolved_rows)) * 100) if resolved_rows else 0
+
+    # Counts by category, in the fixed display order used across the site
+    by_category = []
+    for label in ["Garbage", "Pothole", "Water Leakage", "Street Light"]:
+        cursor.execute("SELECT COUNT(*) AS count FROM civic_issues WHERE issue_type=%s", (label,))
+        by_category.append({"name": label, "count": cursor.fetchone()["count"]})
+
+    # Counts by urgency level
+    by_urgency = {}
+    for level in ["low", "medium", "high", "critical"]:
+        cursor.execute("SELECT COUNT(*) AS count FROM civic_issues WHERE LOWER(urgency)=%s", (level,))
+        by_urgency[level] = cursor.fetchone()["count"]
+
+    # Most recently resolved complaints, no personal citizen info included
+    cursor.execute("""
+        SELECT issue_type, department, updated_at
+        FROM civic_issues
+        WHERE status = 'Resolved'
+        ORDER BY updated_at DESC
+        LIMIT 8
+    """)
+    recent_resolved = cursor.fetchall()
+
+    cursor.close()
+    db.close()
+
+    stats = {
+        "total_reported": total_reported,
+        "total_resolved": total_resolved,
+        "resolution_rate": resolution_rate,
+        "avg_resolution_days": avg_resolution_days,
+        "sla_compliance_rate": sla_compliance_rate,
+        "by_category": by_category,
+        "by_urgency": by_urgency,
+        "recent_resolved": recent_resolved,
+    }
+
+    return render_template("transparency.html", stats=stats)
+
 
 # ---------------- VIEW NOTIFICATIONS ----------------
 @app.route("/notifications")
@@ -700,5 +1042,3 @@ def rate_limit_exceeded(e):
 # ---------------- RUN APPLICATION ----------------
 if __name__ == "__main__":
     app.run(debug=True)
-
-

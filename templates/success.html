@@ -3,126 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Success</title>
+<title>Report Submitted — Civic Issue Mapper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(135deg, #e8f8ef 0%, #d4f1e0 100%);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+  :root{
+    --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --ink:#10151B;
+    --amber:#F2A93B; --amber-ink:#5C3A08; --steel:#3E6C99; --green:#3E9B6F; --line: rgba(237,239,232,0.16);
   }
-  .card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 40px 36px;
-    max-width: 440px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; background:var(--navy); color:var(--paper); font-family:'IBM Plex Sans', sans-serif;
+    display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;
   }
-  .icon-circle {
-    width: 70px;
-    height: 70px;
-    background: #e6f7ed;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; animation-iteration-count:1 !important;} }
+  h1{font-family:'Archivo Expanded', sans-serif; text-transform:uppercase; margin:0;}
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
+
+  .glow{position:absolute; inset:0; pointer-events:none; z-index:0;
+    background:radial-gradient(600px 400px at 20% 20%, rgba(62,157,111,.18), transparent 60%),
+               radial-gradient(500px 380px at 85% 75%, rgba(242,169,59,.10), transparent 60%);}
+
+  .panel{
+    position:relative; z-index:1; text-align:center; max-width:440px; margin:20px; padding:20px;
   }
-  .icon-circle svg {
-    width: 36px;
-    height: 36px;
+  .check-ring{
+    width:88px; height:88px; border-radius:50%; background:var(--green); margin:0 auto 26px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 rgba(62,157,111,.5);
+    opacity:0; transform:scale(.3);
+    animation:pop-in .6s cubic-bezier(.34,1.56,.64,1) forwards, ring-pulse 2.4s ease-in-out .7s infinite;
   }
-  h1 {
-    color: #1d8a4e;
-    font-size: 24px;
-    margin-bottom: 8px;
+  @keyframes pop-in{ to{opacity:1; transform:scale(1);} }
+  @keyframes ring-pulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(62,157,111,.4);}
+    50%{box-shadow:0 0 0 16px rgba(62,157,111,0);}
   }
-  p.message {
-    color: #555;
-    font-size: 15px;
-    margin-bottom: 20px;
+  .check-ring svg{width:44px; height:44px;}
+
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber);
+    opacity:0; animation:fade-up .5s ease .3s forwards;}
+  h1{font-size:clamp(26px,3.6vw,36px); margin:10px 0 14px; opacity:0; animation:fade-up .5s ease .4s forwards;}
+  .ticket-box{
+    background:rgba(237,239,232,.06); border:1px solid var(--line); border-radius:10px; padding:18px 24px;
+    margin:22px 0; opacity:0; animation:fade-up .5s ease .5s forwards;
   }
-  .complaint-id-box {
-    background: #f4f9f6;
-    border: 1px dashed #b7e0c8;
-    border-radius: 10px;
-    padding: 14px 18px;
-    margin-bottom: 28px;
-  }
-  .complaint-id-box .label {
-    font-size: 12px;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-  }
-  .complaint-id-box .value {
-    font-size: 22px;
-    font-weight: 700;
-    color: #1d8a4e;
-    letter-spacing: 1px;
-  }
-  .btn-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .btn {
-    display: inline-block;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
-  }
-  .btn-primary {
-    background: #1d8a4e;
-    color: #fff;
-  }
-  .btn-primary:hover {
-    background: #166e3e;
-  }
-  .btn-secondary {
-    background: #fff;
-    color: #2b7cd3;
-    border: 1px solid #2b7cd3;
-  }
-  .btn-secondary:hover {
-    background: #f0f6fd;
-  }
-  .btn:active {
-    transform: scale(0.98);
-  }
+  .ticket-box .k{font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:rgba(237,239,232,.55);}
+  .ticket-box .v{font-family:'Archivo Expanded', sans-serif; font-size:30px; color:var(--amber); margin-top:4px;}
+  p.sub{color:rgba(237,239,232,.75); font-size:14.5px; opacity:0; animation:fade-up .5s ease .6s forwards;}
+  @keyframes fade-up{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+
+  .actions{display:flex; gap:14px; justify-content:center; margin-top:28px; opacity:0; animation:fade-up .5s ease .7s forwards;}
+  .btn{padding:12px 22px; border-radius:5px; font-weight:700; font-size:14px; text-decoration:none; transition:transform .2s ease;}
+  .btn:hover{transform:translateY(-2px);}
+  .btn-amber{background:var(--amber); color:var(--amber-ink);}
+  .btn-ghost{border:1.5px solid rgba(237,239,232,.4); color:var(--paper);}
 </style>
 </head>
 <body>
-  <div class="card">
-    <div class="icon-circle">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#1d8a4e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 6L9 17l-5-5"/>
-      </svg>
-    </div>
-    <h1>Issue Submitted Successfully!</h1>
-    <p class="message">Your complaint has been recorded.</p>
 
-    <div class="complaint-id-box">
-      <div class="label">Complaint ID</div>
-      <div class="value">#{{ issue.id }}</div>
-    </div>
+<div class="glow"></div>
 
-    <div class="btn-group">
-      <a href="/my_issues" class="btn btn-primary">Track My Complaint</a>
-      <a href="/" class="btn btn-secondary">Submit Another Issue</a>
-    </div>
+<div class="panel">
+  <div class="check-ring">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
   </div>
+  <span class="eyebrow">Complaint filed</span>
+  <h1>Report submitted</h1>
+  <div class="ticket-box">
+    <div class="k">Your ticket number</div>
+    <div class="v">#{{ issue.id }}</div>
+  </div>
+  <p class="sub">Save this number to track your complaint anytime, no login required. We'll notify you here whenever the status changes.</p>
+  <div class="actions">
+    <a href="/my_issues" class="btn btn-amber">View my issues</a>
+    <a href="/" class="btn btn-ghost">Back to home</a>
+  </div>
+</div>
+
 </body>
 </html>

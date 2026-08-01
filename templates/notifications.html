@@ -1,58 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Notifications</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f4f6f9;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
-        .header-section {
-            background-color: #0d6efd;
-            color: white;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-        }
-        .notification-card {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            border-left: 4px solid #0d6efd;
-        }
-        .notification-time {
-            font-size: 12px;
-            color: #888;
-            margin-top: 5px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications — Civic Issue Mapper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --ink:#10151B;
+    --amber:#F2A93B; --amber-ink:#5C3A08; --steel:#3E6C99; --line: rgba(237,239,232,0.16);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:'IBM Plex Sans', sans-serif;}
+  h1{font-family:'Archivo Expanded', sans-serif; text-transform:uppercase; letter-spacing:.01em; margin:0;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
+
+  .nav{position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:16px 6vw; background:rgba(11,37,69,.94); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .nav-brand{color:var(--paper); font-family:'Archivo Expanded', sans-serif; font-weight:800; font-size:17px; letter-spacing:.03em; text-decoration:none; display:flex; align-items:center; gap:9px;}
+  .dot-ring{position:relative; width:12px; height:12px;}
+  .dot-ring::before{content:''; position:absolute; inset:0; border-radius:50%; background:var(--amber); box-shadow:0 0 8px rgba(242,169,59,.8); animation:pulse-dot 1.8s ease-in-out infinite;}
+  @keyframes pulse-dot{ 0%,100%{transform:scale(1); opacity:1;} 50%{transform:scale(1.5); opacity:.5;} }
+  .nav-links{display:flex; align-items:center; gap:16px;}
+  .nav-links a{color:var(--paper); opacity:.8; text-decoration:none; font-size:13.5px;}
+  .nav-links a:hover{opacity:1;}
+
+  .head{background:var(--navy); color:var(--paper); padding:44px 6vw;}
+  .head .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--amber); display:block; margin-bottom:10px;}
+  .head h1{font-size:clamp(26px,3vw,36px);}
+
+  .wrap{max-width:700px; margin:0 auto; padding:36px 6vw 80px;}
+  .fade-in{opacity:0; transform:translateY(14px); animation:fade-in-anim .45s ease forwards;}
+  @keyframes fade-in-anim{ to{opacity:1; transform:translateY(0);} }
+
+  .notif-card{
+    background:#fff; border:1px solid #d9dcd1; border-left:4px solid var(--steel); border-radius:8px;
+    padding:16px 20px; margin-bottom:12px; display:flex; gap:14px; align-items:flex-start;
+    box-shadow:0 6px 16px rgba(11,37,69,.05);
+  }
+  .notif-card.unread{border-left-color:var(--amber); background:#FFFCF6;}
+  .notif-icon{width:34px; height:34px; border-radius:50%; background:var(--paper); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .notif-icon svg{width:17px; height:17px; color:var(--steel);}
+  .notif-card.unread .notif-icon{background:#FCEFDA;}
+  .notif-card.unread .notif-icon svg{color:var(--amber-ink);}
+  .notif-msg{font-size:14px; color:#2a2f28; line-height:1.5;}
+  .notif-time{font-size:11.5px; color:#8a9083; margin-top:5px;}
+  .unread-dot{width:7px; height:7px; border-radius:50%; background:var(--amber); flex-shrink:0; margin-top:6px;}
+
+  .empty-state{text-align:center; padding:70px 20px; color:#5c6558;}
+</style>
 </head>
 <body>
 
-<div class="container mt-3">
-    <div class="header-section">
-        <h2>My Notifications</h2>
-        <a href="/my_issues" class="btn btn-light btn-sm mt-2">← Back to My Complaints</a>
-    </div>
+<nav class="nav">
+  <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
+  <div class="nav-links">
+    <a href="/my_issues">My issues</a>
+    <a href="/logout">Log out</a>
+  </div>
+</nav>
 
-    {% if notifications %}
-        {% for note in notifications %}
-        <div class="notification-card">
-            <p class="mb-0">{{ note.message }}</p>
-            <div class="notification-time">{{ note.created_at }}</div>
-        </div>
-        {% endfor %}
-    {% else %}
-        <div class="alert alert-info text-center mt-4">
-            <h5>No notifications yet</h5>
-            <p>You'll see updates here when your complaint status changes.</p>
-        </div>
-    {% endif %}
+<header class="head">
+  <span class="eyebrow">Updates on your tickets</span>
+  <h1>Notifications</h1>
+</header>
+
+<div class="wrap">
+  {% if notifications %}
+    {% for n in notifications %}
+    <div class="notif-card fade-in {% if not n.is_read %}unread{% endif %}" style="animation-delay:{{ (loop.index0 * 0.04) }}s;">
+      <div class="notif-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <div style="flex:1;">
+        <div class="notif-msg">{{ n.message }}</div>
+        <div class="notif-time mono">{{ n.created_at }}</div>
+      </div>
+      {% if not n.is_read %}<span class="unread-dot"></span>{% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state fade-in">You're all caught up — no notifications yet.</div>
+  {% endif %}
 </div>
 
 </body>
