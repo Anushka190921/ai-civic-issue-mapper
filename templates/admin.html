@@ -281,6 +281,7 @@
 
         <form action="/assign_department/{{ c.id }}" method="POST">
           <select name="department">
+            <option value="" {% if not c.department %}selected{% endif %} disabled>— Unassigned —</option>
             <option value="Sanitation Department" {% if c.department == 'Sanitation Department' %}selected{% endif %}>Sanitation Department</option>
             <option value="Roads & Infrastructure" {% if c.department == 'Roads & Infrastructure' %}selected{% endif %}>Roads & Infrastructure</option>
             <option value="Water Board" {% if c.department == 'Water Board' %}selected{% endif %}>Water Board</option>
