@@ -70,6 +70,47 @@ app.register_blueprint(google_bp, url_prefix="/login")
 UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# ---------------- PERSISTENT IMAGE STORAGE (Cloudinary) ----------------
+# Render's free tier wipes local disk storage on every restart/redeploy, so
+# images saved only to static/uploads/ can silently disappear. If Cloudinary
+# credentials are configured (via .env), uploads go there instead and persist
+# permanently. If they're not configured (e.g. local dev without a Cloudinary
+# account set up yet), this quietly falls back to the old local-disk behavior
+# so nothing breaks — it just won't survive a Render restart in that case.
+CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
+
+CLOUDINARY_ENABLED = bool(CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET)
+
+if CLOUDINARY_ENABLED:
+    import cloudinary
+    import cloudinary.uploader
+    cloudinary.config(
+        cloud_name=CLOUDINARY_CLOUD_NAME,
+        api_key=CLOUDINARY_API_KEY,
+        api_secret=CLOUDINARY_API_SECRET,
+        secure=True
+    )
+
+
+def save_uploaded_image(file_obj, filename_prefix=""):
+    """
+    Saves an uploaded image either to Cloudinary (persistent, preferred) or
+    to local disk (fallback for local dev without Cloudinary configured).
+    Returns the value to store in the database: a full Cloudinary URL if
+    uploaded there, or a plain filename if saved locally.
+    """
+    filename = filename_prefix + str(int(time.time())) + "_" + file_obj.filename
+
+    if CLOUDINARY_ENABLED:
+        result = cloudinary.uploader.upload(file_obj, public_id=filename, folder="civic_issue_mapper")
+        return result["secure_url"]
+    else:
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        file_obj.save(filepath)
+        return filename
+
 # ---------------- DATABASE CONNECTION ----------------\
 def get_db():
 
@@ -246,12 +287,7 @@ def submit():
         image_name = None
 
         if image and image.filename != "":
-            # Create unique filename using timestamp
-            filename = str(int(time.time())) + "_" + image.filename
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            # Save image to uploads folder
-            image.save(filepath)
-            image_name = filename
+            image_name = save_uploaded_image(image)
 
         # Connect to database and save complaint
         db = get_db()
@@ -712,10 +748,7 @@ def update_status(id):
     resolution_image = request.files.get("resolution_image")
 
     if resolution_image and resolution_image.filename != "":
-        filename = "resolved_" + str(int(time.time())) + "_" + resolution_image.filename
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
-        resolution_image.save(filepath)
-        resolution_image_name = filename
+        resolution_image_name = save_uploaded_image(resolution_image, filename_prefix="resolved_")
 
     db = get_db()
     cursor = db.cursor(dictionary=True)

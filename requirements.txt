@@ -8,3 +8,4 @@ gunicorn
 flask-dance
 itsdangerous
 requests
+cloudinary

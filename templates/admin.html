@@ -263,7 +263,7 @@
         <span><b>Department:</b> {{ c.department or 'Unassigned' }}</span>
         <span class="mono">{{ c.created_at }}</span>
         {% if c.image %}
-          <a href="/static/uploads/{{ c.image }}" target="_blank" class="link-btn">View photo</a>
+          <a href="{% if c.image.startswith('http') %}{{ c.image }}{% else %}/static/uploads/{{ c.image }}{% endif %}" target="_blank" class="link-btn">View photo</a>
         {% endif %}
         <a href="/view_map" class="link-btn">View on map</a>
       </div>

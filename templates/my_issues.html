@@ -92,7 +92,7 @@
     {% for i in issues %}
     <div class="issue-card fade-in" style="animation-delay:{{ (loop.index0 * 0.05) }}s;">
       {% if i.image %}
-        <img class="issue-thumb" src="/static/uploads/{{ i.image }}" alt="Photo of reported issue">
+        <img class="issue-thumb" src="{% if i.image.startswith('http') %}{{ i.image }}{% else %}/static/uploads/{{ i.image }}{% endif %}" alt="Photo of reported issue">
       {% else %}
         <div class="issue-thumb placeholder mono">N/A</div>
       {% endif %}
@@ -117,7 +117,7 @@
         </div>
         <div class="i-actions">
           {% if i.resolution_image %}
-            <a href="/static/uploads/{{ i.resolution_image }}" target="_blank" class="link-btn">View resolution proof</a>
+            <a href="{% if i.resolution_image.startswith('http') %}{{ i.resolution_image }}{% else %}/static/uploads/{{ i.resolution_image }}{% endif %}" target="_blank" class="link-btn">View resolution proof</a>
           {% endif %}
           <a href="/delete_my_issue/{{ i.id }}" class="link-btn danger" onclick="return confirm('Delete this complaint?');">Delete</a>
         </div>
