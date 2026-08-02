@@ -30,9 +30,15 @@
   .btn-new{background:var(--amber); color:var(--amber-ink); padding:9px 16px; border-radius:4px; font-weight:700; text-decoration:none; font-size:13.5px;}
   .btn-new:hover{background:#f5b957;}
 
-  .head{background:var(--navy); color:var(--paper); padding:44px 6vw;}
+  .head{background:var(--navy); color:var(--paper); padding:44px 6vw; display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px;}
   .head .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--amber); display:block; margin-bottom:10px;}
   .head h1{font-size:clamp(26px,3vw,36px);}
+  .map-btn{
+    display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:100px;
+    border:1px solid rgba(237,239,232,.35); color:var(--paper); text-decoration:none; font-size:13.5px; font-weight:600;
+    transition:border-color .2s, background .2s;
+  }
+  .map-btn:hover{border-color:var(--amber); background:rgba(237,239,232,.06);}
 
   .wrap{max-width:900px; margin:0 auto; padding:40px 6vw 80px;}
   .fade-in{opacity:0; transform:translateY(16px); animation:fade-in-anim .5s ease forwards;}
@@ -72,8 +78,13 @@
 </nav>
 
 <header class="head">
-  <span class="eyebrow">Your tickets</span>
-  <h1>My Issues</h1>
+  <div>
+    <span class="eyebrow">Your tickets</span>
+    <h1>My Issues</h1>
+  </div>
+  {% if issues %}
+    <a href="/my_map" class="map-btn">🗺️ View my issues on map</a>
+  {% endif %}
 </header>
 
 <div class="wrap">
@@ -105,7 +116,6 @@
           <span class="mono">Filed {{ i.created_at }}</span>
         </div>
         <div class="i-actions">
-          <a href="/view_map/{{ i.id }}" class="link-btn">View on map</a>
           {% if i.resolution_image %}
             <a href="/static/uploads/{{ i.resolution_image }}" target="_blank" class="link-btn">View resolution proof</a>
           {% endif %}

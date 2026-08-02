@@ -420,12 +420,41 @@ def my_issues():
     return render_template("my_issues.html", issues=issues)
 
 
+# ---------------- MY MAP (citizen-facing, own complaints only) ----------------
+@app.route("/my_map")
+def my_map():
+    # Only logged-in citizens can view this, and only their own complaints
+    if "user_id" not in session:
+        return redirect("/login")
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            id,
+            issue_type,
+            latitude,
+            longitude,
+            status
+        FROM civic_issues
+        WHERE user_id = %s
+          AND latitude IS NOT NULL
+          AND longitude IS NOT NULL
+    """, (session["user_id"],))
+
+    complaints = cursor.fetchall()
+
+    cursor.close()
+    db.close()
+
+    return render_template(
+        "view_map.html",
+        complaints=complaints
+    )
+
+
 # ---------------- ADMIN DASHBOARD ---------------
-
-   # if "admin" not in session:
-       # return redirect("/admin")
-
-    
 @app.route("/view_map")
 def view_map():
 
@@ -457,31 +486,6 @@ def view_map():
         complaints=complaints
     )
 
-    if "admin" not in session:
-        return redirect("/admin")
-
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-
-    cursor.execute("""
-         SELECT id, issue_type, latitude, longitude, status
-        FROM civic_issues
-        WHERE latitude IS NOT NULL
-        AND longitude IS NOT NULL
-        """)
-
-    complaints = cursor.fetchall()
-
-    cursor.close()
-    db.close()
-
-    if not complaints:
-      return "No complaints found"
-
-    return render_template(
-    "view_map.html",
-    complaints=complaints
-)
 @app.route("/dashboard")
 def dashboard():
     # Only admin can access dashboard
@@ -605,6 +609,44 @@ def dashboard():
           END
     """)
     overdue_open = cursor.fetchone()["count"]
+
+    # --- New dashboard stats: top issue, today's count, critical count, top department ---
+    # These use a plain (non-dictionary) cursor so they come back as tuples,
+    # matching how admin.html indexes them (e.g. top_issue[0][0]).
+    plain_cursor = db.cursor()
+
+    plain_cursor.execute("""
+        SELECT issue_type, COUNT(*) AS cnt
+        FROM civic_issues
+        GROUP BY issue_type
+        ORDER BY cnt DESC
+        LIMIT 1
+    """)
+    top_issue = plain_cursor.fetchall()  # e.g. [('Pothole', 42)] or [] if no complaints yet
+
+    plain_cursor.execute("""
+        SELECT department, COUNT(*) AS cnt
+        FROM civic_issues
+        WHERE department IS NOT NULL
+        GROUP BY department
+        ORDER BY cnt DESC
+        LIMIT 1
+    """)
+    top_department = plain_cursor.fetchall()
+
+    plain_cursor.execute("""
+        SELECT COUNT(*) FROM civic_issues
+        WHERE DATE(created_at) = CURDATE()
+    """)
+    today_count = plain_cursor.fetchone()[0]
+
+    plain_cursor.execute("""
+        SELECT COUNT(*) FROM civic_issues
+        WHERE urgency = 'Critical'
+    """)
+    critical_count = plain_cursor.fetchone()[0]
+
+    plain_cursor.close()
 
     cursor.close()
     db.close()
