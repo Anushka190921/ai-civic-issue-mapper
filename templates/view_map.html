@@ -1,71 +1,173 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>All Complaint Locations</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complaint Map — Civic Issue Mapper</title>
 
-    <link rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 
-    <style>
-        html,body{
-            margin:0;
-            padding:0;
-        }
+<style>
+  :root{
+    --navy:#0B2545; --amber:#F2A93B; --amber-ink:#5C3A08;
+    --steel:#3E6C99; --green:#3E9B6F; --paper:#EDEFE8; --line: rgba(237,239,232,0.16);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; padding:0; height:100%; font-family:'IBM Plex Sans', sans-serif;}
 
-        #map{
-            width:100%;
-            height:100vh;
-        }
-    </style>
+  .topbar{
+    position:fixed; top:0; left:0; right:0; z-index:1000;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 20px; background:rgba(11,37,69,.96); border-bottom:1px solid var(--line);
+    color:var(--paper); font-family:'Archivo Expanded', sans-serif; font-weight:800; font-size:15px;
+  }
+  .topbar a{color:var(--paper); opacity:.8; text-decoration:none; font-family:'IBM Plex Sans', sans-serif; font-weight:600; font-size:13px;}
+  .topbar a:hover{opacity:1;}
+  .brand{display:flex; align-items:center; gap:8px; letter-spacing:.03em;}
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--amber);}
+
+  #map{position:absolute; top:48px; left:0; right:0; bottom:0;}
+
+  .view-toggle{
+    position:fixed; top:60px; right:14px; z-index:999;
+    background:#fff; border-radius:8px; box-shadow:0 6px 18px rgba(11,37,69,.25);
+    padding:6px; display:flex; gap:4px; font-family:'IBM Plex Sans', sans-serif;
+  }
+  .view-toggle button{
+    border:none; background:transparent; padding:8px 14px; border-radius:6px; cursor:pointer;
+    font-size:12.5px; font-weight:600; color:var(--navy);
+  }
+  .view-toggle button.active{background:var(--navy); color:var(--paper);}
+
+  .legend{
+    position:fixed; bottom:14px; left:14px; z-index:999;
+    background:#fff; border-radius:8px; box-shadow:0 6px 18px rgba(11,37,69,.2);
+    padding:12px 16px; font-size:12px; font-family:'IBM Plex Mono', monospace; color:#333;
+  }
+  .legend .row{display:flex; align-items:center; gap:8px; margin:4px 0;}
+  .legend .dot{width:10px; height:10px; border-radius:50%; margin:0;}
+
+  .empty-banner{
+    position:fixed; top:60px; left:50%; transform:translateX(-50%); z-index:999;
+    background:#fff; padding:14px 22px; border-radius:8px; box-shadow:0 6px 18px rgba(11,37,69,.2);
+    font-size:14px; color:#5c6558; display:none;
+  }
+</style>
 </head>
-
 <body>
 
+<div class="topbar">
+  <span class="brand"><span class="dot"></span>CIVIC / MAPPER</span>
+  <a href="javascript:history.back()">&larr; Back</a>
+</div>
+
 <div id="map"></div>
+<div class="view-toggle">
+  <button id="btnPins" class="active">📍 Pins</button>
+  <button id="btnHeat">🔥 Heatmap</button>
+</div>
+<div class="legend" id="legend">
+  <div class="row"><span class="dot" style="background:#F2A93B;"></span>Pending</div>
+  <div class="row"><span class="dot" style="background:#3E6C99;"></span>In Progress</div>
+  <div class="row"><span class="dot" style="background:#3E9B6F;"></span>Resolved</div>
+</div>
+<div class="empty-banner" id="emptyBanner">No complaints with a location to show yet.</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 
 <script>
-
-var map = L.map('map').setView([28.6139,77.2090],12);
-
-L.tileLayer(
-'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-{
-    attribution:'© OpenStreetMap'
-}).addTo(map);
-
 var complaints = {{ complaints|tojson }};
 
+var STATUS_COLORS = {
+  "Pending": "#F2A93B",
+  "In Progress": "#3E6C99",
+  "Resolved": "#3E9B6F"
+};
+
+var URGENCY_WEIGHT = {
+  "Critical": 1.0,
+  "High": 0.7,
+  "Medium": 0.4,
+  "Low": 0.2
+};
+
+var map = L.map('map').setView([28.6139, 77.2090], 12);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+var pinLayer = L.layerGroup();
+var heatPoints = [];
 var bounds = [];
 
 complaints.forEach(function(c){
+  if(!c.latitude || !c.longitude) return;
 
-    if(c.latitude && c.longitude){
+  var lat = parseFloat(c.latitude);
+  var lng = parseFloat(c.longitude);
+  bounds.push([lat, lng]);
 
-        var marker=L.marker([
-            parseFloat(c.latitude),
-            parseFloat(c.longitude)
-        ]).addTo(map);
+  var color = STATUS_COLORS[c.status] || "#3E6C99";
+  var marker = L.circleMarker([lat, lng], {
+    radius: 9,
+    fillColor: color,
+    color: "#fff",
+    weight: 2,
+    fillOpacity: 0.9
+  });
 
-        marker.bindPopup(
-            "<b>Complaint ID :</b> "+c.id+
-            "<br><b>Issue :</b> "+c.issue_type+
-            "<br><b>Status :</b> "+c.status
-        );
+  marker.bindPopup(
+    "<b>Ticket #" + c.id + "</b><br>" +
+    "<b>Issue:</b> " + c.issue_type + "<br>" +
+    "<b>Status:</b> " + c.status +
+    (c.urgency ? "<br><b>Urgency:</b> " + c.urgency : "") +
+    (c.department ? "<br><b>Department:</b> " + c.department : "")
+  );
 
-        bounds.push([
-            parseFloat(c.latitude),
-            parseFloat(c.longitude)
-        ]);
-    }
+  pinLayer.addLayer(marker);
 
+  var weight = URGENCY_WEIGHT[c.urgency] || 0.4;
+  heatPoints.push([lat, lng, weight]);
 });
 
-if(bounds.length>0){
-    map.fitBounds(bounds);
+pinLayer.addTo(map);
+
+var heatLayer = L.heatLayer(heatPoints, {
+  radius: 30,
+  blur: 25,
+  maxZoom: 15,
+  gradient: {0.2: '#3E9B6F', 0.5: '#F2A93B', 0.8: '#E08B3E', 1.0: '#C1443A'}
+});
+
+if(bounds.length > 0){
+  map.fitBounds(bounds, {padding: [40, 40]});
+} else {
+  document.getElementById('emptyBanner').style.display = 'block';
 }
 
+var btnPins = document.getElementById('btnPins');
+var btnHeat = document.getElementById('btnHeat');
+var legend = document.getElementById('legend');
+
+btnPins.addEventListener('click', function(){
+  if(map.hasLayer(heatLayer)) map.removeLayer(heatLayer);
+  if(!map.hasLayer(pinLayer)) pinLayer.addTo(map);
+  btnPins.classList.add('active');
+  btnHeat.classList.remove('active');
+  legend.style.display = 'block';
+});
+
+btnHeat.addEventListener('click', function(){
+  if(map.hasLayer(pinLayer)) map.removeLayer(pinLayer);
+  if(!map.hasLayer(heatLayer)) heatLayer.addTo(map);
+  btnHeat.classList.add('active');
+  btnPins.classList.remove('active');
+  legend.style.display = 'none';
+});
 </script>
 
 </body>

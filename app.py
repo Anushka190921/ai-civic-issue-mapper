@@ -472,7 +472,9 @@ def my_map():
             issue_type,
             latitude,
             longitude,
-            status
+            status,
+            urgency,
+            department
         FROM civic_issues
         WHERE user_id = %s
           AND latitude IS NOT NULL
@@ -506,7 +508,9 @@ def view_map():
             issue_type,
             latitude,
             longitude,
-            status
+            status,
+            urgency,
+            department
         FROM civic_issues
         WHERE latitude IS NOT NULL
         AND longitude IS NOT NULL
