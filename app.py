@@ -14,6 +14,8 @@ import socket
 import math
 from difflib import SequenceMatcher
 from datetime import datetime
+from PIL import Image as PILImage
+from PIL.ExifTags import TAGS, GPSTAGS
 socket.getfqdn = lambda name="": "localhost"
 from dotenv import load_dotenv
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -192,6 +194,75 @@ DUPLICATE_RADIUS_METERS = 150
 DUPLICATE_LOOKBACK_DAYS = 30
 
 
+# ---------------- PHOTO AUTHENTICITY CHECK ----------------
+# Advisory only — flags photos for admin review, never blocks a citizen's
+# submission. Many phones/apps (WhatsApp, Instagram, screenshots) strip EXIF
+# data entirely, so "no data found" is common and NOT proof of anything wrong.
+PHOTO_LOCATION_MISMATCH_METERS = 500   # how far photo GPS can be from claimed GPS before flagging
+PHOTO_MAX_AGE_DAYS = 7                  # how old a photo's EXIF timestamp can be before flagging
+
+
+def _convert_gps_to_decimal(gps_coord, gps_ref):
+    degrees, minutes, seconds = gps_coord
+    decimal = degrees + (minutes / 60.0) + (seconds / 3600.0)
+    if gps_ref in ("S", "W"):
+        decimal = -decimal
+    return decimal
+
+
+def check_photo_authenticity(file_obj, claimed_lat, claimed_lng):
+    """
+    Reads EXIF GPS + timestamp from an uploaded photo and compares it against
+    the location/time the citizen is submitting the report with.
+    Returns one of:
+      "verified"           - EXIF GPS is close to claimed location, recent photo
+      "location_mismatch"  - EXIF GPS is far from claimed location
+      "old_photo"          - EXIF timestamp is older than PHOTO_MAX_AGE_DAYS
+      "no_exif_data"        - photo has no usable GPS/timestamp metadata (common, not suspicious by itself)
+    Never raises — any parsing failure just falls back to "no_exif_data",
+    since a broken/unreadable EXIF block shouldn't block a real complaint.
+    """
+    try:
+        file_obj.seek(0)
+        img = PILImage.open(file_obj)
+        exif_raw = img._getexif()
+        file_obj.seek(0)  # reset so the file can still be saved/uploaded afterward
+
+        if not exif_raw:
+            return "no_exif_data"
+
+        exif = {TAGS.get(k, k): v for k, v in exif_raw.items()}
+
+        # --- timestamp check ---
+        date_str = exif.get("DateTimeOriginal") or exif.get("DateTime")
+        if date_str:
+            try:
+                photo_time = datetime.strptime(date_str, "%Y:%m:%d %H:%M:%S")
+                age_days = (datetime.now() - photo_time).total_seconds() / 86400
+                if age_days > PHOTO_MAX_AGE_DAYS:
+                    return "old_photo"
+            except ValueError:
+                pass  # unparsable date format, don't penalize for it
+
+        # --- GPS check ---
+        gps_info_raw = exif.get("GPSInfo")
+        if gps_info_raw and claimed_lat and claimed_lng:
+            gps_info = {GPSTAGS.get(k, k): v for k, v in gps_info_raw.items()}
+            if "GPSLatitude" in gps_info and "GPSLongitude" in gps_info:
+                photo_lat = _convert_gps_to_decimal(gps_info["GPSLatitude"], gps_info.get("GPSLatitudeRef", "N"))
+                photo_lng = _convert_gps_to_decimal(gps_info["GPSLongitude"], gps_info.get("GPSLongitudeRef", "E"))
+                distance_m = _haversine_meters(float(claimed_lat), float(claimed_lng), photo_lat, photo_lng)
+                if distance_m > PHOTO_LOCATION_MISMATCH_METERS:
+                    return "location_mismatch"
+                return "verified"
+
+        # had a timestamp but no usable GPS, or vice versa handled above
+        return "no_exif_data" if not gps_info_raw else "verified"
+
+    except Exception:
+        return "no_exif_data"
+
+
 @app.route("/api/check-duplicate", methods=["POST"])
 def check_duplicate():
     # Only logged-in users can check for duplicates (mirrors who can submit)
@@ -285,8 +356,10 @@ def submit():
         # Handle image upload
         image = request.files.get("image")
         image_name = None
+        photo_authenticity = None
 
         if image and image.filename != "":
+            photo_authenticity = check_photo_authenticity(image, latitude, longitude)
             image_name = save_uploaded_image(image)
 
         # Connect to database and save complaint
@@ -295,9 +368,9 @@ def submit():
 
         cursor.execute("""
             INSERT INTO civic_issues
-            (issue_type, description, latitude, longitude, image, user_id, department, urgency)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        """, (issue_type, description, latitude, longitude, image_name, user_id, department, urgency))
+            (issue_type, description, latitude, longitude, image, user_id, department, urgency, photo_authenticity)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (issue_type, description, latitude, longitude, image_name, user_id, department, urgency, photo_authenticity))
 
         db.commit()
         cursor.close()

@@ -9,3 +9,4 @@ flask-dance
 itsdangerous
 requests
 cloudinary
+Pillow

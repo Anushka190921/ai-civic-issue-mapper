@@ -264,6 +264,11 @@
         <span class="mono">{{ c.created_at }}</span>
         {% if c.image %}
           <a href="{% if c.image.startswith('http') %}{{ c.image }}{% else %}/static/uploads/{{ c.image }}{% endif %}" target="_blank" class="link-btn">View photo</a>
+          {% if c.photo_authenticity == 'location_mismatch' %}
+            <span class="link-btn" style="color:#C1443A;" title="This photo's embedded GPS location doesn't match where the citizen said the issue is.">⚠️ Location mismatch</span>
+          {% elif c.photo_authenticity == 'old_photo' %}
+            <span class="link-btn" style="color:#C1443A;" title="This photo's timestamp is older than 7 days.">⚠️ Old photo</span>
+          {% endif %}
         {% endif %}
         <a href="/view_map" class="link-btn">View on map</a>
       </div>
