@@ -159,6 +159,21 @@ DEPARTMENT_MAP = {
     "Street Light": "Electricity Department",
 }
 DEFAULT_DEPARTMENT = "General Administration"
+# ---------------- DROPDOWN OPTIONS ----------------
+
+ALLOWED_STATUSES = [
+    "Pending",
+    "In Progress",
+    "Resolved"
+]
+
+ALLOWED_DEPARTMENTS = [
+    "Sanitation Department",
+    "Roads & Infrastructure",
+    "Water Board",
+    "Electricity Department",
+    "General Administration"
+]
 
 
 # ---------------- SLA TARGETS ----------------
@@ -818,7 +833,10 @@ def update_status(id):
         return redirect("/admin")
 
     # Get new status from form
-    new_status = request.form["status"]
+    new_status = request.form.get("status", "").strip()
+
+if new_status not in ALLOWED_STATUSES:
+    return "Invalid status selected", 400
 
     # Handle resolution proof image (only relevant when marking Resolved)
     resolution_image_name = None
@@ -1001,7 +1019,10 @@ def assign_department(id):
         return redirect("/admin")
 
     # Get selected department from form
-    department = request.form["department"]
+    department = request.form.get("department", "").strip()
+
+if department not in ALLOWED_DEPARTMENTS:
+    return "Invalid department selected", 400
 
     db = get_db()
     cursor = db.cursor()

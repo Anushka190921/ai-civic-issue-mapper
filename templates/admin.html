@@ -7,6 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<!-- Searchable Dropdown CSS -->
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
+
 <style>
   :root{
     --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --paper-dim:#E1E4DA; --ink:#10151B;
@@ -275,7 +278,7 @@
 
       <div class="c-actions">
         <form action="/update_status/{{ c.id }}" method="POST" enctype="multipart/form-data">
-          <select name="status">
+          <select name="status" class="searchable-select"></select>
             <option value="Pending" {% if c.status == 'Pending' %}selected{% endif %}>Pending</option>
             <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>In Progress</option>
             <option value="Resolved" {% if c.status == 'Resolved' %}selected{% endif %}>Resolved</option>
@@ -285,7 +288,7 @@
         </form>
 
         <form action="/assign_department/{{ c.id }}" method="POST">
-          <select name="department">
+          <select name="department" class="searchable-select"></select>
             <option value="" {% if not c.department %}selected{% endif %} disabled>— Unassigned —</option>
             <option value="Sanitation Department" {% if c.department == 'Sanitation Department' %}selected{% endif %}>Sanitation Department</option>
             <option value="Roads & Infrastructure" {% if c.department == 'Roads & Infrastructure' %}selected{% endif %}>Roads & Infrastructure</option>
@@ -329,8 +332,22 @@ new Chart(document.getElementById("issueChart"),{
     }
 
 });
+<!-- Tom Select JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".searchable-select").forEach(function (dropdown) {
+        new TomSelect(dropdown, {
+            create: false,
+            searchField: ["text"],
+            maxOptions: 100,
+            closeAfterSelect: true,
+            allowEmptyOption: true,
+            placeholder: "Search and select..."
+        });
+    });
+});
 </script>
-
 </body>
 </html>
