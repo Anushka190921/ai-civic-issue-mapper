@@ -646,7 +646,10 @@ def dashboard():
 
     if search:
         cursor.execute(f"""
-           SELECT civic_issues.*, users.first_name, users.email
+           SELECT civic_issues.*, users.first_name, users.email,
+              EXISTS(SELECT 1 FROM notifications n
+              WHERE n.issue_id = civic_issues.id
+                AND LOCATE('We have received your complaint', n.message) = 1) AS acknowledged
            FROM civic_issues
            JOIN users ON civic_issues.user_id = users.id
            WHERE civic_issues.issue_type LIKE %s
@@ -656,7 +659,10 @@ def dashboard():
         """, (f"%{search}%", f"%{search}%", f"%{search}%"))
     else:
         cursor.execute(f"""
-           SELECT civic_issues.*, users.first_name, users.email
+           SELECT civic_issues.*, users.first_name, users.email,
+             EXISTS(SELECT 1 FROM notifications n
+              WHERE n.issue_id = civic_issues.id
+                AND LOCATE('We have received your complaint', n.message) = 1) AS acknowledged
            FROM civic_issues
            JOIN users ON civic_issues.user_id = users.id
            {order_clause}
@@ -876,6 +882,38 @@ if new_status not in ALLOWED_STATUSES:
     cursor.close()
     db.close()
 
+    return redirect("/dashboard")
+
+# ---------------- ACKNOWLEDGE COMPLAINT ----------------
+ACK_PREFIX = "We have received your complaint"
+
+@app.route("/acknowledge/<int:id>", methods=["POST"])
+def acknowledge(id):
+    if "admin" not in session:
+        return redirect("/admin")
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT user_id FROM civic_issues WHERE id=%s", (id,))
+    issue = cursor.fetchone()
+
+    if issue:
+        # Don't send a second acknowledgment for the same complaint
+        cursor.execute(
+            "SELECT 1 FROM notifications WHERE issue_id=%s AND LOCATE(%s, message) = 1 LIMIT 1",
+            (id, ACK_PREFIX)
+        )
+        if not cursor.fetchone():
+            message = f"{ACK_PREFIX} #{id} and we are working on it."
+            cursor.execute(
+                "INSERT INTO notifications (user_id, issue_id, message) VALUES (%s, %s, %s)",
+                (issue["user_id"], id, message)
+            )
+            db.commit()
+
+    cursor.close()
+    db.close()
     return redirect("/dashboard")
 
 # ---------------- PUBLIC TRANSPARENCY PAGE ----------------

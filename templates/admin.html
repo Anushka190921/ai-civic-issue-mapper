@@ -317,6 +317,14 @@
       </div>
 
       <div class="c-actions">
+        {% if c.acknowledged %}
+          <span class="badge resolved"><span class="badge-dot"></span>Acknowledged</span>
+        {% else %}
+          <form action="/acknowledge/{{ c.id }}" method="POST">
+            <button type="submit" class="mini-btn">Acknowledge</button>
+          </form>
+        {% endif %}
+
         <form action="/update_status/{{ c.id }}" method="POST" enctype="multipart/form-data">
           <select name="status" class="searchable-select"></select>
             <option value="Pending" {% if c.status == 'Pending' %}selected{% endif %}>Pending</option>
