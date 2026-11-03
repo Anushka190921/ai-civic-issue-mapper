@@ -841,8 +841,8 @@ def update_status(id):
     # Get new status from form
     new_status = request.form.get("status", "").strip()
 
-if new_status not in ALLOWED_STATUSES:
-    return "Invalid status selected", 400
+    if new_status not in ALLOWED_STATUSES:
+        return "Invalid status selected", 400
 
     # Handle resolution proof image (only relevant when marking Resolved)
     resolution_image_name = None
@@ -1059,8 +1059,8 @@ def assign_department(id):
     # Get selected department from form
     department = request.form.get("department", "").strip()
 
-if department not in ALLOWED_DEPARTMENTS:
-    return "Invalid department selected", 400
+    if department not in ALLOWED_DEPARTMENTS:
+        return "Invalid department selected", 400
 
     db = get_db()
     cursor = db.cursor()
