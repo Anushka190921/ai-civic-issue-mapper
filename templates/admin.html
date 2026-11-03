@@ -138,6 +138,31 @@
   @media (max-width: 560px){
     .stats{grid-template-columns:1fr;}
   }
+  /* Chart Type Buttons */
+
+.chart-controls {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0 20px;
+    flex-wrap: wrap;
+}
+
+.chart-type-btn {
+    padding: 9px 18px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.chart-type-btn:hover,
+.chart-type-btn.active {
+    background: #172554;
+    color: white;
+    border-color: #172554;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -212,9 +237,24 @@
 
   </div>
   <div class="card fade-in" style="margin:25px 0;padding:20px;">
+
     <h3>📊 Issue Distribution</h3>
 
+    <div class="chart-controls">
+
+        <button type="button" class="chart-type-btn active"
+                data-chart-type="pie">Pie</button>
+
+        <button type="button" class="chart-type-btn"
+                data-chart-type="bar">Bar</button>
+
+        <button type="button" class="chart-type-btn"
+                data-chart-type="doughnut">Doughnut</button>
+
+    </div>
+
     <canvas id="issueChart" height="120"></canvas>
+
 </div>
 
 <div class="sort-row fade-in" style="animation-delay:.5s;">
@@ -309,35 +349,68 @@
 </div>
 <script>
 
-const issueData = {};
 
-{% for c in complaints %}
-issueData["{{ c.issue_type }}"] =
-(issueData["{{ c.issue_type }}"] || 0) + 1;
-{% endfor %}
+<!-- Chart Type Switching -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
-new Chart(document.getElementById("issueChart"),{
+    const issueData = {};
 
-    type:'pie',
+    {% for c in complaints %}
+    issueData["{{ c.issue_type }}"] =
+        (issueData["{{ c.issue_type }}"] || 0) + 1;
+    {% endfor %}
 
-    data:{
+    const ctx = document.getElementById("issueChart");
 
-        labels:Object.keys(issueData),
+    const issueChart = new Chart(ctx, {
+        type: "pie",
 
-        datasets:[{
+        data: {
+            labels: Object.keys(issueData),
 
-            data:Object.values(issueData)
+            datasets: [{
+                label: "Number of Issues",
+                data: Object.values(issueData)
+            }]
+        },
 
-        }]
-    }
+        options: {
+            responsive: true,
+            maintainAspectRatio: true
+        }
+    });
+
+    document.querySelectorAll(".chart-type-btn").forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const selectedType = this.dataset.chartType;
+
+            issueChart.config.type = selectedType;
+            issueChart.update();
+
+            document.querySelectorAll(".chart-type-btn").forEach(function (btn) {
+                btn.classList.remove("active");
+            });
+
+            this.classList.add("active");
+
+        });
+
+    });
 
 });
+</script>
+
 <!-- Tom Select JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+
     document.querySelectorAll(".searchable-select").forEach(function (dropdown) {
+
         new TomSelect(dropdown, {
             create: false,
             searchField: ["text"],
@@ -346,8 +419,11 @@ document.addEventListener("DOMContentLoaded", function () {
             allowEmptyOption: true,
             placeholder: "Search and select..."
         });
+
     });
+
 });
 </script>
+
 </body>
 </html>
