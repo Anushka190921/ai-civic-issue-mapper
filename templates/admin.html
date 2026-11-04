@@ -365,11 +365,11 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    const issueData = {};
+  const issueData = {};
 
     {% for c in complaints %}
-    issueData["{{ c.issue_type }}"] =
-        (issueData["{{ c.issue_type }}"] || 0) + 1;
+      issueData["{{ c.issue_type }}"] =
+      (issueData["{{ c.issue_type }}"] || 0) + 1;
     {% endfor %}
 
     const ctx = document.getElementById("issueChart");
