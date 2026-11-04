@@ -161,6 +161,8 @@ DEPARTMENT_MAP = {
 DEFAULT_DEPARTMENT = "General Administration"
 # ---------------- DROPDOWN OPTIONS ----------------
 
+PASSWORD_MAX_AGE_DAYS = 30  # passwords expire after this many days
+
 ALLOWED_STATUSES = [
     "Pending",
     "In Progress",
@@ -438,7 +440,7 @@ def register():
 
         # Save new user to database
         cursor.execute(
-            "INSERT INTO users (first_name, last_name, email, password) VALUES (%s, %s, %s, %s)",
+            "INSERT INTO users (first_name, last_name, email, password, password_changed_at) VALUES (%s, %s, %s, %s, NOW())",
             (first_name, last_name, email, hashed_password)
         )
 
@@ -459,7 +461,10 @@ def login():
         db = get_db()
         cursor = db.cursor(dictionary=True)
 
-        cursor.execute("SELECT * FROM users WHERE email=%s", (request.form["email"],))
+        cursor.execute(
+            "SELECT *, DATEDIFF(NOW(), password_changed_at) AS pw_age_days FROM users WHERE email=%s",
+            (request.form["email"],)
+        )
         user = cursor.fetchone()
 
         cursor.close()
@@ -467,6 +472,13 @@ def login():
 
         # Verify password and create session
         if user and check_password_hash(user["password"], request.form["password"]):
+            # Block login if the password is older than 30 days
+            age = user.get("pw_age_days")
+            if age is not None and age >= PASSWORD_MAX_AGE_DAYS:
+                return render_template(
+                    "login.html",
+                    error="Your password has expired. Please use Forgot Password to set a new one."
+                )
             session["user_id"] = user["id"]
             return redirect("/")
 
@@ -1060,11 +1072,7 @@ def assign_department(id):
     department = request.form.get("department", "").strip()
 
     if department not in ALLOWED_DEPARTMENTS:
-<<<<<<< HEAD
-         return "Invalid department selected", 400
-=======
         return "Invalid department selected", 400
->>>>>>> b65070d0ed42562aff573ef53ae25527482a0336
 
     db = get_db()
     cursor = db.cursor()
@@ -1232,7 +1240,10 @@ def reset_password(token):
 
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("UPDATE users SET password=%s WHERE email=%s", (hashed_password, email))
+        cursor.execute(
+            "UPDATE users SET password=%s, password_changed_at=NOW() WHERE email=%s",
+            (hashed_password, email)
+        )
         db.commit()
         cursor.close()
         db.close()
