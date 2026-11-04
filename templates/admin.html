@@ -318,17 +318,20 @@
 
       <div class="c-actions">
         <form action="/update_status/{{ c.id }}" method="POST" enctype="multipart/form-data">
-          <select name="status" class="searchable-select"></select>
-            <option value="Pending" {% if c.status == 'Pending' %}selected{% endif %}>Pending</option>
-            <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>In Progress</option>
-            <option value="Resolved" {% if c.status == 'Resolved' %}selected{% endif %}>Resolved</option>
-          </select>
+          <select name="department" class="searchable-select">
+    <option value="" disabled {% if not c.department %}selected{% endif %}>— Unassigned —</option>
+    <option value="Sanitation Department" {% if c.department == 'Sanitation Department' %}selected{% endif %}>Sanitation Department</option>
+    <option value="Roads & Infrastructure" {% if c.department == 'Roads & Infrastructure' %}selected{% endif %}>Roads & Infrastructure</option>
+    <option value="Water Board" {% if c.department == 'Water Board' %}selected{% endif %}>Water Board</option>
+    <option value="Electricity Department" {% if c.department == 'Electricity Department' %}selected{% endif %}>Electricity Department</option>
+    <option value="General Administration" {% if c.department == 'General Administration' %}selected{% endif %}>General Administration</option>
+</select>
           <input class="file-btn" type="file" name="resolution_image" title="Attach resolution proof (only used if marking Resolved)">
           <button type="submit" class="mini-btn amber">Update status</button>
         </form>
 
         <form action="/assign_department/{{ c.id }}" method="POST">
-          <select name="department" class="searchable-select"></select>
+          <select name="department" class="searchable-select">
             <option value="" {% if not c.department %}selected{% endif %} disabled>— Unassigned —</option>
             <option value="Sanitation Department" {% if c.department == 'Sanitation Department' %}selected{% endif %}>Sanitation Department</option>
             <option value="Roads & Infrastructure" {% if c.department == 'Roads & Infrastructure' %}selected{% endif %}>Roads & Infrastructure</option>
