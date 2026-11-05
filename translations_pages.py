@@ -280,6 +280,14 @@ _ROWS = [
     ("ld_tip3", "3 statuses: pending → progress → resolved", "3 स्थितियाँ: लंबित → प्रगति में → हल"),
     ("ld_tip4", "Report it, don't just complain about it", "सिर्फ शिकायत न करें, रिपोर्ट करें"),
     ("ld_tip5", "Every ticket gets its own ID", "हर टिकट की अपनी आईडी होती है"),
+    ("ad_pie", "Pie", "पाई"),
+    ("ad_bar", "Bar", "बार"),
+    ("ad_doughnut", "Doughnut", "डोनट"),
+    ("ad_chart_label", "Number of Issues", "समस्याओं की संख्या"),
+    ("ad_ack", "Acknowledge", "स्वीकार करें"),
+    ("ad_ack_done", "Acknowledged", "स्वीकार किया गया"),
+    ("ad_set_pri", "Set priority", "प्राथमिकता तय करें"),
+    ("ad_ts_ph", "Search and select...", "खोजें और चुनें..."),
 ]
 
 PAGE_TRANSLATIONS = {
