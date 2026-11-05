@@ -165,6 +165,23 @@ DEPARTMENT_MAP = {
     "Street Light": "Electricity Department",
 }
 DEFAULT_DEPARTMENT = "General Administration"
+# ---------------- DROPDOWN OPTIONS ----------------
+
+PASSWORD_MAX_AGE_DAYS = 30  # passwords expire after this many days
+
+ALLOWED_STATUSES = [
+    "Pending",
+    "In Progress",
+    "Resolved"
+]
+
+ALLOWED_DEPARTMENTS = [
+    "Sanitation Department",
+    "Roads & Infrastructure",
+    "Water Board",
+    "Electricity Department",
+    "General Administration"
+]
 
 
 # ---------------- SLA TARGETS ----------------
@@ -429,7 +446,7 @@ def register():
 
         # Save new user to database
         cursor.execute(
-            "INSERT INTO users (first_name, last_name, email, password) VALUES (%s, %s, %s, %s)",
+            "INSERT INTO users (first_name, last_name, email, password, password_changed_at) VALUES (%s, %s, %s, %s, NOW())",
             (first_name, last_name, email, hashed_password)
         )
 
@@ -581,20 +598,29 @@ def login():
 
         db = get_db()
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT id, email FROM users WHERE LOWER(email)=%s", (email,))
+
+        cursor.execute(
+            "SELECT *, DATEDIFF(NOW(), password_changed_at) AS pw_age_days FROM users WHERE email=%s",
+            (request.form["email"],)
+        )
         user = cursor.fetchone()
         cursor.close()
         db.close()
 
-        session.pop("otp_user_id", None)
-        if user:
-            if issue_otp(user) == "failed":
-                return render_template("login.html", error=_("email_send_failed"))
-            session["otp_user_id"] = user["id"]
+        # Verify password and create session
+        if user and check_password_hash(user["password"], request.form["password"]):
+            # Block login if the password is older than 30 days
+            age = user.get("pw_age_days")
+            if age is not None and age >= PASSWORD_MAX_AGE_DAYS:
+                return render_template(
+                    "login.html",
+                    error="Your password has expired. Please use Forgot Password to set a new one."
+                )
+            session["user_id"] = user["id"]
+            return redirect("/")
 
-        # Same response whether or not the email exists, so nobody can probe which emails are registered
-        session["otp_pending"] = True
-        return redirect("/verify-otp")
+        # Show error if login fails
+        return render_template("login.html", error="Invalid email or password!")
 
     return render_template("login.html")
 
@@ -834,7 +860,10 @@ def dashboard():
 
     if search:
         cursor.execute(f"""
-           SELECT civic_issues.*, users.first_name, users.email
+           SELECT civic_issues.*, users.first_name, users.email,
+              EXISTS(SELECT 1 FROM notifications n
+              WHERE n.issue_id = civic_issues.id
+                AND LOCATE('We have received your complaint', n.message) = 1) AS acknowledged
            FROM civic_issues
            JOIN users ON civic_issues.user_id = users.id
            WHERE civic_issues.issue_type LIKE %s
@@ -844,7 +873,10 @@ def dashboard():
         """, (f"%{search}%", f"%{search}%", f"%{search}%"))
     else:
         cursor.execute(f"""
-           SELECT civic_issues.*, users.first_name, users.email
+           SELECT civic_issues.*, users.first_name, users.email,
+             EXISTS(SELECT 1 FROM notifications n
+              WHERE n.issue_id = civic_issues.id
+                AND LOCATE('We have received your complaint', n.message) = 1) AS acknowledged
            FROM civic_issues
            JOIN users ON civic_issues.user_id = users.id
            {order_clause}
@@ -1021,7 +1053,10 @@ def update_status(id):
         return redirect("/admin")
 
     # Get new status from form
-    new_status = request.form["status"]
+    new_status = request.form.get("status", "").strip()
+
+    if new_status not in ALLOWED_STATUSES:
+        return "Invalid status selected", 400
 
     # Handle resolution proof image (only relevant when marking Resolved)
     resolution_image_name = None
@@ -1061,6 +1096,70 @@ def update_status(id):
     cursor.close()
     db.close()
 
+    return redirect("/dashboard")
+
+# ---------------- SET PRIORITY (ADMIN) ----------------
+PRIORITY_LEVELS = ("Low", "Medium", "High", "Critical")
+
+@app.route("/set_priority/<int:id>", methods=["POST"])
+def set_priority(id):
+    if "admin" not in session:
+        return redirect("/admin")
+
+    new_priority = request.form.get("urgency", "").strip()
+    if new_priority not in PRIORITY_LEVELS:
+        return "Invalid priority selected", 400
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT user_id, urgency FROM civic_issues WHERE id=%s", (id,))
+    issue = cursor.fetchone()
+
+    # Only update and notify if the priority actually changed
+    if issue and issue["urgency"] != new_priority:
+        cursor.execute("UPDATE civic_issues SET urgency=%s WHERE id=%s", (new_priority, id))
+        message = f"The priority of your complaint #{id} has been updated to '{new_priority}' by the admin."
+        cursor.execute(
+            "INSERT INTO notifications (user_id, issue_id, message) VALUES (%s, %s, %s)",
+            (issue["user_id"], id, message)
+        )
+        db.commit()
+
+    cursor.close()
+    db.close()
+    return redirect("/dashboard")
+
+# ---------------- ACKNOWLEDGE COMPLAINT ----------------
+ACK_PREFIX = "We have received your complaint"
+
+@app.route("/acknowledge/<int:id>", methods=["POST"])
+def acknowledge(id):
+    if "admin" not in session:
+        return redirect("/admin")
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT user_id FROM civic_issues WHERE id=%s", (id,))
+    issue = cursor.fetchone()
+
+    if issue:
+        # Don't send a second acknowledgment for the same complaint
+        cursor.execute(
+            "SELECT 1 FROM notifications WHERE issue_id=%s AND LOCATE(%s, message) = 1 LIMIT 1",
+            (id, ACK_PREFIX)
+        )
+        if not cursor.fetchone():
+            message = f"{ACK_PREFIX} #{id} and we are working on it."
+            cursor.execute(
+                "INSERT INTO notifications (user_id, issue_id, message) VALUES (%s, %s, %s)",
+                (issue["user_id"], id, message)
+            )
+            db.commit()
+
+    cursor.close()
+    db.close()
     return redirect("/dashboard")
 
 # ---------------- PUBLIC TRANSPARENCY PAGE ----------------
@@ -1204,7 +1303,10 @@ def assign_department(id):
         return redirect("/admin")
 
     # Get selected department from form
-    department = request.form["department"]
+    department = request.form.get("department", "").strip()
+
+    if department not in ALLOWED_DEPARTMENTS:
+        return "Invalid department selected", 400
 
     db = get_db()
     cursor = db.cursor()
@@ -1375,7 +1477,10 @@ def reset_password(token):
 
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("UPDATE users SET password=%s WHERE email=%s", (hashed_password, email))
+        cursor.execute(
+            "UPDATE users SET password=%s, password_changed_at=NOW() WHERE email=%s",
+            (hashed_password, email)
+        )
         db.commit()
         cursor.close()
         db.close()
