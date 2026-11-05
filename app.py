@@ -9,11 +9,17 @@ from flask import Flask, request, render_template, redirect, session, flash, jso
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import re
 import time
 import socket
 import math
 from difflib import SequenceMatcher
-from datetime import datetime
+from datetime import datetime, timedelta
+import secrets
+import hmac
+import hashlib
+from urllib.parse import urlparse
+from translations import TRANSLATIONS, SUPPORTED_LANGS, DEFAULT_LANG
 from PIL import Image as PILImage
 from PIL.ExifTags import TAGS, GPSTAGS
 socket.getfqdn = lambda name="": "localhost"
@@ -435,30 +441,227 @@ def register():
 
     return render_template("register.html")
 
-# ---------------- LOGIN ----------------
+
+# ---------------- LANGUAGE (English / Hindi) ----------------
+def current_lang():
+    # session first, then the cookie (so the choice survives logout / new sessions)
+    lang = session.get("lang") or request.cookies.get("lang") or DEFAULT_LANG
+    return lang if lang in SUPPORTED_LANGS else DEFAULT_LANG
+
+def _(key, **kw):
+    """Translate a key into the user's chosen language (falls back to English)."""
+    text = TRANSLATIONS.get(current_lang(), {}).get(key) or TRANSLATIONS[DEFAULT_LANG].get(key, key)
+    return text.format(**kw) if kw else text
+
+def tv(prefix, value):
+    """Translate a database value, e.g. tv('cat','Pothole'), tv('st','In Progress'),
+    tv('dept','Water Board'), tv('urg','High'). Unknown values are returned unchanged."""
+    if value is None:
+        return ""
+    key = f"{prefix}_{value}"
+    return _(key) if key in TRANSLATIONS[DEFAULT_LANG] else value
+
+def tv_dict(prefix, values):
+    return {v: tv(prefix, v) for v in values}
+
+@app.context_processor
+def inject_i18n():
+    return {"t": _, "tv": tv, "tv_dict": tv_dict, "lang": current_lang()}
+
+def _safe_next(url):
+    # only allow same-site relative paths
+    if url and url.startswith("/") and not url.startswith("//") and not url.startswith("/settings"):
+        return url
+    return "/"
+
+def _remember_lang(resp, lang):
+    resp.set_cookie("lang", lang, max_age=60 * 60 * 24 * 365, samesite="Lax")
+    return resp
+
+@app.route("/set_language/<lang>")
+@limiter.exempt
+def set_language(lang):
+    resp_url = "/"
+    ref = request.referrer
+    if ref and urlparse(ref).netloc == request.host:
+        resp_url = ref
+    resp = redirect(resp_url)
+    if lang in SUPPORTED_LANGS:
+        session["lang"] = lang
+        _remember_lang(resp, lang)
+    return resp
+
+@app.route("/settings", methods=["GET", "POST"])
+@limiter.exempt
+def settings():
+    if request.method == "POST":
+        lang = request.form.get("lang")
+        resp = redirect(_safe_next(request.form.get("next")))
+        if lang in SUPPORTED_LANGS:
+            session["lang"] = lang
+            _remember_lang(resp, lang)
+        return resp
+    ref = urlparse(request.referrer or "")
+    next_url = _safe_next(ref.path if ref.netloc == request.host else "/")
+    return render_template("settings.html", next_url=next_url)
+
+
+# ---------------- OTP LOGIN ----------------
+OTP_EXPIRY_MINUTES = 5
+OTP_MAX_ATTEMPTS = 5
+OTP_RESEND_COOLDOWN_SECONDS = 60
+
+def _hash_otp(user_id, code):
+    # Keyed hash: a leaked DB can't be used to brute-force the 1,000,000 possible codes
+    msg = f"{user_id}:{code}".encode()
+    return hmac.new(app.secret_key.encode(), msg, hashlib.sha256).hexdigest()
+
+def send_otp_email(to_email, code):
+    api_key = os.getenv("BREVO_API_KEY")
+    if not api_key:
+        if app.debug:
+            # Local dev only: print the code in the terminal instead of emailing it
+            print(f"[DEV ONLY] OTP for {to_email}: {code}")
+            return True
+        app.logger.error("BREVO_API_KEY is not set, so the OTP email can't be sent")
+        return False
+    html = (
+        f"<p>{_('otp_email_body')}</p>"
+        f"<h2 style='letter-spacing:6px'>{code}</h2>"
+    )
+    try:
+        resp = requests.post(
+            "https://api.brevo.com/v3/smtp/email",
+            headers={"api-key": api_key, "content-type": "application/json", "accept": "application/json"},
+            json={
+                "sender": {"name": "Civic Issue Mapper", "email": os.getenv("MAIL_USERNAME")},
+                "to": [{"email": to_email}],
+                "subject": _("otp_email_subject"),
+                "htmlContent": html,
+            },
+            timeout=10,
+        )
+        return resp.status_code in (200, 201)
+    except requests.RequestException as e:
+        app.logger.error(f"OTP email failed: {e}")
+        return False
+
+def issue_otp(user):
+    """Returns 'sent', 'cooldown' or 'failed'."""
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    now = datetime.utcnow()
+
+    cursor.execute(
+        "SELECT created_at FROM login_otps WHERE user_id=%s ORDER BY id DESC LIMIT 1",
+        (user["id"],)
+    )
+    last = cursor.fetchone()
+    if last and (now - last["created_at"]).total_seconds() < OTP_RESEND_COOLDOWN_SECONDS:
+        cursor.close(); db.close()
+        return "cooldown"
+
+    code = f"{secrets.randbelow(1_000_000):06d}"
+    cursor.execute("UPDATE login_otps SET used=1 WHERE user_id=%s AND used=0", (user["id"],))
+    cursor.execute(
+        "INSERT INTO login_otps (user_id, otp_hash, expires_at, created_at) VALUES (%s, %s, %s, %s)",
+        (user["id"], _hash_otp(user["id"], code), now + timedelta(minutes=OTP_EXPIRY_MINUTES), now)
+    )
+    db.commit()
+    cursor.close(); db.close()
+
+    return "sent" if send_otp_email(user["email"], code) else "failed"
+
+# ---------------- LOGIN (step 1: enter email) ----------------
 @app.route("/login", methods=["GET", "POST"])
 @limiter.limit("5 per minute")
 def login():
     if request.method == "POST":
-        # Connect to database and find user by email
+        email = (request.form.get("email") or "").strip().lower()
+
         db = get_db()
         cursor = db.cursor(dictionary=True)
-
-        cursor.execute("SELECT * FROM users WHERE email=%s", (request.form["email"],))
+        cursor.execute("SELECT id, email FROM users WHERE LOWER(email)=%s", (email,))
         user = cursor.fetchone()
-
         cursor.close()
         db.close()
 
-        # Verify password and create session
-        if user and check_password_hash(user["password"], request.form["password"]):
-            session["user_id"] = user["id"]
-            return redirect("/")
+        session.pop("otp_user_id", None)
+        if user:
+            if issue_otp(user) == "failed":
+                return render_template("login.html", error=_("email_send_failed"))
+            session["otp_user_id"] = user["id"]
 
-        # Show error if login fails
-        return render_template("login.html", error="Invalid email or password!")
+        # Same response whether or not the email exists, so nobody can probe which emails are registered
+        session["otp_pending"] = True
+        return redirect("/verify-otp")
 
     return render_template("login.html")
+
+# ---------------- LOGIN (step 2: enter code) ----------------
+@app.route("/verify-otp", methods=["GET", "POST"])
+@limiter.limit("10 per minute")
+def verify_otp():
+    if not session.get("otp_pending"):
+        return redirect("/login")
+
+    if request.method == "GET":
+        return render_template("verify_otp.html", info=_("otp_sent_generic"))
+
+    code = (request.form.get("otp") or "").strip()
+    user_id = session.get("otp_user_id")
+    if not user_id or not (code.isdigit() and len(code) == 6):
+        return render_template("verify_otp.html", error=_("otp_invalid"))
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute(
+        "SELECT * FROM login_otps WHERE user_id=%s AND used=0 ORDER BY id DESC LIMIT 1",
+        (user_id,)
+    )
+    row = cursor.fetchone()
+
+    if not row or row["expires_at"] < datetime.utcnow():
+        cursor.close(); db.close()
+        return render_template("verify_otp.html", error=_("otp_invalid"))
+
+    if row["attempts"] >= OTP_MAX_ATTEMPTS:
+        cursor.close(); db.close()
+        return render_template("verify_otp.html", error=_("otp_too_many"))
+
+    if hmac.compare_digest(row["otp_hash"], _hash_otp(user_id, code)):
+        cursor.execute("UPDATE login_otps SET used=1 WHERE id=%s", (row["id"],))
+        db.commit()
+        cursor.close(); db.close()
+        session.pop("otp_pending", None)
+        session.pop("otp_user_id", None)
+        session["user_id"] = user_id
+        return redirect("/")
+
+    cursor.execute("UPDATE login_otps SET attempts = attempts + 1 WHERE id=%s", (row["id"],))
+    db.commit()
+    cursor.close(); db.close()
+    return render_template("verify_otp.html", error=_("otp_invalid"))
+
+@app.route("/resend-otp", methods=["POST"])
+@limiter.limit("5 per hour")
+def resend_otp():
+    if not session.get("otp_pending"):
+        return redirect("/login")
+    user_id = session.get("otp_user_id")
+    if user_id:
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT id, email FROM users WHERE id=%s", (user_id,))
+        user = cursor.fetchone()
+        cursor.close(); db.close()
+        if user:
+            result = issue_otp(user)
+            if result == "cooldown":
+                return render_template("verify_otp.html", error=_("otp_wait"))
+            if result == "failed":
+                return render_template("verify_otp.html", error=_("email_send_failed"))
+    return render_template("verify_otp.html", info=_("otp_sent_generic"))
 
 # ---------------- ADMIN LOGIN ----------------
 @app.route("/admin", methods=["GET", "POST"])
@@ -1093,8 +1296,11 @@ def success(id):
 # ---------------- LOGOUT ----------------
 @app.route("/logout")
 def logout():
-    # Clear session and redirect to login
+    # Clear session but keep the chosen language
+    lang = session.get("lang")
     session.clear()
+    if lang:
+        session["lang"] = lang
     return redirect("/login")
 
 

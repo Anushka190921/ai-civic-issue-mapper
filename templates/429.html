@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Too Many Requests — Civic Issue Mapper</title>
+<title>{{ t('e429_t') }} — Civic Issue Mapper</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --ink:#10151B;
@@ -36,18 +36,21 @@
 
   .btn{display:inline-flex; padding:12px 24px; border-radius:5px; font-weight:700; font-size:14px; text-decoration:none; background:var(--amber); color:var(--amber-ink); transition:transform .2s ease;}
   .btn:hover{transform:translateY(-2px);}
+  /* Hindi: Devanagari font + no letter-spacing (it breaks Devanagari letter joins) */
+  html[lang="hi"] *{font-family:'Noto Sans Devanagari','IBM Plex Sans',sans-serif !important; letter-spacing:normal !important;}
 </style>
 </head>
 <body>
+{% include '_lang_switcher.html' %}
 
 <div class="glow"></div>
 
 <div class="panel">
   <a href="/" class="brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
   <div class="code">429</div>
-  <h1>Slow down a little</h1>
-  <p class="sub">You've made too many requests in a short time. Please wait a minute before trying again.</p>
-  <a href="/" class="btn">Back to home</a>
+  <h1>{{ t('e429_h') }}</h1>
+  <p class="sub">{{ t('e429_sub') }}</p>
+  <a href="/" class="btn">{{ t('back_home') }}</a>
 </div>
 
 </body>

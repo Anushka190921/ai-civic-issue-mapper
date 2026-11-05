@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Log in — Civic Issue Mapper</title>
+<title>{{ t('login_title') }} — Civic Issue Mapper</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#0B2545;
@@ -24,13 +24,20 @@
     margin:0; min-height:100vh;
     background:var(--navy);
     color:var(--ink);
-    font-family:'IBM Plex Sans', sans-serif;
+    font-family:'IBM Plex Sans', 'Noto Sans Devanagari', sans-serif;
     display:grid;
     grid-template-columns:1.05fr 0.95fr;
   }
-  h1{font-family:'Archivo Expanded', sans-serif; text-transform:uppercase; margin:0;}
+  h1{font-family:'Archivo Expanded', 'Noto Sans Devanagari', sans-serif; text-transform:uppercase; margin:0;}
   a{color:inherit;}
   :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
+
+  /* Hindi: no letter-spacing (it breaks Devanagari letter joins) and allow wider headings */
+  html[lang="hi"] *{letter-spacing:normal !important;}
+  html[lang="hi"] .side h1{max-width:none;}
+
+  /* Language switcher colours: dark on the paper panel, light on the navy panel (mobile) */
+  .lang-switch{color:var(--ink);}
 
   /* ---------- LEFT: brand / story panel ---------- */
   .side{
@@ -55,7 +62,7 @@
   }
   .mini-ticket .row{display:flex; justify-content:space-between; font-size:12.5px; padding:6px 0; border-bottom:1px dashed rgba(237,239,232,0.18);}
   .mini-ticket .row:last-child{border-bottom:none;}
-  .mini-ticket .k{color:rgba(237,239,232,0.55); font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:0.06em; font-size:10.5px;}
+  .mini-ticket .k{color:rgba(237,239,232,0.55); font-family:'IBM Plex Mono', 'Noto Sans Devanagari', monospace; text-transform:uppercase; letter-spacing:0.06em; font-size:10.5px;}
   .mini-ticket .v{font-weight:600;}
   .stage-dot{display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:6px; background:var(--green);}
 
@@ -67,39 +74,35 @@
   }
   .form-card{width:100%; max-width:400px;}
   .eyebrow{
-    font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.12em;
+    font-family:'IBM Plex Mono', 'Noto Sans Devanagari', monospace; font-size:12px; letter-spacing:0.12em;
     text-transform:uppercase; color:var(--steel); display:block; margin-bottom:10px;
   }
   .form-card h2{
-    font-family:'Archivo Expanded', sans-serif; text-transform:uppercase;
+    font-family:'Archivo Expanded', 'Noto Sans Devanagari', sans-serif; text-transform:uppercase;
     font-size:28px; color:var(--navy); margin:0 0 8px;
   }
   .form-card .sub{color:#5c6558; font-size:14px; margin-bottom:30px;}
 
   label{
-    display:block; font-size:12px; font-family:'IBM Plex Mono', monospace;
+    display:block; font-size:12px; font-family:'IBM Plex Mono', 'Noto Sans Devanagari', monospace;
     letter-spacing:0.06em; text-transform:uppercase; color:#5c6558; margin-bottom:6px;
   }
   .field{margin-bottom:20px;}
-  input[type=email], input[type=password]{
+  input[type=email]{
     width:100%; padding:13px 14px; border-radius:4px; border:1.5px solid #c7cabd;
-    background:#fff; font-family:'IBM Plex Sans', sans-serif; font-size:14.5px; color:var(--ink);
+    background:#fff; font-family:'IBM Plex Sans', 'Noto Sans Devanagari', sans-serif; font-size:14.5px; color:var(--ink);
   }
-  input[type=email]:focus, input[type=password]:focus{border-color:var(--steel); outline:none;}
-
-  .row-between{display:flex; justify-content:space-between; align-items:center; margin:-6px 0 22px;}
-  .row-between a{font-size:13px; color:var(--steel); text-decoration:none; font-weight:600;}
-  .row-between a:hover{text-decoration:underline;}
+  input[type=email]:focus{border-color:var(--steel); outline:none;}
 
   .btn{
     width:100%; padding:14px; border-radius:4px; border:none; cursor:pointer;
-    font-family:'IBM Plex Sans', sans-serif; font-weight:700; font-size:14.5px;
+    font-family:'IBM Plex Sans', 'Noto Sans Devanagari', sans-serif; font-weight:700; font-size:14.5px;
     display:flex; align-items:center; justify-content:center; gap:10px;
   }
   .btn-primary{background:var(--amber); color:var(--amber-ink);}
   .btn-primary:hover{background:#f5b957;}
   .btn-google{
-    background:#fff; color:var(--ink); border:1.5px solid #c7cabd; margin-top:12px;
+    background:#fff; color:var(--ink); border:1.5px solid #c7cabd; margin-top:12px; text-decoration:none;
   }
   .btn-google:hover{background:#f7f7f4;}
 
@@ -114,59 +117,54 @@
     body{grid-template-columns:1fr;}
     .side{padding:44px 6vw 30px;}
     .mini-ticket{display:none;}
+    .lang-switch{color:var(--paper);}
   }
 </style>
 </head>
 <body>
 
+{% include '_lang_switcher.html' %}
+
 <div class="side">
   <a href="/" class="brand"><span class="dot"></span>CIVIC / MAPPER</a>
-  <h1>Welcome back<br><span>to your city.</span></h1>
-  <p>Log in to file a new complaint, check what's happened to the ones you've already reported, or pick up right where you left off.</p>
+  <h1>{{ t('login_welcome_1') }}<br><span>{{ t('login_welcome_2') }}</span></h1>
+  <p>{{ t('login_intro') }}</p>
 
   <div class="mini-ticket">
-    <div class="row"><span class="k">Ticket</span><span class="v">#00982</span></div>
-    <div class="row"><span class="k">Issue</span><span class="v">Street light outage</span></div>
-    <div class="row"><span class="k">Status</span><span class="v"><span class="stage-dot"></span>Resolved</span></div>
+    <div class="row"><span class="k">{{ t('ticket') }}</span><span class="v">#00982</span></div>
+    <div class="row"><span class="k">{{ t('issue') }}</span><span class="v">{{ t('sample_issue') }}</span></div>
+    <div class="row"><span class="k">{{ t('status') }}</span><span class="v"><span class="stage-dot"></span>{{ t('resolved') }}</span></div>
   </div>
 </div>
 
 <div class="form-side">
   <div class="form-card">
-    <span class="eyebrow">Citizen access</span>
-    <h2>Log in</h2>
-    <p class="sub">Enter your details to access your account.</p>
+    <span class="eyebrow">{{ t('citizen_access') }}</span>
+    <h2>{{ t('login_title') }}</h2>
+    <p class="sub">{{ t('login_sub') }}</p>
 
     {% if error %}
-    <div style="background:#FCE8E6; border:1.5px solid #E4A199; color:#8C2E22; border-radius:6px; padding:12px 14px; font-size:13.5px; margin-bottom:20px;">
+    <div style="background:#FCE8E6; border:1.5px solid #E4A199; color:#8C2E22; border-radius:6px; padding:12px 14px; font-size:13.5px; margin-bottom:20px;" role="alert">
       {{ error }}
     </div>
     {% endif %}
 
     <form action="/login" method="POST">
       <div class="field">
-        <label for="email">Email address</label>
-        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+        <label for="email">{{ t('email_label') }}</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" required autofocus>
       </div>
-      <div class="field">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="••••••••" required>
-      </div>
-      <div class="row-between">
-        <span></span>
-        <a href="/forgot_password">Forgot password?</a>
-      </div>
-      <button type="submit" class="btn btn-primary">Log in</button>
+      <button type="submit" class="btn btn-primary">{{ t('send_otp') }}</button>
     </form>
 
-    <div class="divider">or</div>
+    <div class="divider">{{ t('or') }}</div>
 
     <a href="/login/google" class="btn btn-google">
       <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.95v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.95a9 9 0 0 0 0 8.1l3.02-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 0 0 .95 4.95l3.02 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
-      Continue with Google
+      {{ t('continue_google') }}
     </a>
 
-    <p class="footer-line">New here? <a href="/register">Create an account</a></p>
+    <p class="footer-line">{{ t('new_here') }} <a href="/register">{{ t('create_account') }}</a></p>
   </div>
 </div>
 

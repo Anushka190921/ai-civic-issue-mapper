@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Report Submitted — Civic Issue Mapper</title>
+<title>{{ t('ok_title') }} — Civic Issue Mapper</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --ink:#10151B;
@@ -60,9 +60,12 @@
   .btn:hover{transform:translateY(-2px);}
   .btn-amber{background:var(--amber); color:var(--amber-ink);}
   .btn-ghost{border:1.5px solid rgba(237,239,232,.4); color:var(--paper);}
+  /* Hindi: Devanagari font + no letter-spacing (it breaks Devanagari letter joins) */
+  html[lang="hi"] *{font-family:'Noto Sans Devanagari','IBM Plex Sans',sans-serif !important; letter-spacing:normal !important;}
 </style>
 </head>
 <body>
+{% include '_lang_switcher.html' %}
 
 <div class="glow"></div>
 
@@ -70,16 +73,16 @@
   <div class="check-ring">
     <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
   </div>
-  <span class="eyebrow">Complaint filed</span>
-  <h1>Report submitted</h1>
+  <span class="eyebrow">{{ t('ok_eyebrow') }}</span>
+  <h1>{{ t('ok_title') }}</h1>
   <div class="ticket-box">
-    <div class="k">Your ticket number</div>
+    <div class="k">{{ t('ok_ticket') }}</div>
     <div class="v">#{{ issue.id }}</div>
   </div>
-  <p class="sub">Save this number to track your complaint anytime, no login required. We'll notify you here whenever the status changes.</p>
+  <p class="sub">{{ t('ok_sub') }}</p>
   <div class="actions">
-    <a href="/my_issues" class="btn btn-amber">View my issues</a>
-    <a href="/" class="btn btn-ghost">Back to home</a>
+    <a href="/my_issues" class="btn btn-amber">{{ t('ok_view') }}</a>
+    <a href="/" class="btn btn-ghost">{{ t('back_home') }}</a>
   </div>
 </div>
 

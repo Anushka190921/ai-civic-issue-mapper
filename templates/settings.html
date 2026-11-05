@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ t('settings_title') }} — Civic Issue Mapper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --amber:#F2A93B; --amber-ink:#5C3A08; --steel:#3E6C99; --line:rgba(237,239,232,0.16); }
+  *{box-sizing:border-box;}
+  body{margin:0; min-height:100vh; background:var(--navy); color:var(--paper); font-family:'IBM Plex Sans',sans-serif; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; animation-iteration-count:1 !important;} }
+  h1{font-family:'Archivo Expanded',sans-serif; text-transform:uppercase; margin:0;}
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
+  html[lang="hi"] *{font-family:'Noto Sans Devanagari','IBM Plex Sans',sans-serif !important; letter-spacing:normal !important;}
+
+  .glow{position:absolute; inset:0; pointer-events:none; background:radial-gradient(560px 380px at 20% 25%, rgba(62,108,153,.20), transparent 60%), radial-gradient(500px 360px at 85% 75%, rgba(242,169,59,.10), transparent 60%);}
+  .panel{position:relative; z-index:1; width:100%; max-width:440px; margin:20px; background:var(--navy-deep); border:1px solid var(--line); border-radius:14px; padding:40px 36px; box-shadow:0 24px 60px rgba(0,0,0,.45); opacity:0; transform:scale(.6) translateY(24px); animation:pop-in .65s cubic-bezier(.34,1.56,.64,1) forwards;}
+  @keyframes pop-in{ to{opacity:1; transform:scale(1) translateY(0);} }
+  .brand{display:flex; align-items:center; gap:9px; font-family:'Archivo Expanded',sans-serif; font-weight:800; font-size:15px; letter-spacing:.03em; text-decoration:none; margin-bottom:26px; justify-content:center;}
+  .dot-ring{position:relative; width:11px; height:11px;}
+  .dot-ring::before{content:''; position:absolute; inset:0; border-radius:50%; background:var(--amber); box-shadow:0 0 8px rgba(242,169,59,.8); animation:pulse-dot 1.8s ease-in-out infinite;}
+  @keyframes pulse-dot{ 0%,100%{transform:scale(1); opacity:1;} 50%{transform:scale(1.5); opacity:.5;} }
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--steel); display:block; text-align:center; margin-bottom:8px;}
+  h1{font-size:22px; text-align:center; margin-bottom:8px;}
+  .sub{color:rgba(237,239,232,.65); font-size:13.5px; text-align:center; margin:0 0 26px; line-height:1.5;}
+  .group-label{font-size:11.5px; font-family:'IBM Plex Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:rgba(237,239,232,.55); margin-bottom:10px; display:block;}
+
+  .lang-opt{display:block; margin-bottom:12px; cursor:pointer;}
+  .lang-opt input{position:absolute; opacity:0; pointer-events:none;}
+  .lang-card{display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-radius:8px; border:1.5px solid rgba(237,239,232,.2); background:rgba(237,239,232,.05); transition:border-color .2s, background .2s;}
+  .lang-card b{font-size:17px;}
+  .lang-card small{display:block; color:rgba(237,239,232,.55); font-size:12px; margin-top:2px;}
+  .tick{width:20px; height:20px; border-radius:50%; border:2px solid rgba(237,239,232,.35); flex-shrink:0;}
+  .lang-opt:hover .lang-card{border-color:var(--steel);}
+  .lang-opt input:checked + .lang-card{border-color:var(--amber); background:rgba(242,169,59,.12);}
+  .lang-opt input:checked + .lang-card .tick{border-color:var(--amber); background:var(--amber); box-shadow:inset 0 0 0 4px var(--navy-deep);}
+  .lang-opt input:focus-visible + .lang-card{outline:3px solid var(--amber); outline-offset:2px;}
+
+  .btn-primary{width:100%; margin-top:10px; padding:13px; border-radius:5px; border:none; cursor:pointer; font-weight:700; font-size:14.5px; background:var(--amber); color:var(--amber-ink); transition:transform .2s ease, background .2s ease;}
+  .btn-primary:hover{background:#f5b957; transform:translateY(-2px);}
+  .note{font-size:12px; color:rgba(237,239,232,.5); text-align:center; margin:18px 0 0; line-height:1.5;}
+  .back-link{display:block; text-align:center; margin-top:18px; font-size:12.5px; color:var(--steel); text-decoration:none; font-weight:600;}
+  .back-link:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="panel">
+  <a href="/" class="brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
+  <span class="eyebrow">{{ t('settings_eyebrow') }}</span>
+  <h1>{{ t('settings_title') }}</h1>
+  <p class="sub">{{ t('settings_sub') }}</p>
+
+  <form method="POST" action="/settings">
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <span class="group-label">{{ t('language') }}</span>
+    <label class="lang-opt">
+      <input type="radio" name="lang" value="en" {% if lang == 'en' %}checked{% endif %}>
+      <span class="lang-card"><span><b>English</b><small>English</small></span><span class="tick"></span></span>
+    </label>
+    <label class="lang-opt">
+      <input type="radio" name="lang" value="hi" {% if lang == 'hi' %}checked{% endif %}>
+      <span class="lang-card"><span><b>हिन्दी</b><small>Hindi</small></span><span class="tick"></span></span>
+    </label>
+    <button type="submit" class="btn-primary">{{ t('settings_save') }}</button>
+  </form>
+  <p class="note">{{ t('settings_note') }}</p>
+  <a href="{{ next_url }}" class="back-link">&larr; {{ t('back') }}</a>
+</div>
+</body>
+</html>

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Complaint Map — Civic Issue Mapper</title>
+<title>{{ t('vm_title') }} — Civic Issue Mapper</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
   :root{
@@ -54,32 +54,37 @@
     background:#fff; padding:14px 22px; border-radius:8px; box-shadow:0 6px 18px rgba(11,37,69,.2);
     font-size:14px; color:#5c6558; display:none;
   }
+  /* Hindi: Devanagari font + no letter-spacing (it breaks Devanagari letter joins) */
+  html[lang="hi"] *{font-family:'Noto Sans Devanagari','IBM Plex Sans',sans-serif !important; letter-spacing:normal !important;}
 </style>
 </head>
 <body>
+{% set sw_right = true %}
+{% include '_lang_switcher.html' %}
 
 <div class="topbar">
   <span class="brand"><span class="dot"></span>CIVIC / MAPPER</span>
-  <a href="javascript:history.back()">&larr; Back</a>
+  <a href="javascript:history.back()">&larr; {{ t('back') }}</a>
 </div>
 
 <div id="map"></div>
 <div class="view-toggle">
-  <button id="btnPins" class="active">📍 Pins</button>
-  <button id="btnHeat">🔥 Heatmap</button>
+  <button id="btnPins" class="active">📍 {{ t('vm_pins') }}</button>
+  <button id="btnHeat">🔥 {{ t('vm_heat') }}</button>
 </div>
 <div class="legend" id="legend">
-  <div class="row"><span class="dot" style="background:#F2A93B;"></span>Pending</div>
-  <div class="row"><span class="dot" style="background:#3E6C99;"></span>In Progress</div>
-  <div class="row"><span class="dot" style="background:#3E9B6F;"></span>Resolved</div>
+  <div class="row"><span class="dot" style="background:#F2A93B;"></span>{{ t('st_Pending') }}</div>
+  <div class="row"><span class="dot" style="background:#3E6C99;"></span>{{ t('st_In Progress') }}</div>
+  <div class="row"><span class="dot" style="background:#3E9B6F;"></span>{{ t('st_Resolved') }}</div>
 </div>
-<div class="empty-banner" id="emptyBanner">No complaints with a location to show yet.</div>
+<div class="empty-banner" id="emptyBanner">{{ t('vm_empty') }}</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 
 <script>
 var complaints = {{ complaints|tojson }};
+var I = {{ ({'ticket': t('ticket'), 'issue': t('issue'), 'status': t('status'), 'urgency': t('urgency'), 'dept': t('dept_label'), 'cat': tv_dict('cat', ['Garbage','Pothole','Water Leakage','Street Light']), 'st': tv_dict('st', ['Pending','In Progress','Resolved']), 'urg': tv_dict('urg', ['Low','Medium','High','Critical']), 'depts': tv_dict('dept', ['Sanitation Department','Roads & Infrastructure','Water Board','Electricity Department','General Administration'])})|tojson }};
 
 var STATUS_COLORS = {
   "Pending": "#F2A93B",
@@ -121,11 +126,11 @@ complaints.forEach(function(c){
   });
 
   marker.bindPopup(
-    "<b>Ticket #" + c.id + "</b><br>" +
-    "<b>Issue:</b> " + c.issue_type + "<br>" +
-    "<b>Status:</b> " + c.status +
-    (c.urgency ? "<br><b>Urgency:</b> " + c.urgency : "") +
-    (c.department ? "<br><b>Department:</b> " + c.department : "")
+    "<b>" + I.ticket + " #" + c.id + "</b><br>" +
+    "<b>" + I.issue + ":</b> " + (I.cat[c.issue_type] || c.issue_type) + "<br>" +
+    "<b>" + I.status + ":</b> " + (I.st[c.status] || c.status) +
+    (c.urgency ? "<br><b>" + I.urgency + ":</b> " + (I.urg[c.urgency] || c.urgency) : "") +
+    (c.department ? "<br><b>" + I.dept + ":</b> " + (I.depts[c.department] || c.department) : "")
   );
 
   pinLayer.addLayer(marker);

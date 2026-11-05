@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Track Complaint — Civic Issue Mapper</title>
+<title>{{ t('ts_h') }} — Civic Issue Mapper</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --ink:#10151B;
@@ -73,25 +73,28 @@
   .step.current{background:var(--amber); box-shadow:0 0 0 4px rgba(242,169,59,.25);}
   .step-line{flex:1; height:2px; background:#d9dcd1;}
   .step-line.done{background:var(--green);}
+  /* Hindi: Devanagari font + no letter-spacing (it breaks Devanagari letter joins) */
+  html[lang="hi"] *{font-family:'Noto Sans Devanagari','IBM Plex Sans',sans-serif !important; letter-spacing:normal !important;}
 </style>
 </head>
 <body>
+{% include '_lang_switcher.html' %}
 
 <nav class="nav">
   <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
-  <a href="/" class="back">&larr; Back to home</a>
+  <a href="/" class="back">&larr; {{ t('back_home') }}</a>
 </nav>
 
 <div class="wrap">
   <div class="head pop-in">
-    <span class="eyebrow">Public lookup</span>
-    <h1>Track your complaint</h1>
+    <span class="eyebrow">{{ t('ts_eyebrow') }}</span>
+    <h1>{{ t('ts_h') }}</h1>
   </div>
 
   <div class="search-panel pop-in" style="animation-delay:.1s;">
     <form action="/track_status" method="POST">
-      <input type="text" name="complaint_id" placeholder="Enter your complaint ID, e.g. 1042" required>
-      <button type="submit">Track</button>
+      <input type="text" name="complaint_id" placeholder="{{ t('ts_placeholder') }}" required>
+      <button type="submit">{{ t('ts_btn') }}</button>
     </form>
   </div>
 
@@ -103,22 +106,22 @@
   <div class="result-card pop-in" style="animation-delay:.15s;">
     <div class="r-top">
       <div>
-        <span class="r-id">TICKET #{{ complaint.id }}</span>
-        <div class="r-type">{{ complaint.issue_type }}</div>
+        <span class="r-id">{{ t('ticket')|upper }} #{{ complaint.id }}</span>
+        <div class="r-type">{{ tv('cat', complaint.issue_type) }}</div>
       </div>
       {% if complaint.status == 'Resolved' %}
-        <span class="badge resolved"><span class="badge-dot"></span>Resolved</span>
+        <span class="badge resolved"><span class="badge-dot"></span>{{ t('st_Resolved') }}</span>
       {% elif complaint.status == 'In Progress' %}
-        <span class="badge inprogress"><span class="badge-dot"></span>In progress</span>
+        <span class="badge inprogress"><span class="badge-dot"></span>{{ t('st_In Progress') }}</span>
       {% else %}
-        <span class="badge pending"><span class="badge-dot"></span>Pending</span>
+        <span class="badge pending"><span class="badge-dot"></span>{{ t('st_Pending') }}</span>
       {% endif %}
     </div>
 
-    <div class="r-row"><span class="k">Department</span><span class="v">{{ complaint.department or 'Awaiting assignment' }}</span></div>
-    <div class="r-row"><span class="k">Filed on</span><span class="v mono">{{ complaint.created_at }}</span></div>
+    <div class="r-row"><span class="k">{{ t('dept_label') }}</span><span class="v">{{ tv('dept', complaint.department) if complaint.department else t('awaiting') }}</span></div>
+    <div class="r-row"><span class="k">{{ t('filed_on') }}</span><span class="v mono">{{ complaint.created_at }}</span></div>
     {% if complaint.resolution_image %}
-      <div class="r-row"><span class="k">Resolution proof</span><span class="v"><a href="/static/uploads/{{ complaint.resolution_image }}" target="_blank" style="color:var(--steel);">View photo</a></span></div>
+      <div class="r-row"><span class="k">{{ t('res_proof') }}</span><span class="v"><a href="{% if complaint.resolution_image.startswith('http') %}{{ complaint.resolution_image }}{% else %}/static/uploads/{{ complaint.resolution_image }}{% endif %}" target="_blank" style="color:var(--steel);">{{ t('view_photo') }}</a></span></div>
     {% endif %}
 
     <div class="lifecycle-mini">
