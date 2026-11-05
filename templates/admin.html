@@ -350,6 +350,15 @@
           <button type="submit" class="mini-btn">Reassign</button>
         </form>
 
+        <form action="/set_priority/{{ c.id }}" method="POST">
+          <select name="urgency">
+            {% for level in ['Low', 'Medium', 'High', 'Critical'] %}
+              <option value="{{ level }}" {% if c.urgency == level %}selected{% endif %}>{{ level }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="mini-btn">Set priority</button>
+        </form>
+
         <a href="/delete_admin_issue/{{ c.id }}" class="link-btn danger" onclick="return confirm('Delete this complaint permanently?');">Delete</a>
       </div>
     </div>

@@ -896,6 +896,38 @@ def update_status(id):
 
     return redirect("/dashboard")
 
+# ---------------- SET PRIORITY (ADMIN) ----------------
+PRIORITY_LEVELS = ("Low", "Medium", "High", "Critical")
+
+@app.route("/set_priority/<int:id>", methods=["POST"])
+def set_priority(id):
+    if "admin" not in session:
+        return redirect("/admin")
+
+    new_priority = request.form.get("urgency", "").strip()
+    if new_priority not in PRIORITY_LEVELS:
+        return "Invalid priority selected", 400
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT user_id, urgency FROM civic_issues WHERE id=%s", (id,))
+    issue = cursor.fetchone()
+
+    # Only update and notify if the priority actually changed
+    if issue and issue["urgency"] != new_priority:
+        cursor.execute("UPDATE civic_issues SET urgency=%s WHERE id=%s", (new_priority, id))
+        message = f"The priority of your complaint #{id} has been updated to '{new_priority}' by the admin."
+        cursor.execute(
+            "INSERT INTO notifications (user_id, issue_id, message) VALUES (%s, %s, %s)",
+            (issue["user_id"], id, message)
+        )
+        db.commit()
+
+    cursor.close()
+    db.close()
+    return redirect("/dashboard")
+
 # ---------------- ACKNOWLEDGE COMPLAINT ----------------
 ACK_PREFIX = "We have received your complaint"
 
