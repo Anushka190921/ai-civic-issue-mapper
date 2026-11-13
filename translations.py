@@ -65,8 +65,6 @@ TRANSLATIONS = {
         "create_account": "खाता बनाएं",
     },
 }
-```python
 from translations_pages import PAGE_TRANSLATIONS
 for _lang, _strings in PAGE_TRANSLATIONS.items():
-    TRANSLATIONS[_lang].update(_strings)
-```
+    TRANSLATIONS[_lang].update(_strings)
