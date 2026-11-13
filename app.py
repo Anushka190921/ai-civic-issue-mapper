@@ -590,35 +590,28 @@ def issue_otp(user):
     return "sent" if send_otp_email(user["email"], code) else "failed"
 
 # ---------------- LOGIN (step 1: enter email) ----------------
+@app.route("/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute")
 def login():
     if request.method == "POST":
         email = (request.form.get("email") or "").strip().lower()
 
         db = get_db()
         cursor = db.cursor(dictionary=True)
-
-        cursor.execute(
-            "SELECT *, DATEDIFF(NOW(), password_changed_at) AS pw_age_days FROM users WHERE email=%s",
-            (request.form["email"],)
-        )
+        cursor.execute("SELECT id, email FROM users WHERE LOWER(email)=%s", (email,))
         user = cursor.fetchone()
         cursor.close()
         db.close()
 
-        # Verify password and create session
-        if user and check_password_hash(user["password"], request.form["password"]):
-            # Block login if the password is older than 30 days
-            age = user.get("pw_age_days")
-            if age is not None and age >= PASSWORD_MAX_AGE_DAYS:
-                return render_template(
-                    "login.html",
-                    error="Your password has expired. Please use Forgot Password to set a new one."
-                )
-            session["user_id"] = user["id"]
-            return redirect("/")
+        session.pop("otp_user_id", None)
+        if user:
+            if issue_otp(user) == "failed":
+                return render_template("login.html", error=_("email_send_failed"))
+            session["otp_user_id"] = user["id"]
 
-        # Show error if login fails
-        return render_template("login.html", error="Invalid email or password!")
+        # Same response whether or not the email exists, so nobody can probe which emails are registered
+        session["otp_pending"] = True
+        return redirect("/verify-otp")
 
     return render_template("login.html")
 
