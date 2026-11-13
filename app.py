@@ -590,8 +590,6 @@ def issue_otp(user):
     return "sent" if send_otp_email(user["email"], code) else "failed"
 
 # ---------------- LOGIN (step 1: enter email) ----------------
-@app.route("/login", methods=["GET", "POST"])
-@limiter.limit("5 per minute")
 def login():
     if request.method == "POST":
         email = (request.form.get("email") or "").strip().lower()
