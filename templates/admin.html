@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard — Civic Issue Mapper</title>
+<title>{{ t('ad_title') }} — Civic Issue Mapper</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <!-- Searchable Dropdown CSS -->
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
-
 <style>
   :root{
     --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --paper-dim:#E1E4DA; --ink:#10151B;
@@ -139,65 +138,47 @@
     .stats{grid-template-columns:1fr;}
   }
   /* Chart Type Buttons */
-
-.chart-controls {
-    display: flex;
-    gap: 10px;
-    margin: 15px 0 20px;
-    flex-wrap: wrap;
-}
-
-.chart-type-btn {
-    padding: 9px 18px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background: white;
-    color: #333;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.chart-type-btn:hover,
-.chart-type-btn.active {
-    background: #172554;
-    color: white;
-    border-color: #172554;
-}
+  .chart-controls{display:flex; gap:10px; margin:15px 0 20px; flex-wrap:wrap;}
+  .chart-type-btn{padding:9px 18px; border:1px solid #ccc; border-radius:6px; background:white; color:#333; cursor:pointer; font-weight:600;}
+  .chart-type-btn:hover, .chart-type-btn.active{background:#172554; color:white; border-color:#172554;}
+  /* Hindi: Devanagari font + no letter-spacing (it breaks Devanagari letter joins) */
+  html[lang="hi"] *{font-family:'Noto Sans Devanagari','IBM Plex Sans',sans-serif !important; letter-spacing:normal !important;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+{% include '_lang_switcher.html' %}
 
 <nav class="nav">
   <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER — ADMIN</a>
-  <a href="/logout" class="logout">Log out</a>
+  <a href="/logout" class="logout">{{ t('nav_logout') }}</a>
 </nav>
 
 <div class="wrap">
   <div class="stats">
     <div class="stat-card fade-in" style="animation-delay:.05s;">
       <div class="num">{{ stats.total }}</div>
-      <div class="label">Total complaints</div>
+      <div class="label">{{ t('ad_total') }}</div>
     </div>
     <div class="stat-card amber fade-in" style="animation-delay:.15s;">
       <div class="num">{{ stats.pending }}</div>
-      <div class="label">Pending</div>
+      <div class="label">{{ t('st_Pending') }}</div>
     </div>
     <div class="stat-card steel fade-in" style="animation-delay:.25s;">
       <div class="num">{{ stats.in_progress }}</div>
-      <div class="label">In progress</div>
+      <div class="label">{{ t('st_In Progress') }}</div>
     </div>
     <div class="stat-card green fade-in" style="animation-delay:.35s;">
       <div class="num">{{ stats.resolved }}</div>
-      <div class="label">Resolved</div>
+      <div class="label">{{ t('st_Resolved') }}</div>
     </div>
     <div class="stat-card red fade-in" style="animation-delay:.45s;">
       <div class="num">{{ stats.high_risk_open }}</div>
-      <div class="label">High-risk open</div>
+      <div class="label">{{ t('ad_highrisk') }}</div>
     </div>
     <div class="stat-card orange fade-in" style="animation-delay:.5s;">
       <div class="num">{{ stats.overdue_open }}</div>
-      <div class="label">Overdue (SLA)</div>
+      <div class="label">{{ t('ad_overdue_sla') }}</div>
     </div>
   </div>
 
@@ -206,73 +187,64 @@
     <div class="stat-card fade-in">
       <div class="num">
         {% if top_issue %}
-          {{ top_issue[0][0] }}
+          {{ tv('cat', top_issue[0][0]) }}
         {% else %}
-          N/A
+          {{ t('n_a') }}
         {% endif %}
       </div>
-      <div class="label">🔥 Top Issue</div>
+      <div class="label">🔥 {{ t('ad_top_issue') }}</div>
     </div>
 
     <div class="stat-card fade-in">
       <div class="num">{{ today_count }}</div>
-      <div class="label">📈 Today's Complaints</div>
+      <div class="label">📈 {{ t('ad_today') }}</div>
     </div>
 
     <div class="stat-card fade-in">
       <div class="num">{{ critical_count }}</div>
-      <div class="label">🚨 Critical Complaints</div>
+      <div class="label">🚨 {{ t('ad_critical') }}</div>
     </div>
 
     <div class="stat-card fade-in">
       <div class="num">
         {% if top_department %}
-          {{ top_department[0][0] }}
+          {{ tv('dept', top_department[0][0]) }}
         {% else %}
-          N/A
+          {{ t('n_a') }}
         {% endif %}
       </div>
-      <div class="label">🏆 Top Department</div>
+      <div class="label">🏆 {{ t('ad_top_dept') }}</div>
     </div>
 
   </div>
   <div class="card fade-in" style="margin:25px 0;padding:20px;">
-
-    <h3>📊 Issue Distribution</h3>
+    <h3>📊 {{ t('ad_dist') }}</h3>
 
     <div class="chart-controls">
-
-        <button type="button" class="chart-type-btn active"
-                data-chart-type="pie">Pie</button>
-
-        <button type="button" class="chart-type-btn"
-                data-chart-type="bar">Bar</button>
-
-        <button type="button" class="chart-type-btn"
-                data-chart-type="doughnut">Doughnut</button>
-
+      <button type="button" class="chart-type-btn active" data-chart-type="pie">{{ t('ad_pie') }}</button>
+      <button type="button" class="chart-type-btn" data-chart-type="bar">{{ t('ad_bar') }}</button>
+      <button type="button" class="chart-type-btn" data-chart-type="doughnut">{{ t('ad_doughnut') }}</button>
     </div>
 
     <canvas id="issueChart" height="120"></canvas>
-
 </div>
 
 <div class="sort-row fade-in" style="animation-delay:.5s;">
     <a href="/dashboard?sort=priority{% if request.args.get('search') %}&search={{ request.args.get('search') }}{% endif %}"
        class="sort-link {% if sort_mode == 'priority' %}active{% endif %}">
-       ⚑ Highest Priority
+       ⚑ {{ t('ad_sort_pri') }}
     </a>
 
     <a href="/dashboard?sort=recent{% if request.args.get('search') %}&search={{ request.args.get('search') }}{% endif %}"
        class="sort-link {% if sort_mode != 'priority' %}active{% endif %}">
-       🕒 Recent
+       🕒 {{ t('ad_sort_recent') }}
     </a>
 </div>
 
   <div class="search-row fade-in" style="animation-delay:.4s;">
     <form action="/dashboard" method="GET">
-      <input type="text" name="search" placeholder="Search by ID, type, or description…" value="{{ request.args.get('search', '') }}">
-      <button type="submit">Search</button>
+      <input type="text" name="search" placeholder="{{ t('ad_search_ph') }}" value="{{ request.args.get('search', '') }}">
+      <button type="submit">{{ t('ad_search') }}</button>
     </form>
   </div>
 
@@ -281,20 +253,20 @@
     <div class="complaint-card urg-{{ (c.urgency or 'medium')|lower }}{% if c.is_overdue %} is-overdue{% endif %} fade-in" style="animation-delay:{{ (loop.index0 * 0.04) + 0.55 }}s;">
       <div class="c-top">
         <div>
-          <span class="c-id">TICKET #{{ c.id }}</span>
-          <div class="c-type">{{ c.issue_type }}</div>
+          <span class="c-id">{{ t('ticket')|upper }} #{{ c.id }}</span>
+          <div class="c-type">{{ tv('cat', c.issue_type) }}</div>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
           {% if c.is_overdue %}
-            <span class="badge overdue"><span class="badge-dot"></span>Overdue</span>
+            <span class="badge overdue"><span class="badge-dot"></span>{{ t('ad_overdue') }}</span>
           {% endif %}
-          <span class="badge urg-{{ (c.urgency or 'medium')|lower }}"><span class="badge-dot"></span>{{ c.urgency or 'Medium' }}</span>
+          <span class="badge urg-{{ (c.urgency or 'medium')|lower }}"><span class="badge-dot"></span>{{ tv('urg', c.urgency or 'Medium') }}</span>
           {% if c.status == 'Resolved' %}
-            <span class="badge resolved"><span class="badge-dot"></span>Resolved</span>
+            <span class="badge resolved"><span class="badge-dot"></span>{{ t('st_Resolved') }}</span>
           {% elif c.status == 'In Progress' %}
-            <span class="badge inprogress"><span class="badge-dot"></span>In progress</span>
+            <span class="badge inprogress"><span class="badge-dot"></span>{{ t('st_In Progress') }}</span>
           {% else %}
-            <span class="badge pending"><span class="badge-dot"></span>Pending</span>
+            <span class="badge pending"><span class="badge-dot"></span>{{ t('st_Pending') }}</span>
           {% endif %}
         </div>
       </div>
@@ -302,146 +274,109 @@
       <p class="c-desc">{{ c.description }}</p>
 
       <div class="c-meta">
-        <span><b>Citizen:</b> {{ c.first_name }} ({{ c.email }})</span>
-        <span><b>Department:</b> {{ c.department or 'Unassigned' }}</span>
+        <span><b>{{ t('ad_citizen') }}:</b> {{ c.first_name }} ({{ c.email }})</span>
+        <span><b>{{ t('dept_label') }}:</b> {{ tv('dept', c.department) if c.department else t('tr_unassigned') }}</span>
         <span class="mono">{{ c.created_at }}</span>
         {% if c.image %}
-          <a href="{% if c.image.startswith('http') %}{{ c.image }}{% else %}/static/uploads/{{ c.image }}{% endif %}" target="_blank" class="link-btn">View photo</a>
+          <a href="{% if c.image.startswith('http') %}{{ c.image }}{% else %}/static/uploads/{{ c.image }}{% endif %}" target="_blank" class="link-btn">{{ t('view_photo') }}</a>
           {% if c.photo_authenticity == 'location_mismatch' %}
-            <span class="link-btn" style="color:#C1443A;" title="This photo's embedded GPS location doesn't match where the citizen said the issue is.">⚠️ Location mismatch</span>
+            <span class="link-btn" style="color:#C1443A;" title="{{ t('ad_mismatch_tip') }}">⚠️ {{ t('ad_mismatch') }}</span>
           {% elif c.photo_authenticity == 'old_photo' %}
-            <span class="link-btn" style="color:#C1443A;" title="This photo's timestamp is older than 7 days.">⚠️ Old photo</span>
+            <span class="link-btn" style="color:#C1443A;" title="{{ t('ad_old_tip') }}">⚠️ {{ t('ad_old') }}</span>
           {% endif %}
         {% endif %}
-        <a href="/view_map" class="link-btn">View on map</a>
+        <a href="/view_map" class="link-btn">{{ t('ad_view_map') }}</a>
       </div>
 
       <div class="c-actions">
         {% if c.acknowledged %}
-          <span class="badge resolved"><span class="badge-dot"></span>Acknowledged</span>
+          <span class="badge resolved"><span class="badge-dot"></span>{{ t('ad_ack_done') }}</span>
         {% else %}
           <form action="/acknowledge/{{ c.id }}" method="POST">
-            <button type="submit" class="mini-btn">Acknowledge</button>
+            <button type="submit" class="mini-btn">{{ t('ad_ack') }}</button>
           </form>
         {% endif %}
 
         <form action="/update_status/{{ c.id }}" method="POST" enctype="multipart/form-data">
-          <select name="department" class="searchable-select">
-    <option value="" disabled {% if not c.department %}selected{% endif %}>— Unassigned —</option>
-    <option value="Sanitation Department" {% if c.department == 'Sanitation Department' %}selected{% endif %}>Sanitation Department</option>
-    <option value="Roads & Infrastructure" {% if c.department == 'Roads & Infrastructure' %}selected{% endif %}>Roads & Infrastructure</option>
-    <option value="Water Board" {% if c.department == 'Water Board' %}selected{% endif %}>Water Board</option>
-    <option value="Electricity Department" {% if c.department == 'Electricity Department' %}selected{% endif %}>Electricity Department</option>
-    <option value="General Administration" {% if c.department == 'General Administration' %}selected{% endif %}>General Administration</option>
-</select>
-          <input class="file-btn" type="file" name="resolution_image" title="Attach resolution proof (only used if marking Resolved)">
-          <button type="submit" class="mini-btn amber">Update status</button>
+          <select name="status">
+            <option value="Pending" {% if c.status == 'Pending' %}selected{% endif %}>{{ t('st_Pending') }}</option>
+            <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>{{ t('st_In Progress') }}</option>
+            <option value="Resolved" {% if c.status == 'Resolved' %}selected{% endif %}>{{ t('st_Resolved') }}</option>
+          </select>
+          <input class="file-btn" type="file" name="resolution_image" title="{{ t('ad_proof_tip') }}">
+          <button type="submit" class="mini-btn amber">{{ t('ad_update') }}</button>
         </form>
 
         <form action="/assign_department/{{ c.id }}" method="POST">
           <select name="department" class="searchable-select">
-            <option value="" {% if not c.department %}selected{% endif %} disabled>— Unassigned —</option>
-            <option value="Sanitation Department" {% if c.department == 'Sanitation Department' %}selected{% endif %}>Sanitation Department</option>
-            <option value="Roads & Infrastructure" {% if c.department == 'Roads & Infrastructure' %}selected{% endif %}>Roads & Infrastructure</option>
-            <option value="Water Board" {% if c.department == 'Water Board' %}selected{% endif %}>Water Board</option>
-            <option value="Electricity Department" {% if c.department == 'Electricity Department' %}selected{% endif %}>Electricity Department</option>
-            <option value="General Administration" {% if c.department == 'General Administration' %}selected{% endif %}>General Administration</option>
+            <option value="" {% if not c.department %}selected{% endif %} disabled>{{ t('ad_unassigned_opt') }}</option>
+            <option value="Sanitation Department" {% if c.department == 'Sanitation Department' %}selected{% endif %}>{{ t('dept_Sanitation Department') }}</option>
+            <option value="Roads & Infrastructure" {% if c.department == 'Roads & Infrastructure' %}selected{% endif %}>{{ t('dept_Roads & Infrastructure') }}</option>
+            <option value="Water Board" {% if c.department == 'Water Board' %}selected{% endif %}>{{ t('dept_Water Board') }}</option>
+            <option value="Electricity Department" {% if c.department == 'Electricity Department' %}selected{% endif %}>{{ t('dept_Electricity Department') }}</option>
+            <option value="General Administration" {% if c.department == 'General Administration' %}selected{% endif %}>{{ t('dept_General Administration') }}</option>
           </select>
-          <button type="submit" class="mini-btn">Reassign</button>
+          <button type="submit" class="mini-btn">{{ t('ad_reassign') }}</button>
         </form>
 
         <form action="/set_priority/{{ c.id }}" method="POST">
           <select name="urgency">
             {% for level in ['Low', 'Medium', 'High', 'Critical'] %}
-              <option value="{{ level }}" {% if c.urgency == level %}selected{% endif %}>{{ level }}</option>
+              <option value="{{ level }}" {% if c.urgency == level %}selected{% endif %}>{{ t('urg_' ~ level) }}</option>
             {% endfor %}
           </select>
-          <button type="submit" class="mini-btn">Set priority</button>
+          <button type="submit" class="mini-btn">{{ t('ad_set_pri') }}</button>
         </form>
 
-        <a href="/delete_admin_issue/{{ c.id }}" class="link-btn danger" onclick="return confirm('Delete this complaint permanently?');">Delete</a>
+        <a href="/delete_admin_issue/{{ c.id }}" class="link-btn danger" onclick='return confirm({{ t("ad_confirm_delete")|tojson }});'>{{ t('delete') }}</a>
       </div>
     </div>
     {% endfor %}
   {% else %}
-    <div class="empty-state fade-in">No complaints found.</div>
+    <div class="empty-state fade-in">{{ t('ad_none') }}</div>
   {% endif %}
 </div>
 <script>
-
-
-<!-- Chart Type Switching -->
-<script>
 document.addEventListener("DOMContentLoaded", function () {
-
   const issueData = {};
+  {% for c in complaints %}
+  issueData[{{ tv('cat', c.issue_type)|tojson }}] = (issueData[{{ tv('cat', c.issue_type)|tojson }}] || 0) + 1;
+  {% endfor %}
 
-    {% for c in complaints %}
-      issueData["{{ c.issue_type }}"] =
-      (issueData["{{ c.issue_type }}"] || 0) + 1;
-    {% endfor %}
+  const issueChart = new Chart(document.getElementById("issueChart"), {
+    type: "pie",
+    data: {
+      labels: Object.keys(issueData),
+      datasets: [{ label: {{ t('ad_chart_label')|tojson }}, data: Object.values(issueData) }]
+    },
+    options: { responsive: true, maintainAspectRatio: true }
+  });
 
-    const ctx = document.getElementById("issueChart");
-
-    const issueChart = new Chart(ctx, {
-        type: "pie",
-
-        data: {
-            labels: Object.keys(issueData),
-
-            datasets: [{
-                label: "Number of Issues",
-                data: Object.values(issueData)
-            }]
-        },
-
-        options: {
-            responsive: true,
-            maintainAspectRatio: true
-        }
+  document.querySelectorAll(".chart-type-btn").forEach(function (button) {
+    button.addEventListener("click", function () {
+      issueChart.config.type = this.dataset.chartType;
+      issueChart.update();
+      document.querySelectorAll(".chart-type-btn").forEach(function (b) { b.classList.remove("active"); });
+      this.classList.add("active");
     });
-
-    document.querySelectorAll(".chart-type-btn").forEach(function (button) {
-
-        button.addEventListener("click", function () {
-
-            const selectedType = this.dataset.chartType;
-
-            issueChart.config.type = selectedType;
-            issueChart.update();
-
-            document.querySelectorAll(".chart-type-btn").forEach(function (btn) {
-                btn.classList.remove("active");
-            });
-
-            this.classList.add("active");
-
-        });
-
-    });
-
+  });
 });
 </script>
 
 <!-- Tom Select JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-
-    document.querySelectorAll(".searchable-select").forEach(function (dropdown) {
-
-        new TomSelect(dropdown, {
-            create: false,
-            searchField: ["text"],
-            maxOptions: 100,
-            closeAfterSelect: true,
-            allowEmptyOption: true,
-            placeholder: "Search and select..."
-        });
-
+  document.querySelectorAll(".searchable-select").forEach(function (dropdown) {
+    new TomSelect(dropdown, {
+      create: false,
+      searchField: ["text"],
+      maxOptions: 100,
+      closeAfterSelect: true,
+      allowEmptyOption: true,
+      placeholder: {{ t('ad_ts_ph')|tojson }}
     });
-
+  });
 });
 </script>
 

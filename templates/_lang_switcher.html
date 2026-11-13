@@ -1,0 +1,6 @@
+{# Small floating language pill, shown on every page. Pages can set sw_right = true to dock it bottom-right. #}
+<div class="lang-switch" style="position:fixed; {% if sw_right %}right:14px; bottom:42px;{% else %}left:16px; bottom:16px;{% endif %} z-index:9999; display:flex; align-items:center; gap:4px; padding:5px 6px; border-radius:100px; background:#0B2545; border:1px solid rgba(237,239,232,.35); box-shadow:0 6px 18px rgba(0,0,0,.3); font:600 13px/1 'IBM Plex Sans','Noto Sans Devanagari',sans-serif;">
+  <a href="/set_language/en" style="text-decoration:none; padding:7px 11px; border-radius:100px; {% if lang == 'en' %}background:#F2A93B; color:#5C3A08;{% else %}color:#EDEFE8;{% endif %}">English</a>
+  <a href="/set_language/hi" style="text-decoration:none; padding:7px 11px; border-radius:100px; {% if lang == 'hi' %}background:#F2A93B; color:#5C3A08;{% else %}color:#EDEFE8;{% endif %}">हिन्दी</a>
+  <a href="/settings" title="{{ t('nav_settings') }}" aria-label="{{ t('nav_settings') }}" style="text-decoration:none; padding:7px 9px; color:#EDEFE8; opacity:.8;">⚙</a>
+</div>

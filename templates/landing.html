@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Civic Issue Mapper — Report it. Track it. Get it fixed.</title>
+<title>{{ t('ld_title') }}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#0B2545;
@@ -314,9 +314,12 @@
     .nav-links a.text-link{display:none;}
     .mascot{width:42px; height:42px; right:16px; bottom:16px;}
   }
+  /* Hindi: Devanagari font + no letter-spacing (it breaks Devanagari letter joins) */
+  html[lang="hi"] *{font-family:'Noto Sans Devanagari','IBM Plex Sans',sans-serif !important; letter-spacing:normal !important;}
 </style>
 </head>
 <body>
+{% include '_lang_switcher.html' %}
  
 <div class="progress-bar" id="progressBar"></div>
 <div class="side-smoke-wrap" id="sideSmoke"></div>
@@ -324,11 +327,11 @@
 <nav class="nav">
   <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
   <div class="nav-links">
-    <a href="#how" class="text-link">How it works</a>
-    <a href="#track" class="text-link">Track a complaint</a>
-    <a href="/transparency" class="text-link">Transparency</a>
-    <a href="/login" class="btn btn-ghost">Log in</a>
-    <a href="/register" class="btn btn-amber">Register</a>
+    <a href="#how" class="text-link">{{ t('nav_how') }}</a>
+    <a href="#track" class="text-link">{{ t('nav_track') }}</a>
+    <a href="/transparency" class="text-link">{{ t('nav_transparency') }}</a>
+    <a href="/login" class="btn btn-ghost">{{ t('nav_login') }}</a>
+    <a href="/register" class="btn btn-amber">{{ t('nav_register') }}</a>
   </div>
 </nav>
  
@@ -343,23 +346,23 @@
     <div class="smoke s5"></div>
   </div>
   <div>
-    <span class="eyebrow">Municipal complaint reporting</span>
-    <h1>Report it.<br>Track it.<br><span class="grad">Get it fixed.</span></h1>
-    <p class="lead">Snap a photo, drop a pin, and file a civic complaint in under a minute. Every report gets a ticket number your local departments can act on — and you can follow along until it's resolved.</p>
+    <span class="eyebrow">{{ t('ld_eyebrow') }}</span>
+    <h1>{{ t('ld_h1a') }}<br>{{ t('ld_h1b') }}<br><span class="grad">{{ t('ld_h1c') }}</span></h1>
+    <p class="lead">{{ t('ld_lead') }}</p>
     <div class="hero-ctas">
-      <a href="/register" class="btn btn-amber">Register to report an issue</a>
-      <a href="/login" class="btn btn-ghost">Log in</a>
+      <a href="/register" class="btn btn-amber">{{ t('ld_cta_reg') }}</a>
+      <a href="/login" class="btn btn-ghost">{{ t('nav_login') }}</a>
     </div>
     <div class="hero-facts">
-      <div><b>4</b>issue categories</div>
-      <div><b>3</b>tracked ticket stages</div>
-      <div><b>0</b>login needed to track</div>
+      <div><b>4</b>{{ t('ld_f1') }}</div>
+      <div><b>3</b>{{ t('ld_f2') }}</div>
+      <div><b>0</b>{{ t('ld_f3') }}</div>
     </div>
     <div class="track-box" id="track">
-      <label>Already filed a complaint?</label>
+      <label>{{ t('ld_track_q') }}</label>
       <form class="track-form" action="/track_status" method="POST">
-        <input type="text" name="complaint_id" placeholder="Enter your complaint ID, e.g. 1042" required>
-        <button type="submit">Track status</button>
+        <input type="text" name="complaint_id" placeholder="{{ t('ts_placeholder') }}" required>
+        <button type="submit">{{ t('ts_landing_btn') }}</button>
       </form>
     </div>
   </div>
@@ -388,96 +391,96 @@
  
 <div class="marquee-wrap">
   <div class="marquee">
-    <span>GARBAGE &amp; DUMPING</span><span>POTHOLES &amp; ROADS</span><span>WATER LEAKAGE</span><span>STREET LIGHTS</span><span>PENDING</span><span>IN PROGRESS</span><span>RESOLVED</span>
-    <span>GARBAGE &amp; DUMPING</span><span>POTHOLES &amp; ROADS</span><span>WATER LEAKAGE</span><span>STREET LIGHTS</span><span>PENDING</span><span>IN PROGRESS</span><span>RESOLVED</span>
+    <span>{{ t('catl_Garbage')|upper }}</span><span>{{ t('catl_Pothole')|upper }}</span><span>{{ t('catl_Water')|upper }}</span><span>{{ t('catl_Street')|upper }}</span><span>{{ t('st_Pending')|upper }}</span><span>{{ t('st_In Progress')|upper }}</span><span>{{ t('st_Resolved')|upper }}</span>
+    <span>{{ t('catl_Garbage')|upper }}</span><span>{{ t('catl_Pothole')|upper }}</span><span>{{ t('catl_Water')|upper }}</span><span>{{ t('catl_Street')|upper }}</span><span>{{ t('st_Pending')|upper }}</span><span>{{ t('st_In Progress')|upper }}</span><span>{{ t('st_Resolved')|upper }}</span>
   </div>
 </div>
  
 <section>
   <div class="section-head reveal">
-    <span class="kicker mono">What you can report</span>
-    <h2>Four categories. One tap to file.</h2>
-    <p>Photo and GPS location get attached automatically, so departments know exactly where and what they're dealing with.</p>
+    <span class="kicker mono">{{ t('ld_k_report') }}</span>
+    <h2>{{ t('ld_h_report') }}</h2>
+    <p>{{ t('ld_p_report') }}</p>
   </div>
   <div class="cat-grid reveal-stagger">
     <div class="cat-card r-child pop">
       <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 12v4M14 12v4"/></svg>
-      <h3>Garbage &amp; dumping</h3>
-      <p>Overflowing bins, illegal dumping, missed collection.</p>
+      <h3>{{ t('catl_Garbage') }}</h3>
+      <p>{{ t('ld_c1') }}</p>
     </div>
     <div class="cat-card r-child pop">
       <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="15" rx="7" ry="3"/><path d="M5 15v-1c0-3 3-7 7-7s7 4 7 7v1"/></svg>
-      <h3>Potholes &amp; roads</h3>
-      <p>Broken pavement, cracked roads, damaged footpaths.</p>
+      <h3>{{ t('catl_Pothole') }}</h3>
+      <p>{{ t('ld_c2') }}</p>
     </div>
     <div class="cat-card r-child pop">
       <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>
-      <h3>Water leakage</h3>
-      <p>Burst pipes, leaking mains, standing water on streets.</p>
+      <h3>{{ t('catl_Water') }}</h3>
+      <p>{{ t('ld_c3') }}</p>
     </div>
     <div class="cat-card r-child pop">
       <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v6"/><circle cx="12" cy="12" r="3.2"/><path d="M12 15v6M9 21h6"/></svg>
-      <h3>Street lights</h3>
-      <p>Outages, flickering lamps, poles down or damaged.</p>
+      <h3>{{ t('catl_Street') }}</h3>
+      <p>{{ t('ld_c4') }}</p>
     </div>
   </div>
 </section>
  
 <section id="how">
   <div class="section-head reveal">
-    <span class="kicker mono">How it works</span>
-    <h2>From report to resolved, in four steps.</h2>
-    <p>No black box. Here's exactly what happens after you hit submit.</p>
+    <span class="kicker mono">{{ t('nav_how') }}</span>
+    <h2>{{ t('ld_h_how') }}</h2>
+    <p>{{ t('ld_p_how') }}</p>
   </div>
   <div class="flow-grid">
-    <div class="flow-cell"><div class="flow-step fly-left" data-dir="left"><span class="num mono">STEP 01</span><h3>You report it</h3><p>Photo, category, and GPS location, filed in under a minute.</p></div></div>
-    <div class="flow-cell"><div class="flow-step fly-up" data-dir="up"><span class="num mono">STEP 02</span><h3>It's routed</h3><p>Your ticket is assigned to the department responsible for it.</p></div></div>
-    <div class="flow-cell"><div class="flow-step fly-up" data-dir="up"><span class="num mono">STEP 03</span><h3>You're notified</h3><p>Status updates land automatically as work progresses.</p></div></div>
-    <div class="flow-cell"><div class="flow-step fly-right" data-dir="right"><span class="num mono">STEP 04</span><h3>It's resolved</h3><p>Proof-of-resolution photo attached, ticket closed, done.</p></div></div>
+    <div class="flow-cell"><div class="flow-step fly-left" data-dir="left"><span class="num mono">{{ t('step')|upper }} 01</span><h3>{{ t('ld_s1h') }}</h3><p>{{ t('ld_s1p') }}</p></div></div>
+    <div class="flow-cell"><div class="flow-step fly-up" data-dir="up"><span class="num mono">{{ t('step')|upper }} 02</span><h3>{{ t('ld_s2h') }}</h3><p>{{ t('ld_s2p') }}</p></div></div>
+    <div class="flow-cell"><div class="flow-step fly-up" data-dir="up"><span class="num mono">{{ t('step')|upper }} 03</span><h3>{{ t('ld_s3h') }}</h3><p>{{ t('ld_s3p') }}</p></div></div>
+    <div class="flow-cell"><div class="flow-step fly-right" data-dir="right"><span class="num mono">{{ t('step')|upper }} 04</span><h3>{{ t('ld_s4h') }}</h3><p>{{ t('ld_s4p') }}</p></div></div>
   </div>
 </section>
  
 <section>
   <div class="section-head reveal">
-    <span class="kicker mono">Every ticket's status</span>
-    <h2>A status you can trust, not a black box.</h2>
-    <p>Once you file, your ticket moves through exactly three states — and you're notified the moment it changes.</p>
+    <span class="kicker mono">{{ t('ld_k_status') }}</span>
+    <h2>{{ t('ld_h_status') }}</h2>
+    <p>{{ t('ld_p_status') }}</p>
   </div>
   <div class="lifecycle-strip">
-    <div class="life-stage life-pending"><span class="mono">STATE 01</span><span class="name">Pending</span></div>
+    <div class="life-stage life-pending"><span class="mono">{{ t('state')|upper }} 01</span><span class="name">{{ t('st_Pending') }}</span></div>
     <span class="life-arrow">&rarr;</span>
-    <div class="life-stage life-progress"><span class="mono">STATE 02</span><span class="name">In progress</span></div>
+    <div class="life-stage life-progress"><span class="mono">{{ t('state')|upper }} 02</span><span class="name">{{ t('st_In Progress') }}</span></div>
     <span class="life-arrow">&rarr;</span>
-    <div class="life-stage life-resolved"><span class="mono">STATE 03</span><span class="name">Resolved</span></div>
+    <div class="life-stage life-resolved"><span class="mono">{{ t('state')|upper }} 03</span><span class="name">{{ t('st_Resolved') }}</span></div>
   </div>
 </section>
  
 <section class="facts reveal-stagger">
-  <div class="fact r-child"><div class="num">4</div><div class="label">ISSUE CATEGORIES</div></div>
-  <div class="fact r-child"><div class="num">3</div><div class="label">TICKET STATES</div></div>
-  <div class="fact r-child"><div class="num">0</div><div class="label">LOGIN NEEDED TO TRACK</div></div>
-  <div class="fact r-child"><div class="num">MIT</div><div class="label">OPEN SOURCE LICENSE</div></div>
+  <div class="fact r-child"><div class="num">4</div><div class="label">{{ t('ld_f1')|upper }}</div></div>
+  <div class="fact r-child"><div class="num">3</div><div class="label">{{ t('ld_g2')|upper }}</div></div>
+  <div class="fact r-child"><div class="num">0</div><div class="label">{{ t('ld_f3')|upper }}</div></div>
+  <div class="fact r-child"><div class="num">MIT</div><div class="label">{{ t('ld_g4')|upper }}</div></div>
 </section>
  
 <section class="credibility">
   <div class="reveal">
-    <span class="kicker mono" style="color:var(--amber);">Why this exists</span>
-    <h2>Built for cities, run by citizens.</h2>
-    <p>Civic Issue Mapper gives residents a direct, trackable line to the departments responsible for fixing what's broken — and gives departments a clear queue instead of scattered calls and complaints.</p>
+    <span class="kicker mono" style="color:var(--amber);">{{ t('ld_k_why') }}</span>
+    <h2>{{ t('ld_h_why') }}</h2>
+    <p>{{ t('ld_p_why') }}</p>
   </div>
   <div class="sdg-badge reveal">
     <span class="num">SDG 11</span>
-    Aligned with the UN Sustainable Development Goal for sustainable cities and communities.
+    {{ t('ld_sdg') }}
   </div>
 </section>
  
 <section class="final-cta">
   <div class="reveal">
-    <h2>Your street. Your report. Your city, fixed.</h2>
-    <p>It takes less time to file a complaint than to complain about it.</p>
+    <h2>{{ t('ld_h_cta') }}</h2>
+    <p>{{ t('ld_p_cta') }}</p>
     <div class="hero-ctas">
-      <a href="/register" class="btn btn-navy">Create an account</a>
-      <a href="/login" class="btn btn-ghost" style="border-color:var(--navy); color:var(--navy);">Log in</a>
+      <a href="/register" class="btn btn-navy">{{ t('create_account') }}</a>
+      <a href="/login" class="btn btn-ghost" style="border-color:var(--navy); color:var(--navy);">{{ t('nav_login') }}</a>
     </div>
   </div>
 </section>
@@ -485,13 +488,13 @@
 <footer>
   <span>&copy; 2026 Civic Issue Mapper &middot; MIT Licensed</span>
   <div class="footer-links">
-    <a href="#track">Track a complaint</a>
-    <a href="/admin">Admin login</a>
+    <a href="#track">{{ t('nav_track') }}</a>
+    <a href="/admin">{{ t('al_title') }}</a>
     <a href="https://github.com/Anushka190921/ai-civic-issue-mapper" target="_blank" rel="noopener">GitHub</a>
   </div>
 </footer>
  
-<div class="mascot-bubble" id="mascotBubble">Need a hand? 👋</div>
+<div class="mascot-bubble" id="mascotBubble">{{ t('ld_hi') }}</div>
 <svg class="mascot" id="mascot" viewBox="0 0 56 56" fill="none">
   <defs>
     <radialGradient id="mascotG" cx="35%" cy="30%" r="70%">
@@ -627,11 +630,11 @@
   const mascot = document.getElementById('mascot');
   const bubble = document.getElementById('mascotBubble');
   const tips = [
-    "No login needed to track a ticket!",
-    "Photo + GPS = faster resolution",
-    "3 statuses: pending → progress → resolved",
-    "Report it, don't just complain about it",
-    "Every ticket gets its own ID"
+    {{ t('ld_tip1')|tojson }},
+    {{ t('ld_tip2')|tojson }},
+    {{ t('ld_tip3')|tojson }},
+    {{ t('ld_tip4')|tojson }},
+    {{ t('ld_tip5')|tojson }}
   ];
   let bubbleTimeout;
   mascot.addEventListener('click', ()=>{

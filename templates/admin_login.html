@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Login — Civic Issue Mapper</title>
+<title>{{ t('al_title') }} — Civic Issue Mapper</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --ink:#10151B;
@@ -75,9 +75,12 @@
 
   .back-link{display:block; text-align:center; margin-top:22px; font-size:12.5px; color:rgba(237,239,232,.5); text-decoration:none;}
   .back-link:hover{color:var(--paper);}
+  /* Hindi: Devanagari font + no letter-spacing (it breaks Devanagari letter joins) */
+  html[lang="hi"] *{font-family:'Noto Sans Devanagari','IBM Plex Sans',sans-serif !important; letter-spacing:normal !important;}
 </style>
 </head>
 <body>
+{% include '_lang_switcher.html' %}
 
 <div class="glow"></div>
 <div class="smoke s1"></div>
@@ -85,9 +88,9 @@
 
 <div class="panel">
   <a href="/" class="brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
-  <span class="eyebrow">Restricted access</span>
-  <h1>Admin Login</h1>
-  <p class="sub">Sign in to manage complaints and departments.</p>
+  <span class="eyebrow">{{ t('al_eyebrow') }}</span>
+  <h1>{{ t('al_title') }}</h1>
+  <p class="sub">{{ t('al_sub') }}</p>
 
   {% if error %}
   <div class="error-box">{{ error }}</div>
@@ -95,17 +98,17 @@
 
   <form action="/admin" method="POST">
     <div class="field">
-      <label for="admin_username">Username</label>
+      <label for="admin_username">{{ t('al_user') }}</label>
       <input type="text" id="admin_username" name="admin_username" placeholder="admin" required>
     </div>
     <div class="field">
-      <label for="admin_password">Password</label>
+      <label for="admin_password">{{ t('password') }}</label>
       <input type="password" id="admin_password" name="admin_password" placeholder="••••••••" required>
     </div>
-    <button type="submit" class="btn-primary">Log in</button>
+    <button type="submit" class="btn-primary">{{ t('nav_login') }}</button>
   </form>
 
-  <a href="/" class="back-link">&larr; Back to site</a>
+  <a href="/" class="back-link">&larr; {{ t('back_site') }}</a>
 </div>
 
 <script>

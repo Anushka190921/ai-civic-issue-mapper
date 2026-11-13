@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Transparency — Civic Issue Mapper</title>
+<title>{{ t('nav_transparency') }} — Civic Issue Mapper</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --paper-dim:#E1E4DA; --ink:#10151B;
@@ -93,24 +93,27 @@
     .nav-links a.text-link{display:none;}
     .cat-name{width:90px;}
   }
+  /* Hindi: Devanagari font + no letter-spacing (it breaks Devanagari letter joins) */
+  html[lang="hi"] *{font-family:'Noto Sans Devanagari','IBM Plex Sans',sans-serif !important; letter-spacing:normal !important;}
 </style>
 </head>
 <body>
+{% include '_lang_switcher.html' %}
 
 <nav class="nav">
   <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
   <div class="nav-links">
-    <a href="/track_status" class="text-link">Track a complaint</a>
-    <a href="/login" class="btn btn-ghost">Log in</a>
-    <a href="/register" class="btn btn-amber">Register</a>
+    <a href="/track_status" class="text-link">{{ t('nav_track') }}</a>
+    <a href="/login" class="btn btn-ghost">{{ t('nav_login') }}</a>
+    <a href="/register" class="btn btn-amber">{{ t('nav_register') }}</a>
   </div>
 </nav>
 
 <header class="page-head">
   <div class="head-glow"></div>
-  <span class="eyebrow">Public data</span>
-  <h1>What's been reported,<br>and how fast it's fixed.</h1>
-  <p>A live, unfiltered look at civic issues in your area — no login required. This is the same data admins see, just without personal details.</p>
+  <span class="eyebrow">{{ t('tr_eyebrow') }}</span>
+  <h1>{{ t('tr_h1a') }}<br>{{ t('tr_h1b') }}</h1>
+  <p>{{ t('tr_p') }}</p>
 </header>
 
 <div class="wrap">
@@ -118,64 +121,64 @@
   <div class="stat-grid">
     <div class="stat-card fade-in" style="animation-delay:.05s;">
       <div class="num">{{ stats.total_reported }}</div>
-      <div class="label">Reported</div>
+      <div class="label">{{ t('tr_reported') }}</div>
     </div>
     <div class="stat-card green fade-in" style="animation-delay:.15s;">
       <div class="num">{{ stats.total_resolved }}</div>
-      <div class="label">Resolved</div>
+      <div class="label">{{ t('resolved') }}</div>
     </div>
     <div class="stat-card amber fade-in" style="animation-delay:.25s;">
       <div class="num">{{ stats.resolution_rate }}%</div>
-      <div class="label">Resolution rate</div>
+      <div class="label">{{ t('tr_rate') }}</div>
     </div>
     <div class="stat-card steel fade-in" style="animation-delay:.35s;">
-      <div class="num">{{ stats.avg_resolution_days }}d</div>
-      <div class="label">Avg. time to fix</div>
+      <div class="num">{{ stats.avg_resolution_days }}{{ t('day_short') }}</div>
+      <div class="label">{{ t('tr_avg') }}</div>
     </div>
     <div class="stat-card orange fade-in" style="animation-delay:.45s;">
       <div class="num">{{ stats.sla_compliance_rate }}%</div>
-      <div class="label">Fixed on time (SLA)</div>
+      <div class="label">{{ t('tr_sla') }}</div>
     </div>
   </div>
 
   <div class="section-block fade-in" style="animation-delay:.4s;">
-    <span class="block-label">// By category</span>
+    <span class="block-label">{{ t('tr_cat') }}</span>
     {% for cat in stats.by_category %}
     <div class="cat-row">
-      <div class="cat-name">{{ cat.name }}</div>
+      <div class="cat-name">{{ tv('cat', cat.name) }}</div>
       <div class="cat-bar-track">
         <div class="cat-bar-fill" style="width:{{ (cat.count / stats.total_reported * 100) if stats.total_reported else 0 }}%;"></div>
       </div>
       <div class="cat-count">{{ cat.count }}</div>
     </div>
     {% else %}
-    <p class="empty-note">No issues reported yet.</p>
+    <p class="empty-note">{{ t('tr_none') }}</p>
     {% endfor %}
   </div>
 
   <div class="section-block fade-in" style="animation-delay:.45s;">
-    <span class="block-label">// By urgency</span>
+    <span class="block-label">{{ t('tr_urg') }}</span>
     <div class="urg-badges">
-      <span class="urg-badge low"><span class="d"></span>Low: {{ stats.by_urgency.low }}</span>
-      <span class="urg-badge medium"><span class="d"></span>Medium: {{ stats.by_urgency.medium }}</span>
-      <span class="urg-badge high"><span class="d"></span>High: {{ stats.by_urgency.high }}</span>
-      <span class="urg-badge critical"><span class="d"></span>Critical: {{ stats.by_urgency.critical }}</span>
+      <span class="urg-badge low"><span class="d"></span>{{ t('urg_Low') }}: {{ stats.by_urgency.low }}</span>
+      <span class="urg-badge medium"><span class="d"></span>{{ t('urg_Medium') }}: {{ stats.by_urgency.medium }}</span>
+      <span class="urg-badge high"><span class="d"></span>{{ t('urg_High') }}: {{ stats.by_urgency.high }}</span>
+      <span class="urg-badge critical"><span class="d"></span>{{ t('urg_Critical') }}: {{ stats.by_urgency.critical }}</span>
     </div>
   </div>
 
   <div class="section-block fade-in" style="animation-delay:.5s;">
-    <span class="block-label">// Recently resolved</span>
+    <span class="block-label">{{ t('tr_recent') }}</span>
     <ul class="resolved-list">
       {% for item in stats.recent_resolved %}
       <li>
         <div>
-          <div class="r-title">{{ item.issue_type }}</div>
-          <div class="r-dept">{{ item.department or 'Unassigned' }}</div>
+          <div class="r-title">{{ tv('cat', item.issue_type) }}</div>
+          <div class="r-dept">{{ tv('dept', item.department) if item.department else t('tr_unassigned') }}</div>
         </div>
         <div class="r-date">{{ item.updated_at }}</div>
       </li>
       {% else %}
-      <li><span class="empty-note">Nothing resolved yet — check back soon.</span></li>
+      <li><span class="empty-note">{{ t('tr_nothing') }}</span></li>
       {% endfor %}
     </ul>
   </div>

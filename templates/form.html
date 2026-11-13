@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Report an Issue — Civic Issue Mapper</title>
+<title>{{ t('f_title') }} — Civic Issue Mapper</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --paper-dim:#E1E4DA; --ink:#10151B;
@@ -161,17 +161,20 @@
     .cat-grid{grid-template-columns:1fr 1fr;}
     .nav-links a.text-link{display:none;}
   }
+  /* Hindi: Devanagari font + no letter-spacing (it breaks Devanagari letter joins) */
+  html[lang="hi"] *{font-family:'Noto Sans Devanagari','IBM Plex Sans',sans-serif !important; letter-spacing:normal !important;}
 </style>
 </head>
 <body>
+{% include '_lang_switcher.html' %}
  
 <nav class="nav">
   <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
   <div class="nav-links">
-    <a href="/my_issues" class="text-link">My issues</a>
-    <a href="/notifications" class="text-link">Notifications</a>
-    <a href="/transparency" class="text-link">Transparency</a>
-    <a href="/logout" class="btn btn-ghost">Log out</a>
+    <a href="/my_issues" class="text-link">{{ t('nav_my_issues') }}</a>
+    <a href="/notifications" class="text-link">{{ t('nav_notifications') }}</a>
+    <a href="/transparency" class="text-link">{{ t('nav_transparency') }}</a>
+    <a href="/logout" class="btn btn-ghost">{{ t('nav_logout') }}</a>
   </div>
 </nav>
  
@@ -179,95 +182,95 @@
   <div class="head-glow"></div>
   <div class="smoke s1"></div>
   <div class="smoke s2"></div>
-  <span class="eyebrow">New report</span>
-  <h1>File a complaint,<br><span class="grad">get a ticket in seconds.</span></h1>
-  <p>Pick a category, describe what's wrong, attach a photo, and drop your location. We'll route it to the right department automatically.</p>
+  <span class="eyebrow">{{ t('f_eyebrow') }}</span>
+  <h1>{{ t('f_h1a') }}<br><span class="grad">{{ t('f_h1b') }}</span></h1>
+  <p>{{ t('f_p') }}</p>
 </header>
  
 <div class="wrap">
   <form action="/submit" method="POST" enctype="multipart/form-data" id="reportForm">
  
     <div class="form-block pop-in pop-1">
-      <span class="block-label">// 01 — What's the issue?</span>
+      <span class="block-label">{{ t('f_s1') }}</span>
       <div class="cat-grid">
         <label>
           <input class="cat-option" type="radio" name="issue_type" value="Garbage" required>
           <div class="cat-card">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 12v4M14 12v4"/></svg>
-            <span>Garbage &amp; Dumping</span>
+            <span>{{ t('catl_Garbage') }}</span>
           </div>
         </label>
         <label>
           <input class="cat-option" type="radio" name="issue_type" value="Pothole">
           <div class="cat-card">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="15" rx="7" ry="3"/><path d="M5 15v-1c0-3 3-7 7-7s7 4 7 7v1"/></svg>
-            <span>Potholes &amp; Roads</span>
+            <span>{{ t('catl_Pothole') }}</span>
           </div>
         </label>
         <label>
           <input class="cat-option" type="radio" name="issue_type" value="Water Leakage">
           <div class="cat-card">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>
-            <span>Water Leakage</span>
+            <span>{{ t('catl_Water') }}</span>
           </div>
         </label>
         <label>
           <input class="cat-option" type="radio" name="issue_type" value="Street Light">
           <div class="cat-card">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v6"/><circle cx="12" cy="12" r="3.2"/><path d="M12 15v6M9 21h6"/></svg>
-            <span>Street Lights</span>
+            <span>{{ t('catl_Street') }}</span>
           </div>
         </label>
       </div>
     </div>
  
     <div class="form-block pop-in pop-2">
-      <span class="block-label">// 02 — How urgent is it?</span>
-      <div class="urgency-row" role="radiogroup" aria-label="Issue urgency">
+      <span class="block-label">{{ t('f_s2') }}</span>
+      <div class="urgency-row" role="radiogroup" aria-label="{{ t('f_urg_aria') }}">
         <input class="urgency-option" type="radio" id="urgency-low" name="urgency" value="Low">
-        <label for="urgency-low" class="urgency-pill"><span class="urgency-dot"></span>Low — can wait</label>
+        <label for="urgency-low" class="urgency-pill"><span class="urgency-dot"></span>{{ t('u_low') }}</label>
  
         <input class="urgency-option" type="radio" id="urgency-medium" name="urgency" value="Medium" checked>
-        <label for="urgency-medium" class="urgency-pill"><span class="urgency-dot"></span>Medium — needs attention</label>
+        <label for="urgency-medium" class="urgency-pill"><span class="urgency-dot"></span>{{ t('u_med') }}</label>
  
         <input class="urgency-option" type="radio" id="urgency-high" name="urgency" value="High">
-        <label for="urgency-high" class="urgency-pill"><span class="urgency-dot"></span>High — risk to people</label>
+        <label for="urgency-high" class="urgency-pill"><span class="urgency-dot"></span>{{ t('u_high') }}</label>
  
         <input class="urgency-option" type="radio" id="urgency-critical" name="urgency" value="Critical">
-        <label for="urgency-critical" class="urgency-pill"><span class="urgency-dot"></span>Critical — immediate danger</label>
+        <label for="urgency-critical" class="urgency-pill"><span class="urgency-dot"></span>{{ t('u_crit') }}</label>
       </div>
-      <p class="urgency-hint">Pick honestly — this is what admins use to decide what gets fixed first.</p>
+      <p class="urgency-hint">{{ t('u_hint') }}</p>
     </div>
  
     <div class="form-block pop-in pop-3">
-      <span class="block-label">// 03 — Describe it</span>
-      <textarea name="description" id="descriptionInput" placeholder="e.g. Large pothole in the middle of the road, been growing for two weeks, cars swerving to avoid it." required></textarea>
+      <span class="block-label">{{ t('f_s3') }}</span>
+      <textarea name="description" id="descriptionInput" placeholder="{{ t('f_ph') }}" required></textarea>
     </div>
  
     <div class="form-block pop-in pop-4">
-      <span class="block-label">// 04 — Where is it?</span>
+      <span class="block-label">{{ t('f_s4') }}</span>
       <div class="geo-row">
         <button type="button" class="geo-btn" id="geoBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
-          Use my current location
+          {{ t('geo_btn') }}
         </button>
-        <span class="geo-status" id="geoStatus">No location captured yet</span>
+        <span class="geo-status" id="geoStatus">{{ t('geo_none') }}</span>
       </div>
       <input type="hidden" name="latitude" id="latitude">
       <input type="hidden" name="longitude" id="longitude">
     </div>
  
     <div class="form-block pop-in pop-5">
-      <span class="block-label">// 05 — Add a photo</span>
+      <span class="block-label">{{ t('f_s5') }}</span>
       <div class="upload-zone" id="uploadZone">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
-        <p><strong>Click to upload</strong> or drag a photo here</p>
+        <p><strong>{{ t('up_click') }}</strong> {{ t('up_rest') }}</p>
         <input type="file" name="image" id="imageInput" accept="image/*">
       </div>
-      <div id="previewWrap"><img id="previewImg" alt="Preview of uploaded photo"></div>
+      <div id="previewWrap"><img id="previewImg" alt="{{ t('preview_alt') }}"></div>
     </div>
  
-    <button type="submit" class="submit-btn pop-in pop-6">SUBMIT COMPLAINT <span style="font-size:18px;">→</span></button>
+    <button type="submit" class="submit-btn pop-in pop-6">{{ t('f_submit')|upper }} <span style="font-size:18px;">→</span></button>
     <div id="duplicate-box"
      style="
      display:none;
@@ -281,6 +284,7 @@
 </div>
  
 <script>
+  const I = {{ ({'geo_unsupported': t('geo_unsupported'), 'geo_requesting': t('geo_requesting'), 'geo_ok': t('geo_ok'), 'geo_fail': t('geo_fail'), 'pick_cat': t('pick_cat'), 'ticket': t('ticket'), 'dup_status': t('dup_status'), 'dup_match': t('dup_match'), 'dup_h': t('dup_h'), 'dup_found': t('dup_found'), 'dup_cancel': t('dup_cancel'), 'dup_go': t('dup_go'), 'cat': tv_dict('cat', ['Garbage','Pothole','Water Leakage','Street Light']), 'st': tv_dict('st', ['Pending','In Progress','Resolved'])})|tojson }};
   // cursor sparkle, desktop only
   if(window.matchMedia('(hover:hover)').matches){
     let last = 0;
@@ -334,19 +338,19 @@
   const lngInput = document.getElementById('longitude');
   geoBtn.addEventListener('click', ()=>{
     if(!navigator.geolocation){
-      geoStatus.textContent = 'Geolocation not supported on this browser';
+      geoStatus.textContent = I.geo_unsupported;
       return;
     }
-    geoStatus.textContent = 'Requesting location…';
+    geoStatus.textContent = I.geo_requesting;
     navigator.geolocation.getCurrentPosition(
       pos=>{
         latInput.value = pos.coords.latitude;
         lngInput.value = pos.coords.longitude;
-        geoStatus.innerHTML = '<span class="geo-pulse"></span>Location captured (' + pos.coords.latitude.toFixed(4) + ', ' + pos.coords.longitude.toFixed(4) + ')';
+        geoStatus.innerHTML = '<span class="geo-pulse"></span>' + I.geo_ok + ' (' + pos.coords.latitude.toFixed(4) + ', ' + pos.coords.longitude.toFixed(4) + ')';
         geoStatus.classList.add('ok');
       },
       err=>{
-        geoStatus.textContent = 'Could not get location — please allow access and try again';
+        geoStatus.textContent = I.geo_fail;
       },
       { enableHighAccuracy:true, timeout:10000 }
     );
@@ -387,7 +391,7 @@
     const picked = document.querySelector('input[name="issue_type"]:checked');
     if(!picked){
       e.preventDefault();
-      alert('Please choose a category for your report.');
+      alert(I.pick_cat);
       return;
     }
  
@@ -430,21 +434,21 @@
     const itemsHtml = duplicates.slice(0, 3).map(d => `
       <div class="dup-item">
         <div style="flex:1">
-          <strong>Ticket #${d.id} — ${escapeHtml(d.title)}</strong>
-          <div class="dup-meta">${escapeHtml(d.distance_label)} · status: ${escapeHtml(d.status)}</div>
+          <strong>${escapeHtml(I.ticket)} #${d.id} — ${escapeHtml(I.cat[d.title] || d.title)}</strong>
+          <div class="dup-meta">${escapeHtml(d.distance_label)} · ${escapeHtml(I.dup_status)}: ${escapeHtml(I.st[d.status] || d.status)}</div>
         </div>
-        <div class="match-pct">${Math.round(d.similarity * 100)}% match</div>
+        <div class="match-pct">${Math.round(d.similarity * 100)}% ${escapeHtml(I.dup_match)}</div>
       </div>
     `).join('');
  
     overlay.innerHTML = `
       <div class="dup-modal" role="dialog" aria-modal="true">
-        <h3>This might already be reported</h3>
-        <p class="sub">We found ${duplicates.length} similar complaint${duplicates.length > 1 ? 's' : ''} nearby. Take a look before submitting a new one:</p>
+        <h3>${escapeHtml(I.dup_h)}</h3>
+        <p class="sub">${escapeHtml(I.dup_found.replace('{n}', duplicates.length))}</p>
         ${itemsHtml}
         <div class="dup-actions">
-          <button type="button" class="dup-btn-secondary" id="dupCancelBtn">Cancel, it's a duplicate</button>
-          <button type="button" class="dup-btn-primary" id="dupContinueBtn">Report anyway</button>
+          <button type="button" class="dup-btn-secondary" id="dupCancelBtn">${escapeHtml(I.dup_cancel)}</button>
+          <button type="button" class="dup-btn-primary" id="dupContinueBtn">${escapeHtml(I.dup_go)}</button>
         </div>
       </div>`;
  

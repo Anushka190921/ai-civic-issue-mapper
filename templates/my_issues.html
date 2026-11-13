@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Issues — Civic Issue Mapper</title>
+<title>{{ t('nav_my_issues') }} — Civic Issue Mapper</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#0B2545; --navy-deep:#081B34; --paper:#EDEFE8; --ink:#10151B;
@@ -64,26 +64,29 @@
 
   .empty-state{text-align:center; padding:70px 20px; color:#5c6558;}
   .empty-state a{color:var(--steel); font-weight:600; text-decoration:none;}
+  /* Hindi: Devanagari font + no letter-spacing (it breaks Devanagari letter joins) */
+  html[lang="hi"] *{font-family:'Noto Sans Devanagari','IBM Plex Sans',sans-serif !important; letter-spacing:normal !important;}
 </style>
 </head>
 <body>
+{% include '_lang_switcher.html' %}
 
 <nav class="nav">
   <a href="/" class="nav-brand"><span class="dot-ring"></span>CIVIC / MAPPER</a>
   <div class="nav-links">
-    <a href="/notifications">Notifications</a>
-    <a href="/logout">Log out</a>
-    <a href="/" class="btn-new">+ Report an issue</a>
+    <a href="/notifications">{{ t('nav_notifications') }}</a>
+    <a href="/logout">{{ t('nav_logout') }}</a>
+    <a href="/" class="btn-new">{{ t('nav_report') }}</a>
   </div>
 </nav>
 
 <header class="head">
   <div>
-    <span class="eyebrow">Your tickets</span>
-    <h1>My Issues</h1>
+    <span class="eyebrow">{{ t('mi_eyebrow') }}</span>
+    <h1>{{ t('nav_my_issues') }}</h1>
   </div>
   {% if issues %}
-    <a href="/my_map" class="map-btn">🗺️ View my issues on map</a>
+    <a href="/my_map" class="map-btn">🗺️ {{ t('mi_map') }}</a>
   {% endif %}
 </header>
 
@@ -92,42 +95,42 @@
     {% for i in issues %}
     <div class="issue-card fade-in" style="animation-delay:{{ (loop.index0 * 0.05) }}s;">
       {% if i.image %}
-        <img class="issue-thumb" src="{% if i.image.startswith('http') %}{{ i.image }}{% else %}/static/uploads/{{ i.image }}{% endif %}" alt="Photo of reported issue">
+        <img class="issue-thumb" src="{% if i.image.startswith('http') %}{{ i.image }}{% else %}/static/uploads/{{ i.image }}{% endif %}" alt="{{ t('mi_photo_alt') }}">
       {% else %}
-        <div class="issue-thumb placeholder mono">N/A</div>
+        <div class="issue-thumb placeholder mono">{{ t('n_a') }}</div>
       {% endif %}
       <div style="flex:1;">
         <div class="i-top">
           <div>
-            <span class="i-id">TICKET #{{ i.id }}</span>
-            <div class="i-type">{{ i.issue_type }}</div>
+            <span class="i-id">{{ t('ticket')|upper }} #{{ i.id }}</span>
+            <div class="i-type">{{ tv('cat', i.issue_type) }}</div>
           </div>
           {% if i.status == 'Resolved' %}
-            <span class="badge resolved"><span class="badge-dot"></span>Resolved</span>
+            <span class="badge resolved"><span class="badge-dot"></span>{{ t('st_Resolved') }}</span>
           {% elif i.status == 'In Progress' %}
-            <span class="badge inprogress"><span class="badge-dot"></span>In progress</span>
+            <span class="badge inprogress"><span class="badge-dot"></span>{{ t('st_In Progress') }}</span>
           {% else %}
-            <span class="badge pending"><span class="badge-dot"></span>Pending</span>
+            <span class="badge pending"><span class="badge-dot"></span>{{ t('st_Pending') }}</span>
           {% endif %}
         </div>
         <p class="i-desc">{{ i.description }}</p>
         <div class="i-meta">
-          <span><b>Department:</b> {{ i.department or 'Awaiting assignment' }}</span>
-          <span class="mono">Filed {{ i.created_at }}</span>
+          <span><b>{{ t('dept_label') }}:</b> {{ tv('dept', i.department) if i.department else t('awaiting') }}</span>
+          <span class="mono">{{ t('filed') }} {{ i.created_at }}</span>
         </div>
         <div class="i-actions">
           {% if i.resolution_image %}
-            <a href="{% if i.resolution_image.startswith('http') %}{{ i.resolution_image }}{% else %}/static/uploads/{{ i.resolution_image }}{% endif %}" target="_blank" class="link-btn">View resolution proof</a>
+            <a href="{% if i.resolution_image.startswith('http') %}{{ i.resolution_image }}{% else %}/static/uploads/{{ i.resolution_image }}{% endif %}" target="_blank" class="link-btn">{{ t('view_proof') }}</a>
           {% endif %}
-          <a href="/delete_my_issue/{{ i.id }}" class="link-btn danger" onclick="return confirm('Delete this complaint?');">Delete</a>
+          <a href="/delete_my_issue/{{ i.id }}" class="link-btn danger" onclick='return confirm({{ t("confirm_delete")|tojson }});'>{{ t('delete') }}</a>
         </div>
       </div>
     </div>
     {% endfor %}
   {% else %}
     <div class="empty-state fade-in">
-      <p>You haven't filed any complaints yet.</p>
-      <a href="/">Report your first issue &rarr;</a>
+      <p>{{ t('mi_empty') }}</p>
+      <a href="/">{{ t('mi_first') }} &rarr;</a>
     </div>
   {% endif %}
 </div>
